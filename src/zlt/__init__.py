@@ -32,8 +32,17 @@ from .jacobian import (
     make_local_basis_field,
     observability_report,
     render_fixed_transport_cell,
+    sparse_bilinear_transport,
+    sparse_geometry_image_jacobian,
     support_report,
     topology_event_pixels,
+)
+from .benchmark import (
+    RESOLUTION_SWEEP,
+    benchmark_cpu_reference,
+    benchmark_cuda_resolution,
+    cuda_environment,
+    cuda_equivalence_report,
 )
 
 __all__ = [
@@ -64,6 +73,13 @@ __all__ = [
     "make_local_basis_field",
     "observability_report",
     "render_fixed_transport_cell",
+    "sparse_bilinear_transport",
+    "sparse_geometry_image_jacobian",
     "support_report",
     "topology_event_pixels",
+    "RESOLUTION_SWEEP",
+    "benchmark_cpu_reference",
+    "benchmark_cuda_resolution",
+    "cuda_environment",
+    "cuda_equivalence_report",
 ]

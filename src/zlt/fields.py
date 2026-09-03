@@ -40,8 +40,13 @@ class SphereField:
 
     def sample_surface(self, count: int, generator: torch.Generator) -> Tensor:
         # Random-area sampling is deterministic through the caller-owned generator.
-        z = 2.0 * torch.rand(count, generator=generator, dtype=torch.float64) - 1.0
-        phi = 2.0 * torch.pi * torch.rand(count, generator=generator, dtype=torch.float64)
+        device = generator.device
+        z = 2.0 * torch.rand(
+            count, generator=generator, dtype=torch.float64, device=device
+        ) - 1.0
+        phi = 2.0 * torch.pi * torch.rand(
+            count, generator=generator, dtype=torch.float64, device=device
+        )
         radial = torch.sqrt((1.0 - z * z).clamp_min(0.0))
         return self.radius * torch.stack(
             (radial * torch.cos(phi), radial * torch.sin(phi), z), dim=-1
@@ -69,8 +74,13 @@ class TorusField:
     def sample_surface(self, count: int, generator: torch.Generator) -> Tensor:
         # Uniform parameters are sufficient here: samples are temporary emitters,
         # not the persistent representation of the surface.
-        u = 2.0 * torch.pi * torch.rand(count, generator=generator, dtype=torch.float64)
-        v = 2.0 * torch.pi * torch.rand(count, generator=generator, dtype=torch.float64)
+        device = generator.device
+        u = 2.0 * torch.pi * torch.rand(
+            count, generator=generator, dtype=torch.float64, device=device
+        )
+        v = 2.0 * torch.pi * torch.rand(
+            count, generator=generator, dtype=torch.float64, device=device
+        )
         ring = self.major_radius + self.minor_radius * torch.cos(v)
         return torch.stack(
             (ring * torch.cos(u), ring * torch.sin(u), self.minor_radius * torch.sin(v)),

@@ -67,8 +67,12 @@ def make_local_basis_field(
 
 
 def _tangent_basis(normals: Tensor) -> tuple[Tensor, Tensor]:
-    z_axis = torch.tensor([0.0, 0.0, 1.0], dtype=normals.dtype)
-    y_axis = torch.tensor([0.0, 1.0, 0.0], dtype=normals.dtype)
+    z_axis = torch.tensor(
+        [0.0, 0.0, 1.0], dtype=normals.dtype, device=normals.device
+    )
+    y_axis = torch.tensor(
+        [0.0, 1.0, 0.0], dtype=normals.dtype, device=normals.device
+    )
     helper = torch.where((normals[:, 2].abs() > 0.9)[:, None], y_axis, z_axis)
     tangent = torch.linalg.cross(helper, normals, dim=-1)
     tangent = tangent / torch.linalg.vector_norm(
@@ -82,8 +86,12 @@ def deterministic_directions(
 ) -> Tensor:
     """Reusable low-discrepancy cone directions, ordered emitter-major."""
     emitters = normals.shape[0]
-    packet = torch.arange(packets_per_emitter, dtype=normals.dtype)
-    emitter = torch.arange(emitters, dtype=normals.dtype)[:, None]
+    packet = torch.arange(
+        packets_per_emitter, dtype=normals.dtype, device=normals.device
+    )
+    emitter = torch.arange(
+        emitters, dtype=normals.dtype, device=normals.device
+    )[:, None]
     u = (packet + 0.5) / packets_per_emitter
     cos_theta = u.pow(1.0 / (cone_power + 1.0)).expand(emitters, -1)
     sin_theta = torch.sqrt((1.0 - cos_theta**2).clamp_min(0.0))
@@ -106,24 +114,39 @@ def _photon_batch(
     points: Tensor, directions: Tensor, colors: Tensor, packets_per_emitter: int
 ) -> PhotonBatch:
     emitters = points.shape[0]
-    emitter_ids = torch.arange(emitters).repeat_interleave(packets_per_emitter)
+    emitter_ids = torch.arange(
+        emitters, device=points.device
+    ).repeat_interleave(packets_per_emitter)
     count = emitter_ids.numel()
     return PhotonBatch(
         origins=points[emitter_ids],
         directions=directions,
         colors=colors[emitter_ids],
-        energies=torch.full((count,), 1.0 / packets_per_emitter, dtype=points.dtype),
-        emit_times=torch.zeros(count, dtype=points.dtype),
+        energies=torch.full(
+            (count,),
+            1.0 / packets_per_emitter,
+            dtype=points.dtype,
+            device=points.device,
+        ),
+        emit_times=torch.zeros(count, dtype=points.dtype, device=points.device),
         emitter_ids=emitter_ids,
     )
 
 
 def _owners(trace_pixels: Tensor, arrivals: Tensor, photon_ids: Tensor, pixels: int) -> Tensor:
-    owners = torch.full((pixels,), -1, dtype=torch.long)
-    for pixel in torch.unique(trace_pixels):
-        members = torch.nonzero(trace_pixels == pixel, as_tuple=False).flatten()
-        winner = members[torch.argmin(arrivals[members])]
-        owners[pixel] = photon_ids[winner]
+    missing = torch.iinfo(torch.long).max
+    owners = torch.full(
+        (pixels,), missing, dtype=torch.long, device=trace_pixels.device
+    )
+    minimum_times = torch.full(
+        (pixels,), torch.inf, dtype=arrivals.dtype, device=arrivals.device
+    )
+    minimum_times.scatter_reduce_(0, trace_pixels, arrivals, reduce="amin")
+    winners = arrivals == minimum_times[trace_pixels]
+    owners.scatter_reduce_(
+        0, trace_pixels[winners], photon_ids[winners], reduce="amin"
+    )
+    owners[owners == missing] = -1
     return owners
 
 
@@ -179,11 +202,15 @@ def _topology(
 ) -> tuple[Tensor, Tensor, Tensor]:
     photons = _photon_batch(points, directions, colors, packets_per_emitter)
     valid, _, camera_pixels, _ = camera.intersect(photons.origins, directions)
-    state = torch.full((photons.count,), -1, dtype=torch.long)
+    state = torch.full(
+        (photons.count,), -1, dtype=torch.long, device=points.device
+    )
     state[valid] = camera_pixels[valid]
     trace = trace_photons(field, camera, photons, root_samples=root_samples)
     candidate = torch.nonzero(valid, as_tuple=False).flatten()
-    survived = torch.zeros(photons.count, dtype=torch.bool)
+    survived = torch.zeros(
+        photons.count, dtype=torch.bool, device=points.device
+    )
     survived[trace.photon_ids] = True
     state[candidate[~survived[candidate]]] = -2
     owners = _owners(
@@ -277,6 +304,135 @@ def render_fixed_transport_cell(
     )
 
 
+def sparse_bilinear_transport(
+    cell: FixedTransportCell,
+    points: Tensor,
+) -> tuple[Tensor, Tensor]:
+    """Construct local detector transport directly as sparse COO."""
+    sensor_xy, _ = _continuous_sensor(
+        cell.camera, points[cell.emitter_ids], cell.fixed_directions
+    )
+    fractional = sensor_xy - cell.footprint_base_xy.to(sensor_xy.dtype)
+    dx, dy = fractional.unbind(dim=-1)
+    weights = torch.stack(
+        ((1.0 - dx) * (1.0 - dy), dx * (1.0 - dy), (1.0 - dx) * dy, dx * dy),
+        dim=-1,
+    )
+    valid = cell.footprint_valid & (weights != 0.0)
+    rows = cell.footprint_pixels[valid]
+    columns = cell.emitter_ids[:, None].expand_as(weights)[valid]
+    transport = torch.sparse_coo_tensor(
+        torch.stack((rows, columns)),
+        weights[valid],
+        size=(cell.camera.pixel_count, cell.emitter_colors.shape[0]),
+        dtype=points.dtype,
+        device=points.device,
+    ).coalesce()
+    image = torch.sparse.mm(transport, cell.emitter_colors)
+    return transport, image
+
+
+def sparse_geometry_image_jacobian(
+    field: LocalBasisField,
+    points: Tensor,
+    reference_normals: Tensor,
+    cell: FixedTransportCell,
+    *,
+    threshold: float = 1e-12,
+) -> Tensor:
+    """Build the RGB geometry Jacobian from touched local entries only.
+
+    The largest candidate tensor is proportional to
+    ``winning_photons * 4 footprints * K * 3 channels``; no tensor has a
+    ``3 * image_pixels * K`` shape.  v0.2.1 keeps the validated primary
+    reference-direction transport semantics for this scaling path.
+    """
+    if cell.normal_mode != "reference":
+        raise ValueError("sparse scaling Jacobian requires reference normal mode")
+    dp_dlambda, stable, _ = implicit_position_jacobian(
+        field, points, reference_normals
+    )
+    selected_dp = dp_dlambda[cell.emitter_ids]
+    selected_dp = torch.where(
+        stable[cell.emitter_ids][:, None, None],
+        selected_dp,
+        torch.zeros_like(selected_dp),
+    )
+
+    directions = cell.fixed_directions
+    denominator = directions @ cell.camera.normal
+    right_gradient = (
+        cell.camera.right
+        - (directions @ cell.camera.right)[:, None]
+        * cell.camera.normal
+        / denominator[:, None]
+    )
+    up_gradient = (
+        cell.camera.up
+        - (directions @ cell.camera.up)[:, None]
+        * cell.camera.normal
+        / denominator[:, None]
+    )
+    rows, columns = cell.camera.resolution
+    sensor_gradient = torch.stack(
+        (
+            columns / cell.camera.width * right_gradient,
+            -rows / cell.camera.height * up_gradient,
+        ),
+        dim=1,
+    )
+    dxy_dlambda = torch.einsum("qac,qkc->qka", sensor_gradient, selected_dp)
+
+    sensor_xy, _ = _continuous_sensor(
+        cell.camera, points[cell.emitter_ids], directions
+    )
+    fractional = sensor_xy - cell.footprint_base_xy.to(sensor_xy.dtype)
+    dx, dy = fractional.unbind(dim=-1)
+    weight_gradient = torch.stack(
+        (
+            torch.stack((-(1.0 - dy), -(1.0 - dx)), dim=-1),
+            torch.stack((1.0 - dy, -dx), dim=-1),
+            torch.stack((-dy, 1.0 - dx), dim=-1),
+            torch.stack((dy, dx), dim=-1),
+        ),
+        dim=1,
+    )
+    dweight_dlambda = torch.einsum(
+        "qfa,qka->qfk", weight_gradient, dxy_dlambda
+    )
+    values = (
+        dweight_dlambda[..., None]
+        * cell.emitter_colors[cell.emitter_ids, None, None, :]
+    )
+    parameter_count = field.parameter_count
+    channels = torch.arange(3, device=points.device)
+    output_rows = (
+        cell.footprint_pixels[:, :, None, None] * 3
+        + channels[None, None, None, :]
+    ).expand(-1, -1, parameter_count, -1)
+    parameter_columns = torch.arange(
+        parameter_count, device=points.device
+    )[None, None, :, None].expand_as(output_rows)
+    touched = cell.footprint_valid[:, :, None, None] & (values != 0.0)
+    sparse = torch.sparse_coo_tensor(
+        torch.stack((output_rows[touched], parameter_columns[touched])),
+        values[touched],
+        size=(3 * cell.camera.pixel_count, parameter_count),
+        dtype=points.dtype,
+        device=points.device,
+    ).coalesce()
+    if threshold > 0.0:
+        keep = sparse.values().abs() > threshold
+        sparse = torch.sparse_coo_tensor(
+            sparse.indices()[:, keep],
+            sparse.values()[keep],
+            size=sparse.shape,
+            dtype=points.dtype,
+            device=points.device,
+        ).coalesce()
+    return sparse
+
+
 def geometry_image_jacobian(
     field: LocalBasisField,
     points: Tensor,
@@ -287,7 +443,9 @@ def geometry_image_jacobian(
     dp_dlambda, stable, _ = implicit_position_jacobian(
         field, points, reference_normals
     )
-    zero = torch.zeros(field.parameter_count, dtype=torch.float64)
+    zero = torch.zeros(
+        field.parameter_count, dtype=points.dtype, device=points.device
+    )
 
     def image_from_delta(delta: Tensor) -> Tensor:
         linear_points = points + torch.einsum("ekd,k->ed", dp_dlambda, delta)
@@ -507,7 +665,9 @@ def support_report(
     }
 
     emitter_support = field.basis_values(points) > 0.0
-    predicted = torch.zeros((pixels, parameters), dtype=torch.bool)
+    predicted = torch.zeros(
+        (pixels, parameters), dtype=torch.bool, device=points.device
+    )
     for owner, emitter in enumerate(result.cell.emitter_ids.tolist()):
         footprint = result.cell.footprint_pixels[owner][result.cell.footprint_valid[owner]]
         supported_parameters = torch.nonzero(

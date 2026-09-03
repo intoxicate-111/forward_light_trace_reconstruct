@@ -79,10 +79,14 @@ def emit_photons(
     origins = points.repeat_interleave(packets_per_emitter, dim=0)
     primary = normals.repeat_interleave(packets_per_emitter, dim=0)
     packet_colors = colors.repeat_interleave(packets_per_emitter, dim=0)
-    emitter_ids = torch.arange(emitter_count).repeat_interleave(packets_per_emitter)
+    emitter_ids = torch.arange(
+        emitter_count, device=points.device
+    ).repeat_interleave(packets_per_emitter)
     count = origins.shape[0]
 
-    uniform = torch.rand((count, 2), generator=generator, dtype=points.dtype)
+    uniform = torch.rand(
+        (count, 2), generator=generator, dtype=points.dtype, device=points.device
+    )
     cos_theta = uniform[:, 0].pow(1.0 / (cone_power + 1.0))
     sin_theta = torch.sqrt((1.0 - cos_theta * cos_theta).clamp_min(0.0))
     azimuth = 2.0 * torch.pi * uniform[:, 1]
@@ -93,11 +97,15 @@ def emit_photons(
         + (sin_theta * torch.sin(azimuth))[:, None] * bitangent
     )
     directions = directions / torch.linalg.vector_norm(directions, dim=-1, keepdim=True)
-    energies = torch.full((count,), 1.0 / packets_per_emitter, dtype=points.dtype)
+    energies = torch.full(
+        (count,), 1.0 / packets_per_emitter, dtype=points.dtype, device=points.device
+    )
     if emission_interval == 0.0:
-        emit_times = torch.zeros(count, dtype=points.dtype)
+        emit_times = torch.zeros(count, dtype=points.dtype, device=points.device)
     else:
-        emit_times = emission_interval * torch.rand(count, generator=generator, dtype=points.dtype)
+        emit_times = emission_interval * torch.rand(
+            count, generator=generator, dtype=points.dtype, device=points.device
+        )
     return PhotonBatch(origins, directions, packet_colors, energies, emit_times, emitter_ids)
 
 
@@ -135,7 +143,7 @@ def first_zero_set_intersections(
         changes = (values[:, :-1] * values[:, 1:] <= 0.0) & usable[:, None]
         found = changes.any(dim=1)
         first = changes.to(torch.int64).argmax(dim=1)
-        row = torch.arange(stop - start)
+        row = torch.arange(stop - start, device=origins.device)
         low = times[row, first]
         high = times[row, first + 1]
         low_value = values[row, first]
@@ -167,9 +175,13 @@ def trace_photons(
     camera_valid, camera_times, pixels, _ = camera.intersect(photons.origins, photons.directions)
     candidate_indices = torch.nonzero(camera_valid, as_tuple=False).flatten()
     if candidate_indices.numel() == 0:
-        empty_long = torch.empty(0, dtype=torch.long)
-        empty_float = torch.empty(0, dtype=photons.origins.dtype)
-        empty_color = torch.empty((0, 3), dtype=photons.origins.dtype)
+        empty_long = torch.empty(0, dtype=torch.long, device=photons.origins.device)
+        empty_float = torch.empty(
+            0, dtype=photons.origins.dtype, device=photons.origins.device
+        )
+        empty_color = torch.empty(
+            (0, 3), dtype=photons.origins.dtype, device=photons.origins.device
+        )
         return TraceResult(
             photons.count,
             0,
@@ -227,14 +239,20 @@ def render_first_arrival(
         if mode == "hard":
             local_choice = torch.argmin(local_times)
             chosen_packets.append(packet_indices[local_choice : local_choice + 1])
-            chosen_weights.append(torch.ones(1, dtype=emitter_colors.dtype))
+            chosen_weights.append(
+                torch.ones(1, dtype=emitter_colors.dtype, device=emitter_colors.device)
+            )
         else:
             weights = torch.exp(-beta * (local_times - local_times.min()))
             weights = weights / weights.sum()
             chosen_packets.append(packet_indices)
             chosen_weights.append(weights)
 
-    direct = torch.zeros((pixel_count, 3), dtype=emitter_colors.dtype)
+    direct = torch.zeros(
+        (pixel_count, 3),
+        dtype=emitter_colors.dtype,
+        device=emitter_colors.device,
+    )
     if chosen_packets:
         packets = torch.cat(chosen_packets)
         weights = torch.cat(chosen_weights)
@@ -250,8 +268,10 @@ def render_first_arrival(
         ).coalesce()
     else:
         transport = torch.sparse_coo_tensor(
-            torch.empty((2, 0), dtype=torch.long),
-            torch.empty(0, dtype=emitter_colors.dtype),
+            torch.empty((2, 0), dtype=torch.long, device=emitter_colors.device),
+            torch.empty(
+                0, dtype=emitter_colors.dtype, device=emitter_colors.device
+            ),
             size=(pixel_count, emitter_colors.shape[0]),
         ).coalesce()
     sparse_image = torch.sparse.mm(transport, emitter_colors)

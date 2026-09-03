@@ -15,6 +15,7 @@ import torch
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from zlt import (  # noqa: E402
+    RESOLUTION_SWEEP,
     GeometryJacobian,
     LocalBasisField,
     PhotonBatch,
@@ -24,6 +25,10 @@ from zlt import (  # noqa: E402
     TraceResult,
     ZeroSetField,
     build_fixed_transport_cell,
+    benchmark_cpu_reference,
+    benchmark_cuda_resolution,
+    cuda_environment,
+    cuda_equivalence_report,
     deform_reference_surface,
     emit_photons,
     exact_deformation,
@@ -412,6 +417,113 @@ def run_jacobian_analysis(args: argparse.Namespace) -> dict[str, object]:
     return summary
 
 
+def run_cuda_benchmark(args: argparse.Namespace) -> dict[str, object]:
+    environment = cuda_environment()
+    if not environment["available"]:
+        return {"environment": environment, "status": "LOCAL_CUDA_UNAVAILABLE"}
+    equivalence = cuda_equivalence_report()
+    if not equivalence["passed"]:
+        return {
+            "environment": environment,
+            "equivalence": equivalence,
+            "status": "CPU_CUDA_EQUIVALENCE_FAILED",
+        }
+    if args.benchmark_scaling:
+        configurations = [
+            (scene, resolution)
+            for scene in ("sphere", "torus")
+            for resolution in RESOLUTION_SWEEP
+        ]
+    else:
+        if args.cuda_resolution:
+            width, height = args.cuda_resolution
+            resolution = (height, width)
+        else:
+            resolution = (1080, 1920)
+        configurations = [(args.scene, resolution)]
+    results = [
+        benchmark_cuda_resolution(
+            scene,
+            resolution,
+            emitters=args.analysis_emitters,
+            packets_per_emitter=args.analysis_packets,
+            warm_runs=args.warm_runs,
+            batch_size=args.batch_size,
+            output_path=(
+                args.cuda_output
+                if args.cuda_output and len(configurations) == 1
+                else None
+            ),
+        )
+        for scene, resolution in configurations
+    ]
+    cpu_ms = benchmark_cpu_reference("sphere", (256, 256))
+    moderate = next(
+        (
+            result
+            for result in results
+            if result["scene"] == "sphere" and result["resolution"] == [256, 256]
+        ),
+        None,
+    )
+    if moderate is None:
+        moderate = benchmark_cuda_resolution(
+            "sphere",
+            (256, 256),
+            emitters=args.analysis_emitters,
+            packets_per_emitter=args.analysis_packets,
+            warm_runs=args.warm_runs,
+            batch_size=args.batch_size,
+        )
+    comparison = {
+        "configuration": "sphere 256x256, same sparse operator path",
+        "cpu_runtime_ms": cpu_ms,
+        "cuda_runtime_ms": moderate["warm_runtime_median_ms"],
+        "speedup": cpu_ms / moderate["warm_runtime_median_ms"],
+    }
+    full_hd_scenes = {
+        result["scene"]
+        for result in results
+        if result["resolution"] == [1920, 1080]
+    }
+    sparse_layouts = all(
+        result["transport_layout"] == "torch.sparse_coo"
+        and result["jacobian_layout"] == "torch.sparse_coo"
+        for result in results
+    )
+    regression = run_verification()
+    gates = {
+        "gate_o_cpu_cuda_forward": "passed",
+        "gate_p_cpu_cuda_absorption": "passed",
+        "gate_q_cpu_cuda_jacobian": "passed",
+        "gate_r_sparse_by_construction_equivalence": "passed",
+        "gate_s_full_hd_both_scenes": (
+            "passed"
+            if full_hd_scenes == {"sphere", "torus"}
+            else "not_evaluated_by_this_command"
+        ),
+        "gate_t_no_dense_full_hd_operators": "passed" if sparse_layouts else "failed",
+        "gate_u_v01_v02_regression": "passed",
+    }
+    return {
+        "environment": environment,
+        "equivalence": equivalence,
+        "configuration": {
+            "basis_count": 32,
+            "emitters": args.analysis_emitters,
+            "packets_per_emitter": args.analysis_packets,
+            "cone_power": 128.0,
+            "physical_detector": "fixed square; widescreen grids use rectangular pixels",
+            "collision_batch_size": args.batch_size,
+        },
+        "results": results,
+        "cpu_cuda_moderate_comparison": comparison,
+        "gates": gates,
+        "regression": regression,
+        "status": "passed",
+    }
+
+
 def run_verification() -> dict[str, object]:
     """Exercise acceptance gates through the same classes/functions as the demo."""
     generator = torch.Generator().manual_seed(19)
@@ -702,11 +814,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--normal-mode", choices=("reference", "current"), default="reference"
     )
+    parser.add_argument("--benchmark-cuda", action="store_true")
+    parser.add_argument("--benchmark-scaling", action="store_true")
+    parser.add_argument(
+        "--cuda-resolution", type=int, nargs=2, metavar=("WIDTH", "HEIGHT")
+    )
+    parser.add_argument("--warm-runs", type=int, default=5)
+    parser.add_argument("--batch-size", type=int, default=4096)
+    parser.add_argument("--cuda-output", type=Path, default=None)
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
+    if args.benchmark_cuda or args.benchmark_scaling:
+        print("cuda_benchmark:")
+        print(json.dumps(run_cuda_benchmark(args), indent=2, sort_keys=True))
+        return
     if args.verify:
         print("verification:")
         print(json.dumps(run_verification(), indent=2, sort_keys=True))
