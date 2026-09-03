@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zero-set-light-tracing"
+version = "0.1.0"
+description = "Minimal forward light tracing from analytic zero sets"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Zero-Set Light Tracing contributors"}]
+dependencies = [
+  "torch>=2.1",
+  "matplotlib>=3.7",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
