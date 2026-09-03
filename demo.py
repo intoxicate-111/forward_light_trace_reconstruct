@@ -15,13 +15,27 @@ import torch
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from zlt import (  # noqa: E402
+    GeometryJacobian,
+    LocalBasisField,
     PhotonBatch,
     PlanarCamera,
     SphereField,
     TorusField,
     TraceResult,
+    ZeroSetField,
+    build_fixed_transport_cell,
+    deform_reference_surface,
+    emit_photons,
+    exact_deformation,
+    finite_difference_report,
+    geometry_image_jacobian,
+    implicit_position_jacobian,
+    locality_perturbation_report,
     make_scene,
+    make_local_basis_field,
+    observability_report,
     render_first_arrival,
+    support_report,
     trace_photons,
     unit_normals,
 )
@@ -114,6 +128,290 @@ def run_demo(args: argparse.Namespace) -> tuple[dict[str, object], torch.Tensor]
     return summary, render.direct_image
 
 
+def analysis_camera(
+    position: tuple[float, float, float], scene: str, resolution: int
+) -> PlanarCamera:
+    center = torch.tensor(position, dtype=torch.float64)
+    normal = -center / torch.linalg.vector_norm(center)
+    world_up = torch.tensor([0.0, 1.0, 0.0], dtype=torch.float64)
+    if abs(float(normal @ world_up)) > 0.9:
+        world_up = torch.tensor([0.0, 0.0, 1.0], dtype=torch.float64)
+    right = torch.linalg.cross(normal, world_up)
+    right = right / torch.linalg.vector_norm(right)
+    up = torch.linalg.cross(right, normal)
+    extent = 4.0 if scene == "sphere" else 4.5
+    return PlanarCamera(center, normal, right, up, extent, extent, (resolution, resolution))
+
+
+def analysis_cameras(scene: str, resolution: int) -> list[PlanarCamera]:
+    distance = 3.0 if scene == "sphere" else 3.5
+    unit_positions = [
+        (0.0, 0.0, 1.0),
+        (1.0, 0.0, 0.0),
+        (0.0, 1.0, 0.0),
+        (-1.0, 0.0, 0.0),
+        (0.0, -1.0, 0.0),
+        (2**-0.5, 0.0, 2**-0.5),
+        (-2**-0.5, 0.0, 2**-0.5),
+        (0.0, 2**-0.5, -2**-0.5),
+    ]
+    if scene == "torus":
+        unit_positions = unit_positions[1:] + unit_positions[:1]
+    return [
+        analysis_camera(tuple(distance * value for value in position), scene, resolution)
+        for position in unit_positions
+    ]
+
+
+def prepare_analysis_geometry(
+    scene: str, emitter_count: int, parameter_count: int, support_radius: float | None
+) -> tuple[
+    ZeroSetField,
+    LocalBasisField,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+]:
+    base = SphereField() if scene == "sphere" else TorusField()
+    default_radius = 0.60 if scene == "sphere" else 0.50
+    field = make_local_basis_field(
+        base, parameter_count, support_radius or default_radius
+    )
+    generator = torch.Generator().manual_seed(211)
+    reference_points = base.sample_surface(emitter_count, generator)
+    reference_normals = unit_normals(base, reference_points)
+    points, success, _ = deform_reference_surface(
+        field, reference_points, reference_normals
+    )
+    if not bool(success.all()):
+        raise RuntimeError("baseline reference correspondence failed")
+    colors = base.color(reference_points)
+    return base, field, reference_points, reference_normals, points, colors
+
+
+def implicit_derivative_check(
+    field: LocalBasisField,
+    reference_points: torch.Tensor,
+    reference_normals: torch.Tensor,
+    points: torch.Tensor,
+    parameter_ids: torch.Tensor,
+    *,
+    step: float = 1e-5,
+) -> dict[str, float]:
+    analytic, stable, denominator = implicit_position_jacobian(
+        field, points, reference_normals
+    )
+    errors: list[float] = []
+    for parameter in parameter_ids.tolist():
+        plus = field.coefficients.clone()
+        minus = field.coefficients.clone()
+        plus[parameter] += step
+        minus[parameter] -= step
+        _, plus_points, _ = exact_deformation(
+            field, reference_points, reference_normals, plus
+        )
+        _, minus_points, _ = exact_deformation(
+            field, reference_points, reference_normals, minus
+        )
+        finite_difference = (plus_points - minus_points) / (2.0 * step)
+        affected = (
+            field.basis_values(points)[:, parameter] > 1e-10
+        ) & stable
+        numerator = torch.linalg.vector_norm(
+            finite_difference[affected] - analytic[affected, parameter]
+        )
+        denominator_norm = torch.linalg.vector_norm(
+            analytic[affected, parameter]
+        ).clamp_min(1e-15)
+        errors.append(float(numerator / denominator_norm))
+    values = torch.tensor(errors, dtype=torch.float64)
+    return {
+        "median_relative_error": float(values.median()),
+        "maximum_relative_error": float(values.max()),
+        "degenerate_emitter_fraction": float((~stable).double().mean()),
+        "minimum_denominator_magnitude": float(denominator.abs().min()),
+    }
+
+
+def save_analysis_figures(
+    output_directory: Path,
+    field: LocalBasisField,
+    points: torch.Tensor,
+    results: list[GeometryJacobian],
+) -> list[str]:
+    """Write at most four compact diagnostics; no figures are generated by default."""
+    import matplotlib.pyplot as plt
+
+    output_directory.mkdir(parents=True, exist_ok=True)
+    primary = results[0]
+    response = torch.linalg.vector_norm(
+        primary.matrix.reshape(primary.cell.camera.pixel_count, 3, -1), dim=1
+    )
+    strongest = torch.argsort(torch.linalg.vector_norm(primary.matrix, dim=0))[-4:]
+    written: list[str] = []
+
+    figure = plt.figure(figsize=(5, 4))
+    axis = figure.add_subplot(projection="3d")
+    support = field.basis_values(points)[:, strongest[-1]]
+    axis.scatter(*points.T, c=support, s=5, cmap="viridis")
+    axis.set_title("Example compact zero-set basis support")
+    figure.tight_layout()
+    path = output_directory / "basis_support.png"
+    figure.savefig(path, dpi=150)
+    plt.close(figure)
+    written.append(str(path))
+
+    figure, axes = plt.subplots(1, 4, figsize=(10, 2.7))
+    for axis, parameter in zip(axes, strongest.tolist()):
+        image = response[:, parameter].reshape(primary.cell.camera.resolution)
+        axis.imshow(image, cmap="magma")
+        axis.set_title(f"$J_{{:,{parameter}}}$")
+        axis.axis("off")
+    figure.tight_layout()
+    path = output_directory / "jacobian_columns.png"
+    figure.savefig(path, dpi=150)
+    plt.close(figure)
+    written.append(str(path))
+
+    figure, axis = plt.subplots(figsize=(5, 4))
+    axis.imshow(
+        primary.matrix.abs().numpy() > 1e-12,
+        aspect="auto",
+        interpolation="nearest",
+        cmap="binary",
+    )
+    axis.set_xlabel("geometry parameter")
+    axis.set_ylabel("pixel-color row")
+    axis.set_title("Geometry Jacobian sparsity")
+    figure.tight_layout()
+    path = output_directory / "jacobian_sparsity.png"
+    figure.savefig(path, dpi=150)
+    plt.close(figure)
+    written.append(str(path))
+
+    if len(results) > 1:
+        figure, axis = plt.subplots(figsize=(5, 4))
+        for views in (1, 2, 4, 8):
+            singular_values = torch.linalg.svdvals(
+                torch.cat([result.matrix for result in results[:views]], dim=0)
+            )
+            axis.semilogy(singular_values.numpy(), label=f"{views} view(s)")
+        axis.set_xlabel("singular-value index")
+        axis.set_ylabel("singular value")
+        axis.legend()
+        axis.set_title("Multiview geometry observability")
+        figure.tight_layout()
+        path = output_directory / "singular_spectrum.png"
+        figure.savefig(path, dpi=150)
+        plt.close(figure)
+        written.append(str(path))
+    return written
+
+
+def run_jacobian_analysis(args: argparse.Namespace) -> dict[str, object]:
+    emitter_count = args.analysis_emitters
+    started = time.perf_counter()
+    base, field, reference_points, reference_normals, points, colors = (
+        prepare_analysis_geometry(
+            args.scene, emitter_count, args.basis_count, args.support_radius
+        )
+    )
+    cameras = analysis_cameras(args.scene, args.analysis_resolution)
+    view_total = 8 if args.observability else 1
+    results = []
+    for camera in cameras[:view_total]:
+        cell = build_fixed_transport_cell(
+            field,
+            camera,
+            points,
+            reference_normals,
+            colors,
+            packets_per_emitter=args.analysis_packets,
+            cone_power=args.analysis_cone_power,
+            normal_mode=args.normal_mode,
+            root_samples=args.root_samples,
+        )
+        results.append(
+            geometry_image_jacobian(field, points, reference_normals, cell)
+        )
+    primary = results[0]
+    column_norms = torch.linalg.vector_norm(primary.matrix, dim=0)
+    responsive = torch.nonzero(column_norms > 1e-12, as_tuple=False).flatten()
+    if responsive.numel() < 8:
+        raise RuntimeError("fewer than eight geometry parameters are visible")
+    selected = responsive[torch.argsort(column_norms[responsive], descending=True)[:8]]
+    implicit = implicit_derivative_check(
+        field, reference_points, reference_normals, points, selected
+    )
+    finite_difference = finite_difference_report(
+        field,
+        reference_points,
+        reference_normals,
+        colors,
+        primary,
+        parameter_ids=selected,
+    )
+    support = support_report(field, points, primary)
+    locality = locality_perturbation_report(
+        field, reference_points, reference_normals, primary, selected
+    )
+    response = torch.linalg.vector_norm(
+        primary.matrix.reshape(primary.cell.camera.pixel_count, 3, -1), dim=1
+    )
+    primary_active = response > 1e-12
+    affected_counts = primary_active.sum(dim=0).to(torch.float64)
+    responsive_counts = affected_counts[affected_counts > 0]
+    summary: dict[str, object] = {
+        "scene": args.scene,
+        "normal_mode": args.normal_mode,
+        "basis_count": field.parameter_count,
+        "emitters": emitter_count,
+        "pixels": primary.cell.camera.pixel_count,
+        "emitted_photons": emitter_count * args.analysis_packets,
+        "baseline_absorbed_photons": int((primary.cell.photon_state == -2).sum()),
+        "baseline_absorption_fraction": float(
+            (primary.cell.photon_state == -2).double().mean()
+        ),
+        "jacobian_shape": list(primary.matrix.shape),
+        "jacobian_nnz_rgb_at_1e-12": primary.sparse_matrix._nnz(),
+        "jacobian_density_rgb_at_1e-12": float(
+            (primary.matrix.abs() > 1e-12).double().mean()
+        ),
+        "mean_affected_pixels_per_parameter": float(
+            primary_active.sum(dim=0).to(torch.float64).mean()
+        ),
+        "median_affected_pixels_per_parameter": float(
+            affected_counts.median()
+        ),
+        "mean_affected_pixels_per_responsive_parameter": float(
+            responsive_counts.mean()
+        ),
+        "median_affected_pixels_per_responsive_parameter": float(
+            responsive_counts.median()
+        ),
+        "mean_active_parameters_per_pixel": float(
+            primary_active.sum(dim=1).to(torch.float64).mean()
+        ),
+        "root_failure_fraction": 0.0,
+        "max_zero_set_residual": float(field.value(points).abs().max()),
+        "implicit_derivative": implicit,
+        "image_finite_difference": finite_difference,
+        "support": support,
+        "locality_perturbation": locality,
+    }
+    if args.observability:
+        summary["observability"] = observability_report(
+            [result.matrix for result in results]
+        )
+    if args.analysis_output:
+        summary["figures"] = save_analysis_figures(
+            args.analysis_output, field, points, results
+        )
+    summary["runtime_seconds"] = time.perf_counter() - started
+    return summary
+
+
 def run_verification() -> dict[str, object]:
     """Exercise acceptance gates through the same classes/functions as the demo."""
     generator = torch.Generator().manual_seed(19)
@@ -190,6 +488,7 @@ def run_verification() -> dict[str, object]:
         colors=torch.tensor([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]], dtype=torch.float64),
         energies=torch.ones(2, dtype=torch.float64),
         emitter_ids=torch.tensor([0, 1]),
+        photon_ids=torch.tensor([0, 1]),
     )
     emitter_colors = competition.colors.clone()
     hard = render_first_arrival(competition, 1, emitter_colors, mode="hard")
@@ -227,7 +526,7 @@ def run_verification() -> dict[str, object]:
     assert torch.equal(first_render.transport.values(), second_render.transport.values())
     assert first_render.max_difference < 1e-6
 
-    return {
+    v01_report = {
         "gate_a_zero_set": {
             "sphere_max_abs_F": sphere_zero_error,
             "torus_max_abs_F": torus_zero_error,
@@ -241,6 +540,139 @@ def run_verification() -> dict[str, object]:
         "gate_e_first_arrival": "passed",
         "gate_f_sparse": {"max_difference": first_render.max_difference},
         "gate_g_determinism": "passed",
+    }
+    v02_report = run_v02_verification()
+    return {**v01_report, **v02_report}
+
+
+def run_v02_verification() -> dict[str, object]:
+    base, field, reference_points, reference_normals, points, colors = (
+        prepare_analysis_geometry("sphere", 128, 16, 0.9)
+    )
+    parameter_ids = torch.arange(8)
+
+    outside = field.centers + torch.tensor([1.01, 0.0, 0.0]) * field.radii[:, None]
+    own_outside_values = field.basis_values(outside).diagonal()
+    assert torch.equal(own_outside_values, torch.zeros_like(own_outside_values))
+
+    perturbation = torch.where(
+        torch.arange(field.parameter_count) % 2 == 0,
+        torch.tensor(0.01),
+        torch.tensor(-0.01),
+    ).to(torch.float64)
+    perturbed_field, perturbed_points, success = exact_deformation(
+        field, reference_points, reference_normals, perturbation
+    )
+    deformation_residual = float(perturbed_field.value(perturbed_points).abs().max())
+    assert bool(success.all()) and deformation_residual < 1e-8
+
+    implicit = implicit_derivative_check(
+        field, reference_points, reference_normals, points, parameter_ids
+    )
+    assert implicit["maximum_relative_error"] < 1e-4
+
+    cell = build_fixed_transport_cell(
+        field,
+        analysis_cameras("sphere", 16)[0],
+        points,
+        reference_normals,
+        colors,
+        packets_per_emitter=4,
+        cone_power=32.0,
+    )
+    jacobian = geometry_image_jacobian(field, points, reference_normals, cell)
+    column_norms = torch.linalg.vector_norm(jacobian.matrix, dim=0)
+    responsive = torch.nonzero(column_norms > 1e-12, as_tuple=False).flatten()
+    selected = responsive[torch.argsort(column_norms[responsive], descending=True)[:8]]
+    assert selected.numel() == 8
+    image_fd = finite_difference_report(
+        field,
+        reference_points,
+        reference_normals,
+        colors,
+        jacobian,
+        parameter_ids=selected,
+    )
+    assert image_fd["median_relative_error"] < 1e-3
+    locality = locality_perturbation_report(
+        field, reference_points, reference_normals, jacobian, selected
+    )
+    assert locality["median_local_energy_norm_fraction"] > 0.9
+
+    # Zero coefficients must preserve exact v0.1 sphere and torus transport.
+    regression_absorbed: dict[str, int] = {}
+    for scene, regression_base, count, radius in (
+        ("sphere", base, 128, 0.9),
+        ("torus", TorusField(), 256, 0.5),
+    ):
+        generator = torch.Generator().manual_seed(313)
+        regression_points = regression_base.sample_surface(count, generator)
+        regression_normals = unit_normals(regression_base, regression_points)
+        regression_colors = regression_base.color(regression_points)
+        regression_field = make_local_basis_field(regression_base, 8, radius)
+        regression_photons = emit_photons(
+            regression_points,
+            regression_normals,
+            regression_colors,
+            8,
+            16.0,
+            0.0,
+            generator,
+        )
+        regression_camera = camera_for_scene(scene, 16)
+        base_trace = trace_photons(
+            regression_base, regression_camera, regression_photons, root_samples=32
+        )
+        local_trace = trace_photons(
+            regression_field, regression_camera, regression_photons, root_samples=32
+        )
+        base_render = render_first_arrival(
+            base_trace, regression_camera.pixel_count, regression_colors
+        )
+        local_render = render_first_arrival(
+            local_trace, regression_camera.pixel_count, regression_colors
+        )
+        assert base_trace.absorbed_count == local_trace.absorbed_count
+        assert torch.equal(base_trace.pixels, local_trace.pixels)
+        assert torch.equal(base_trace.arrival_times, local_trace.arrival_times)
+        assert torch.equal(base_render.direct_image, local_render.direct_image)
+        regression_absorbed[scene] = base_trace.absorbed_count
+    assert regression_absorbed["torus"] > 0
+
+    small_jacobians = []
+    for camera in analysis_cameras("sphere", 12):
+        small_cell = build_fixed_transport_cell(
+            field,
+            camera,
+            points,
+            reference_normals,
+            colors,
+            packets_per_emitter=4,
+            cone_power=32.0,
+            root_samples=32,
+        )
+        small_jacobians.append(
+            geometry_image_jacobian(
+                field, points, reference_normals, small_cell
+            ).matrix
+        )
+    observability = observability_report(small_jacobians)
+    return {
+        "gate_h_basis_locality": "passed",
+        "gate_i_zero_set_deformation": {
+            "max_residual": deformation_residual,
+            "root_failure_fraction": float((~success).double().mean()),
+        },
+        "gate_j_implicit_root_derivative": implicit,
+        "gate_k_image_jacobian": image_fd,
+        "gate_l_locality": locality,
+        "gate_m_multiview_rank": {
+            views: observability[views]["rank"] for views in ("1", "2", "4", "8")
+        },
+        "gate_n_v01_regression": {
+            "status": "passed",
+            "absorbed_photons": regression_absorbed,
+        },
     }
 
 
@@ -258,6 +690,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--output", type=Path, default=None, help="optional PNG path")
     parser.add_argument("--verify", action="store_true")
+    parser.add_argument("--jacobian", action="store_true")
+    parser.add_argument("--observability", action="store_true")
+    parser.add_argument("--basis-count", type=int, default=32)
+    parser.add_argument("--support-radius", type=float, default=None)
+    parser.add_argument("--analysis-emitters", type=int, default=256)
+    parser.add_argument("--analysis-packets", type=int, default=8)
+    parser.add_argument("--analysis-cone-power", type=float, default=128.0)
+    parser.add_argument("--analysis-resolution", type=int, default=32)
+    parser.add_argument("--analysis-output", type=Path, default=None)
+    parser.add_argument(
+        "--normal-mode", choices=("reference", "current"), default="reference"
+    )
     return parser.parse_args()
 
 
@@ -266,6 +710,10 @@ def main() -> None:
     if args.verify:
         print("verification:")
         print(json.dumps(run_verification(), indent=2, sort_keys=True))
+    if args.jacobian or args.observability:
+        print("geometry_jacobian:")
+        print(json.dumps(run_jacobian_analysis(args), indent=2, sort_keys=True))
+        return
     summary, _ = run_demo(args)
     print("render:")
     print(json.dumps(summary, indent=2, sort_keys=True))

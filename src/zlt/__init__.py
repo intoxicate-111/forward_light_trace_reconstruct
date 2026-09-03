@@ -1,7 +1,15 @@
 """Zero-Set Forward Light Tracing research prototype."""
 
 from .camera import PlanarCamera
-from .fields import SphereField, TorusField, ZeroSetField, unit_normals
+from .fields import (
+    LocalBasisField,
+    SphereField,
+    TorusField,
+    ZeroSetField,
+    deform_reference_surface,
+    implicit_position_jacobian,
+    unit_normals,
+)
 from .tracer import (
     PhotonBatch,
     RenderResult,
@@ -12,19 +20,50 @@ from .tracer import (
     render_first_arrival,
     trace_photons,
 )
+from .jacobian import (
+    FixedTransportCell,
+    GeometryJacobian,
+    build_fixed_transport_cell,
+    deterministic_directions,
+    exact_deformation,
+    finite_difference_report,
+    geometry_image_jacobian,
+    locality_perturbation_report,
+    make_local_basis_field,
+    observability_report,
+    render_fixed_transport_cell,
+    support_report,
+    topology_event_pixels,
+)
 
 __all__ = [
     "PhotonBatch",
     "PlanarCamera",
     "RenderResult",
+    "LocalBasisField",
     "SphereField",
     "TorusField",
     "TraceResult",
     "ZeroSetField",
     "emit_photons",
+    "deform_reference_surface",
     "first_zero_set_intersections",
+    "implicit_position_jacobian",
     "make_scene",
     "render_first_arrival",
     "trace_photons",
     "unit_normals",
+    "FixedTransportCell",
+    "GeometryJacobian",
+    "build_fixed_transport_cell",
+    "deterministic_directions",
+    "exact_deformation",
+    "finite_difference_report",
+    "geometry_image_jacobian",
+    "locality_perturbation_report",
+    "make_local_basis_field",
+    "observability_report",
+    "render_fixed_transport_cell",
+    "support_report",
+    "topology_event_pixels",
 ]

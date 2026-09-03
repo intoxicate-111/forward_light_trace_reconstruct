@@ -37,6 +37,7 @@ class TraceResult:
     colors: Tensor
     energies: Tensor
     emitter_ids: Tensor
+    photon_ids: Tensor
 
     @property
     def camera_hit_count(self) -> int:
@@ -178,6 +179,7 @@ def trace_photons(
             empty_color,
             empty_float,
             empty_long,
+            empty_long,
         )
 
     absorbed, _ = first_zero_set_intersections(
@@ -199,6 +201,7 @@ def trace_photons(
         photons.colors[survivors],
         photons.energies[survivors],
         photons.emitter_ids[survivors],
+        survivors,
     )
 
 
