@@ -57,7 +57,8 @@ class BatchPolicy:
     alpha: float = 0.10
     tau: float = 0.10
     rho_max: float = 0.15
-    maximum_size: int = 32
+    maximum_size: int | None = 32
+    precompute_gram: bool = False
 
 
 @dataclass
@@ -65,6 +66,8 @@ class CandidateColumns:
     matrices: list[Tensor]
     alignment: Tensor
     seconds: float
+    gram: Tensor | None = None
+    gram_seconds: float = 0.0
 
 
 def _image_digest(images: list[Tensor]) -> str:
@@ -78,6 +81,8 @@ def _candidate_columns(
     context: SequentialContext,
     state: ActiveState,
     targets: list[Tensor],
+    *,
+    precompute_gram: bool = False,
 ) -> CandidateColumns:
     """Rebuild exact sparse candidate columns retained only for one selection."""
     started = time.perf_counter()
@@ -87,6 +92,16 @@ def _candidate_columns(
         device=state.points.device,
     )
     matrices: list[Tensor] = []
+    gram = (
+        torch.zeros(
+            (context.config.master_count, context.config.master_count),
+            dtype=torch.float64,
+            device=state.points.device,
+        )
+        if precompute_gram
+        else None
+    )
+    gram_seconds = 0.0
     for cell, image, target in zip(context.cells, state.images, targets):
         matrix = _local_sparse_jacobian(
             context.master_layout,
@@ -103,12 +118,29 @@ def _candidate_columns(
             matrix.values() * (image - target)[indices[0]],
         )
         matrices.append(matrix)
+        if gram is not None:
+            if state.points.is_cuda:
+                torch.cuda.synchronize()
+            gram_started = time.perf_counter()
+            product = torch.sparse.mm(matrix.transpose(0, 1), matrix)
+            gram += product.to_dense() if product.is_sparse else product
+            if state.points.is_cuda:
+                torch.cuda.synchronize()
+            gram_seconds += time.perf_counter() - gram_started
     if state.points.is_cuda:
         torch.cuda.synchronize()
-    return CandidateColumns(matrices, alignment, time.perf_counter() - started)
+    return CandidateColumns(
+        matrices,
+        alignment,
+        time.perf_counter() - started,
+        gram,
+        gram_seconds,
+    )
 
 
 def _dot_with_all(columns: CandidateColumns, candidate: int, count: int) -> Tensor:
+    if columns.gram is not None:
+        return columns.gram[candidate]
     result = torch.zeros(
         count,
         dtype=columns.alignment.dtype,
@@ -152,7 +184,7 @@ def _select_compatible_batch(
     columns: CandidateColumns | None,
     policy: BatchPolicy,
     round_index: int,
-) -> tuple[Tensor, Tensor, dict[str, float | int]]:
+) -> tuple[Tensor, Tensor, dict[str, float | int | str | None]]:
     remaining_budget = context.config.budget - int(state.active_ids.numel())
     inactive = torch.ones(
         context.config.master_count,
@@ -160,6 +192,7 @@ def _select_compatible_batch(
         device=state.active_ids.device,
     )
     inactive[state.active_ids] = False
+    inactive_count = int(inactive.sum())
     if policy.uniform_schedule:
         nominal = min(policy.uniform_schedule[round_index], remaining_budget)
         selected = torch.nonzero(inactive, as_tuple=False).flatten()[:nominal]
@@ -182,12 +215,28 @@ def _select_compatible_batch(
         return selected, gram, {
             "nominal_batch_size": nominal,
             "actual_batch_size": int(selected.numel()),
+            "p_max_raw": nominal,
+            "p_max_effective": nominal,
+            "p_max_reached": False,
+            "score_floor": None,
+            "terminating_score": None,
+            "stopping_reason": (
+                "TARGET_K_REACHED"
+                if int(selected.numel()) == remaining_budget
+                else "MATCHED_SCHEDULE"
+            ),
             **coupling,
         }
 
+    p_max_raw = (
+        100 * int(state.active_ids.numel())
+        if policy.maximum_size is None
+        else policy.maximum_size
+    )
     nominal = min(
-        policy.maximum_size if policy.dynamic else int(policy.nominal_size or 1),
+        p_max_raw if policy.dynamic else int(policy.nominal_size or 1),
         remaining_budget,
+        inactive_count,
     )
     values = torch.where(
         inactive,
@@ -196,14 +245,21 @@ def _select_compatible_batch(
     )
     order = torch.argsort(values, descending=True, stable=True)
     best_score = float(values[order[0]])
+    score_floor = policy.alpha * best_score if policy.dynamic else None
     selected_ids: list[int] = []
     dot_vectors: list[Tensor] = []
+    pairwise_rejections = 0
+    rho_rejections = 0
+    terminating_score: float | None = None
+    stopping_reason: str | None = None
     for candidate_tensor in order:
         candidate = int(candidate_tensor)
         score = float(values[candidate])
         if not math.isfinite(score):
             break
         if policy.dynamic and selected_ids and score < policy.alpha * best_score:
+            terminating_score = score
+            stopping_reason = "SCORE_FLOOR"
             break
         if selected_ids:
             assert columns is not None
@@ -218,6 +274,7 @@ def _select_compatible_batch(
                 ]
             )
             if float(correlations.max()) > policy.tau:
+                pairwise_rejections += 1
                 continue
             if policy.dynamic:
                 ids = selected_ids + [candidate]
@@ -235,6 +292,7 @@ def _select_compatible_batch(
                     trial[row, -1] = dot_vectors[row][candidate]
                     trial[-1, row] = trial[row, -1]
                 if _coupling_statistics(trial)["rho_off"] > policy.rho_max:
+                    rho_rejections += 1
                     continue
         selected_ids.append(candidate)
         if columns is not None:
@@ -242,6 +300,11 @@ def _select_compatible_batch(
                 _dot_with_all(columns, candidate, context.config.master_count)
             )
         if len(selected_ids) >= nominal:
+            stopping_reason = (
+                "TARGET_K_REACHED"
+                if nominal == remaining_budget
+                else "P_MAX_REACHED"
+            )
             break
     selected = torch.tensor(
         selected_ids, dtype=torch.long, device=state.active_ids.device
@@ -256,9 +319,26 @@ def _select_compatible_batch(
             gram[row, column] = dot_vectors[row][selected_ids[column]]
             gram[column, row] = gram[row, column]
     coupling = _coupling_statistics(gram)
+    if stopping_reason is None:
+        if not selected_ids:
+            stopping_reason = "NO_CANDIDATES"
+        elif rho_rejections:
+            stopping_reason = "RHO_OFF_LIMIT"
+        elif pairwise_rejections:
+            stopping_reason = "PAIRWISE_COUPLING"
+        else:
+            stopping_reason = "NO_CANDIDATES"
     return selected, gram, {
         "nominal_batch_size": nominal,
         "actual_batch_size": size,
+        "p_max_raw": p_max_raw,
+        "p_max_effective": nominal,
+        "p_max_reached": stopping_reason == "P_MAX_REACHED",
+        "score_floor": score_floor,
+        "terminating_score": terminating_score,
+        "pairwise_rejections": pairwise_rejections,
+        "rho_off_rejections": rho_rejections,
+        "stopping_reason": stopping_reason,
         **coupling,
     }
 
@@ -293,6 +373,8 @@ def _run_batch_trajectory(
     context: SequentialContext,
     target: dict[str, object],
     policy: BatchPolicy,
+    *,
+    retain_final_state: bool = False,
 ) -> dict[str, object]:
     device = context.reference_points.device
     if device.type == "cuda":
@@ -313,6 +395,7 @@ def _run_batch_trajectory(
         context.config.initial_optimization_steps,
     )
     scoring_time = 0.0
+    gram_time = 0.0
     scores, diagnostics, seconds = _candidate_scores(
         context, state, target["images"]  # type: ignore[arg-type]
     )
@@ -354,9 +437,13 @@ def _run_batch_trajectory(
         columns = None
         if policy.uniform_schedule or policy.dynamic or (policy.nominal_size or 1) > 1:
             columns = _candidate_columns(
-                context, state, target["images"]  # type: ignore[arg-type]
+                context,
+                state,
+                target["images"],  # type: ignore[arg-type]
+                precompute_gram=policy.precompute_gram,
             )
             scoring_time += columns.seconds
+            gram_time += columns.gram_seconds
         selected, gram, coupling = _select_compatible_batch(
             context, state, scores, columns, policy, len(batches)
         )
@@ -381,6 +468,9 @@ def _run_batch_trajectory(
         at_birth.optimizer_steps = state.optimizer_steps
         at_birth.line_search_failures = state.line_search_failures
         at_birth.cg_failures = state.cg_failures
+        at_birth.accepted_step_sizes = state.accepted_step_sizes
+        at_birth.optimization_loss_pairs = state.optimization_loss_pairs
+        at_birth.cg_iterations_total = state.cg_iterations_total
         jump = float(torch.linalg.vector_norm(at_birth.points - state.points))
         state, optimize_seconds = _optimize(
             context,
@@ -453,6 +543,12 @@ def _run_batch_trajectory(
                 "predicted_batch_gain": predicted_joint,
                 "independent_sum_gain": predicted_sum,
                 "joint_to_independent_ratio": prediction_ratio,
+                "p_max_raw": batch["p_max_raw"],
+                "p_max_effective": batch["p_max_effective"],
+                "p_max_reached": batch["p_max_reached"],
+                "score_floor": batch["score_floor"],
+                "terminating_score": batch["terminating_score"],
+                "stopping_reason": batch["stopping_reason"],
                 "selected_score_min_to_max": batch[
                     "selected_score_min_to_max"
                 ],
@@ -476,7 +572,7 @@ def _run_batch_trajectory(
     )
     sizes = [int(item["actual_batch_size"]) for item in batches]
     total = time.perf_counter() - started
-    return {
+    report = {
         "method": policy.name,
         "rows": rows,
         "batches": batches,
@@ -488,6 +584,7 @@ def _run_batch_trajectory(
         "maximum_batch_size": max(sizes),
         "minimum_batch_size": min(sizes),
         "cumulative_scoring_seconds": scoring_time,
+        "cumulative_batch_gram_seconds": gram_time,
         "cumulative_optimization_seconds": optimization_time,
         "render_evaluation_overhead_seconds": max(
             0.0, total - scoring_time - optimization_time
@@ -529,6 +626,9 @@ def _run_batch_trajectory(
             for _ in range(int(item["actual_batch_size"]))
         ),
     }
+    if retain_final_state:
+        report["_final_state"] = state
+    return report
 
 
 def _report_rows(trajectory: dict[str, object]) -> list[dict[str, object]]:

@@ -19,12 +19,12 @@ from .birth import (
     KScalingConfig,
     _ScalingOptimization,
     _candidate_image_deltas,
-    _conjugate_gradient,
     _gradient,
     _image_loss,
     _images,
     _local_sparse_jacobian,
     _new_only_oracle,
+    _normal_matvec,
     _sparse_column_statistics,
 )
 from .fields import SphereField, unit_normals
@@ -126,6 +126,9 @@ class ActiveState:
     root_failures: int
     line_search_failures: int = 0
     cg_failures: int = 0
+    accepted_step_sizes: tuple[float, ...] = ()
+    optimization_loss_pairs: tuple[tuple[float, float], ...] = ()
+    cg_iterations_total: int = 0
 
 
 def _hierarchical_layout(
@@ -422,6 +425,32 @@ def _active_jacobians(
     ]
 
 
+def _conjugate_gradient_with_count(
+    matrices: list[Tensor],
+    right: Tensor,
+    config: RepeatedBirthConfig,
+) -> tuple[Tensor, int]:
+    """Run the existing stateless CG recurrence and expose its iteration count."""
+    solution = torch.zeros_like(right)
+    residual = right.clone()
+    direction = residual.clone()
+    residual_squared = residual @ residual
+    iterations = 0
+    for _ in range(config.cg_iterations):
+        iterations += 1
+        product = _normal_matvec(matrices, direction, config.damping)
+        alpha = residual_squared / (direction @ product).clamp_min(1e-30)
+        solution = solution + alpha * direction
+        next_residual = residual - alpha * product
+        next_squared = next_residual @ next_residual
+        if float(torch.sqrt(next_squared)) < 1e-10:
+            break
+        direction = next_residual + next_squared / residual_squared * direction
+        residual = next_residual
+        residual_squared = next_squared
+    return solution, iterations
+
+
 def _optimize(
     context: SequentialContext,
     state: ActiveState,
@@ -434,6 +463,9 @@ def _optimize(
     completed = 0
     line_search_failures = state.line_search_failures
     cg_failures = state.cg_failures
+    accepted_step_sizes = list(state.accepted_step_sizes)
+    loss_pairs = list(state.optimization_loss_pairs)
+    cg_iterations_total = state.cg_iterations_total
     components = _active_components(context, state.active_ids)
     for _ in range(steps):
         result = _evaluate_active(
@@ -444,12 +476,16 @@ def _optimize(
             matrices, result.images, targets, state.active_ids.numel()
         )
         gradient_norm = float(torch.linalg.vector_norm(gradient))
-        step = _conjugate_gradient(matrices, -gradient, context.config)  # type: ignore[arg-type]
+        step, cg_iterations = _conjugate_gradient_with_count(
+            matrices, -gradient, context.config
+        )
+        cg_iterations_total += cg_iterations
         if not bool(torch.isfinite(step).all()):
             cg_failures += 1
             break
         accepted = coefficients
         accepted_loss = result.loss
+        accepted_scale = 0.0
         for trial in range(context.config.line_evaluations):
             scale = 0.5**trial
             proposal = (coefficients + scale * step).clamp(
@@ -462,9 +498,12 @@ def _optimize(
             if proposal_state.root_failures == 0 and proposal_state.loss < accepted_loss:
                 accepted = proposal
                 accepted_loss = proposal_state.loss
+                accepted_scale = scale
         relative = (result.loss - accepted_loss) / max(result.loss, 1e-30)
         if accepted_loss >= result.loss:
             line_search_failures += 1
+        accepted_step_sizes.append(accepted_scale)
+        loss_pairs.append((result.loss, accepted_loss))
         coefficients = accepted
         completed += 1
         result.last_relative_improvement = relative
@@ -483,6 +522,9 @@ def _optimize(
     result.gradient_norm = gradient_norm if completed else math.inf
     result.line_search_failures = line_search_failures
     result.cg_failures = cg_failures
+    result.accepted_step_sizes = tuple(accepted_step_sizes)
+    result.optimization_loss_pairs = tuple(loss_pairs)
+    result.cg_iterations_total = cg_iterations_total
     torch.cuda.synchronize() if result.points.is_cuda else None
     return result, time.perf_counter() - started
 
@@ -762,9 +804,12 @@ def _checkpoint_row(
         "minimum_denominator_magnitude": float(state.denominator.abs().min()),
         "line_search_failures": state.line_search_failures,
         "cg_failures": state.cg_failures,
+        "cg_iterations": state.cg_iterations_total,
     }
     if context.geometry_evaluator is not None:
+        geometry_started = time.perf_counter()
         row.update(context.geometry_evaluator(state.points))
+        row["geometry_evaluation_seconds"] = time.perf_counter() - geometry_started
     return row
 
 

@@ -583,7 +583,7 @@ def _diagnostic_optimize(
     state: ActiveState,
     targets: list[Tensor],
     steps: int,
-) -> tuple[ActiveState, dict[str, float | int]]:
+) -> tuple[ActiveState, dict[str, object]]:
     device = state.points.device
     _sync(device)
     total_started = time.perf_counter()
@@ -593,6 +593,8 @@ def _diagnostic_optimize(
     cg_iterations = 0
     line_search_failures = state.line_search_failures
     cg_failures = state.cg_failures
+    accepted_step_sizes: list[float] = []
+    loss_pairs: list[list[float]] = []
     evaluation_seconds = 0.0
     active_jacobian_seconds = 0.0
     linear_solve_seconds = 0.0
@@ -624,6 +626,7 @@ def _diagnostic_optimize(
             break
         accepted = coefficients
         accepted_loss = result.loss
+        accepted_scale = 0.0
         for trial in range(context.config.line_evaluations):
             scale = 0.5**trial
             proposal = (coefficients + scale * step).clamp(
@@ -642,9 +645,12 @@ def _diagnostic_optimize(
             ):
                 accepted = proposal
                 accepted_loss = proposal_state.loss
+                accepted_scale = scale
         relative = (result.loss - accepted_loss) / max(result.loss, 1e-30)
         if accepted_loss >= result.loss:
             line_search_failures += 1
+        accepted_step_sizes.append(accepted_scale)
+        loss_pairs.append([result.loss, accepted_loss])
         coefficients = accepted
         completed += 1
         if (
@@ -671,6 +677,8 @@ def _diagnostic_optimize(
         "render_evaluation_seconds": evaluation_seconds,
         "active_jacobian_seconds": active_jacobian_seconds,
         "linear_solve_seconds": linear_solve_seconds,
+        "accepted_step_sizes": accepted_step_sizes,
+        "optimization_loss_pairs": loss_pairs,
     }
 
 
@@ -895,6 +903,9 @@ def _operator_diagnostics(
                 ("min", "p10", "median", "p90", "max"), quantiles
             )
         },
+        "candidate_column_norm_mean": float(norm_values.mean())
+        if norm_values.numel()
+        else 0.0,
         "affected_pixels_per_candidate_mean": float(
             affected_pixels[responsive].to(torch.float64).mean()
         )
@@ -934,6 +945,8 @@ def _operator_diagnostics(
         else math.inf,
         "mutual_column_cosine_max": float(mutual.max()),
         "mutual_column_cosine_median": float(mutual.median()),
+        "mutual_column_cosine_p95": float(torch.quantile(mutual, 0.95)),
+        "mutual_column_cosine_p99": float(torch.quantile(mutual, 0.99)),
         "candidate_pair_fraction_cosine_gt_0.05": float(
             (mutual > 0.05).to(torch.float64).mean()
         ),

@@ -121,6 +121,21 @@ def nested_deterministic_directions(
     """
     if packets_per_emitter < 1:
         raise ValueError("packets_per_emitter must be positive")
+    return nested_deterministic_direction_block(
+        normals, packets_per_emitter, cone_power, emitter_offset=0
+    )
+
+
+def nested_deterministic_direction_block(
+    normals: Tensor,
+    packets_per_emitter: int,
+    cone_power: float,
+    *,
+    emitter_offset: int,
+) -> Tensor:
+    """Generate one emitter block without changing the global sequence."""
+    if packets_per_emitter < 1:
+        raise ValueError("packets_per_emitter must be positive")
     emitters = normals.shape[0]
     packet = torch.arange(
         packets_per_emitter, dtype=normals.dtype, device=normals.device
@@ -132,7 +147,10 @@ def nested_deterministic_directions(
     sin_theta = torch.sqrt((1.0 - cos_theta**2).clamp_min(0.0))
     golden_ratio = (1.0 + 5.0**0.5) / 2.0
     emitter = torch.arange(
-        emitters, dtype=normals.dtype, device=normals.device
+        emitter_offset,
+        emitter_offset + emitters,
+        dtype=normals.dtype,
+        device=normals.device,
     )[:, None]
     phase = torch.frac(packet[None, :] / golden_ratio + emitter / golden_ratio**2)
     azimuth = 2.0 * torch.pi * phase
@@ -146,6 +164,39 @@ def nested_deterministic_directions(
         directions, dim=-1, keepdim=True
     )
     return directions.reshape(-1, 3)
+
+
+def nested_deterministic_directions_for_ids(
+    normals: Tensor,
+    emitter_ids: Tensor,
+    packet_ids: Tensor,
+    packets_per_emitter: int,
+    cone_power: float,
+) -> Tensor:
+    """Regenerate selected global nested directions without the full array."""
+    if emitter_ids.shape != packet_ids.shape:
+        raise ValueError("emitter_ids and packet_ids must have matching shapes")
+    sobol = torch.quasirandom.SobolEngine(dimension=1, scramble=False)
+    radial = sobol.draw(
+        packets_per_emitter + 1, dtype=normals.dtype
+    )[1:, 0].to(normals.device)
+    selected_normals = normals[emitter_ids]
+    packet = packet_ids.to(normals.dtype)
+    emitter = emitter_ids.to(normals.dtype)
+    cos_theta = radial[packet_ids].pow(1.0 / (cone_power + 1.0))
+    sin_theta = torch.sqrt((1.0 - cos_theta**2).clamp_min(0.0))
+    golden_ratio = (1.0 + 5.0**0.5) / 2.0
+    phase = torch.frac(packet / golden_ratio + emitter / golden_ratio**2)
+    azimuth = 2.0 * torch.pi * phase
+    tangent, bitangent = _tangent_basis(selected_normals)
+    directions = (
+        cos_theta[:, None] * selected_normals
+        + (sin_theta * torch.cos(azimuth))[:, None] * tangent
+        + (sin_theta * torch.sin(azimuth))[:, None] * bitangent
+    )
+    return directions / torch.linalg.vector_norm(
+        directions, dim=-1, keepdim=True
+    )
 
 
 def _photon_batch(

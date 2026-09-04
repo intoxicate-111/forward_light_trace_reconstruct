@@ -616,6 +616,22 @@ def run_observation_bandwidth_analysis(
     )
 
 
+def run_natural_multiview_analysis(
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    from zlt.mesh_field import obtain_stanford_bunny
+    from zlt.natural import run_natural_multiview_experiment
+
+    mesh_path = args.bunny_mesh
+    if mesh_path is None:
+        mesh_path = obtain_stanford_bunny(args.bunny_cache)
+    return run_natural_multiview_experiment(
+        mesh_path,
+        args.bunny_artifacts,
+        args.bunny_figures,
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -764,8 +780,10 @@ def run_verification() -> dict[str, object]:
     locality_report = locality_cpu_verification()
     sequential_report = sequential_cpu_verification()
     from zlt.bandwidth import bandwidth_cpu_verification
+    from zlt.natural import natural_cpu_verification
 
     bandwidth_report = bandwidth_cpu_verification()
+    natural_report = natural_cpu_verification()
     return {
         **v01_report,
         **v02_report,
@@ -773,6 +791,7 @@ def run_verification() -> dict[str, object]:
         "gate_w_sparse_locality_equivalence": locality_report,
         "gate_x_true_parameter_birth": sequential_report,
         "gate_y_nested_observation_sampling": bandwidth_report,
+        "gate_z_natural_multiview_nesting": natural_report,
     }
 
 
@@ -967,6 +986,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--bunny", action="store_true")
     parser.add_argument("--batch-birth", action="store_true")
     parser.add_argument("--observation-bandwidth", action="store_true")
+    parser.add_argument("--natural-multiview", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -989,6 +1009,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.natural_multiview:
+        report = run_natural_multiview_analysis(args)
+        print("natural_multiview_analysis:")
+        print(json.dumps(report["verdicts"], indent=2, sort_keys=True))
+        return
     if args.observation_bandwidth:
         report = run_observation_bandwidth_analysis(args)
         print("observation_bandwidth_analysis:")
