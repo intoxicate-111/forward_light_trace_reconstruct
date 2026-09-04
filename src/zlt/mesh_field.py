@@ -7,6 +7,7 @@ import io
 import math
 import tarfile
 import urllib.request
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -93,6 +94,42 @@ def _trilinear(data: Tensor, points: Tensor, lower: Tensor, upper: Tensor) -> Te
     return output.reshape(*shape, *data.shape[3:])
 
 
+def _trilinear_scalar_gradient(
+    data: Tensor, points: Tensor, lower: Tensor, upper: Tensor
+) -> Tensor:
+    """Evaluate the exact spatial derivative of a trilinear scalar interpolant."""
+    shape = points.shape[:-1]
+    flat_points = points.reshape(-1, 3)
+    dimensions = torch.tensor(
+        data.shape, dtype=points.dtype, device=points.device
+    )
+    coordinate = (flat_points - lower) / (upper - lower) * (dimensions - 1.0)
+    maximum = dimensions.to(torch.long) - 2
+    index = torch.floor(coordinate).to(torch.long)
+    index = torch.minimum(torch.maximum(index, torch.zeros_like(index)), maximum)
+    fraction = (coordinate - index.to(points.dtype)).clamp(0.0, 1.0)
+    scale = (dimensions - 1.0) / (upper - lower)
+    nx, ny, nz = data.shape
+    flattened = data.reshape(-1)
+    output = torch.zeros(
+        (flat_points.shape[0], 3), dtype=data.dtype, device=data.device
+    )
+    for dx in (0, 1):
+        wx = fraction[:, 0] if dx else 1.0 - fraction[:, 0]
+        for dy in (0, 1):
+            wy = fraction[:, 1] if dy else 1.0 - fraction[:, 1]
+            for dz in (0, 1):
+                wz = fraction[:, 2] if dz else 1.0 - fraction[:, 2]
+                linear = (
+                    (index[:, 0] + dx) * ny + index[:, 1] + dy
+                ) * nz + index[:, 2] + dz
+                value = flattened[linear]
+                output[:, 0] += value * (1.0 if dx else -1.0) * wy * wz * scale[0]
+                output[:, 1] += value * wx * (1.0 if dy else -1.0) * wz * scale[1]
+                output[:, 2] += value * wx * wy * (1.0 if dz else -1.0) * scale[2]
+    return output.reshape(*shape, 3)
+
+
 @dataclass(frozen=True)
 class GridZeroSetField:
     """A fixed trilinear scalar field; learned distance semantics are not used."""
@@ -121,6 +158,11 @@ class GridZeroSetField:
 
     def gradient(self, points: Tensor) -> Tensor:
         return _trilinear(self.gradient_grid, points, self.lower, self.upper)
+
+    def interpolant_gradient(self, points: Tensor) -> Tensor:
+        return _trilinear_scalar_gradient(
+            self.grid, points, self.lower, self.upper
+        )
 
     def hierarchical_surface_points(
         self, count: int, device: torch.device
@@ -378,6 +420,41 @@ def prepare_stanford_bunny(
         np.asarray(repaired.vertices),
         np.asarray(repaired.faces),
         gt_field,
+        base_field,
+    )
+
+
+def resmooth_stanford_bunny(
+    prepared: PreparedBunny,
+    sigma_voxels: float,
+) -> PreparedBunny:
+    """Reuse a prepared GT grid while changing only the fixed coarse base."""
+    from scipy.ndimage import gaussian_filter
+
+    if sigma_voxels <= 0.0:
+        raise ValueError("Bunny smoothing sigma must be positive")
+    gt_values = prepared.gt_field.grid.detach().cpu().numpy()
+    base_values = gaussian_filter(gt_values, sigma=sigma_voxels)
+    lower = float(prepared.gt_field.lower[0])
+    upper = float(prepared.gt_field.upper[0])
+    base_field, base_stats = _grid_field(base_values, lower, upper)
+    metadata = deepcopy(prepared.metadata)
+    resolution = int(gt_values.shape[0])
+    metadata["base"] = {
+        "construction": "fixed Gaussian smoothing of the GT proxy grid",
+        "gaussian_sigma_voxels": sigma_voxels,
+        "effective_sigma_world": sigma_voxels
+        * ((upper - lower) / (resolution - 1)),
+        "surface": base_stats,
+    }
+    return PreparedBunny(
+        prepared.mesh_path,
+        metadata,
+        prepared.original_vertices,
+        prepared.original_faces,
+        prepared.repaired_vertices,
+        prepared.repaired_faces,
+        prepared.gt_field,
         base_field,
     )
 

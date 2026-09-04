@@ -349,6 +349,10 @@ def _build_bunny_context(
     detail_ids = torch.nonzero(
         center_displacement.abs() >= detail_threshold, as_tuple=False
     ).flatten()
+    top_ten_threshold = torch.quantile(center_displacement.abs(), 0.90)
+    detail_ids_top_ten = torch.nonzero(
+        center_displacement.abs() >= top_ten_threshold, as_tuple=False
+    ).flatten()
     evaluator = BunnyGeometryEvaluator(
         prepared, reference_points, reference_normals, config.evaluation_samples
     )
@@ -371,7 +375,9 @@ def _build_bunny_context(
         "seed": 0,
         "points": target_points,
         "images": target_images,
+        "transport_cells": target_transports,
         "detail_ids": detail_ids,
+        "detail_ids_top_ten": detail_ids_top_ten,
         "rms": float(torch.sqrt((target_displacement**2).mean())),
         "initial_loss": _image_loss(_images(context.cells, reference_points), target_images),
     }

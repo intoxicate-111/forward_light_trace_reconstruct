@@ -586,6 +586,20 @@ def run_bunny_analysis(args: argparse.Namespace) -> dict[str, object]:
     )
 
 
+def run_batch_birth_analysis(args: argparse.Namespace) -> dict[str, object]:
+    from zlt.batch import run_batch_birth_experiment
+    from zlt.mesh_field import obtain_stanford_bunny
+
+    mesh_path = args.bunny_mesh
+    if mesh_path is None:
+        mesh_path = obtain_stanford_bunny(args.bunny_cache)
+    return run_batch_birth_experiment(
+        mesh_path,
+        args.bunny_artifacts,
+        args.bunny_figures,
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -931,6 +945,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repeated-birth-figures", type=Path, default=None)
     parser.add_argument("--skip-oracle-greedy", action="store_true")
     parser.add_argument("--bunny", action="store_true")
+    parser.add_argument("--batch-birth", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -953,6 +968,24 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.batch_birth:
+        report = run_batch_birth_analysis(args)
+        phase_b = report["phase_b"]
+        print("batch_birth_analysis:")
+        print(
+            json.dumps(
+                {
+                    "phase_a": report["phase_a"]["verdict"],
+                    "best_multi_birth": report["phase_a"]["best_multi_birth"],
+                    "phase_b": phase_b
+                    if isinstance(phase_b, str)
+                    else phase_b["verdict"],
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return
     if args.bunny:
         report = run_bunny_analysis(args)
         print("bunny_birth_analysis:")

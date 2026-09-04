@@ -76,6 +76,7 @@ class RepeatedBirthConfig:
     root_samples: int = 32
     root_bisection_steps: int = 20
     deformation_iterations: int = 10
+    deformation_max_offset: float = 0.03
     oracle_master_count: int = 256
     oracle_births: int = 32
     oracle_evaluations: int = 5
@@ -289,7 +290,7 @@ def _evaluate_active(
     )
     points, success, _, denominator = field.deform(
         iterations=context.config.deformation_iterations,
-        max_offset=0.03,
+        max_offset=context.config.deformation_max_offset,
     )
     images = _images(context.cells, points)
     loss = _image_loss(images, targets) if targets is not None else math.nan
@@ -323,7 +324,9 @@ def _normalize_target(
     def evaluate(scale: float) -> tuple[Tensor, Tensor, float, bool]:
         coefficients = scale * raw
         field = template.with_coefficients(coefficients)
-        points, success, displacement, _ = field.deform(max_offset=0.03)
+        points, success, displacement, _ = field.deform(
+            max_offset=context.config.deformation_max_offset
+        )
         rms = float(torch.sqrt((displacement * displacement).mean()))
         return coefficients, points, rms, bool(success.all())
 
