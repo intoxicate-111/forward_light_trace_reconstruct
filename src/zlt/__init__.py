@@ -44,7 +44,12 @@ from .benchmark import (
     cuda_environment,
     cuda_equivalence_report,
 )
-from .birth import BirthConfig, run_birth_experiment
+from .birth import (
+    BirthConfig,
+    KScalingConfig,
+    run_birth_experiment,
+    run_k_scaling_experiment,
+)
 from .multiview import (
     CAMERA_COUNTS,
     CameraTransport,
@@ -57,6 +62,7 @@ from .multiview import (
     run_multiview_benchmark,
     validate_multiview_equivalence,
 )
+from .locality import locality_cpu_verification
 
 __all__ = [
     "PhotonBatch",
@@ -96,7 +102,9 @@ __all__ = [
     "cuda_environment",
     "cuda_equivalence_report",
     "BirthConfig",
+    "KScalingConfig",
     "run_birth_experiment",
+    "run_k_scaling_experiment",
     "CAMERA_COUNTS",
     "CameraTransport",
     "MultiviewConfig",
@@ -107,4 +115,5 @@ __all__ = [
     "project_camera",
     "run_multiview_benchmark",
     "validate_multiview_equivalence",
+    "locality_cpu_verification",
 ]

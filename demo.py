@@ -18,6 +18,7 @@ from zlt import (  # noqa: E402
     RESOLUTION_SWEEP,
     BirthConfig,
     GeometryJacobian,
+    KScalingConfig,
     LocalBasisField,
     MultiviewConfig,
     PhotonBatch,
@@ -38,12 +39,14 @@ from zlt import (  # noqa: E402
     geometry_image_jacobian,
     implicit_position_jacobian,
     locality_perturbation_report,
+    locality_cpu_verification,
     make_scene,
     make_local_basis_field,
     multiview_cpu_verification,
     observability_report,
     render_first_arrival,
     run_birth_experiment,
+    run_k_scaling_experiment,
     run_multiview_benchmark,
     support_report,
     trace_photons,
@@ -543,6 +546,16 @@ def run_birth_analysis(args: argparse.Namespace) -> dict[str, object]:
     )
 
 
+def run_k_scaling_analysis(args: argparse.Namespace) -> dict[str, object]:
+    config = KScalingConfig(k_values=tuple(args.k_values))
+    return run_k_scaling_experiment(
+        config,
+        csv_path=args.k_scaling_csv,
+        json_path=args.k_scaling_json,
+        figure_directory=args.k_scaling_figures,
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -688,10 +701,12 @@ def run_verification() -> dict[str, object]:
     }
     v02_report = run_v02_verification()
     multiview_report = multiview_cpu_verification()
+    locality_report = locality_cpu_verification()
     return {
         **v01_report,
         **v02_report,
         "gate_v_shared_multiview_equivalence": multiview_report,
+        "gate_w_sparse_locality_equivalence": locality_report,
     }
 
 
@@ -867,6 +882,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--birth-oracle-iterations", type=int, default=5)
     parser.add_argument("--birth-csv", type=Path, default=None)
     parser.add_argument("--birth-figures", type=Path, default=None)
+    parser.add_argument("--birth-k-scaling", action="store_true")
+    parser.add_argument(
+        "--k-values",
+        type=int,
+        nargs="+",
+        default=[32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768],
+    )
+    parser.add_argument("--k-scaling-csv", type=Path, default=None)
+    parser.add_argument("--k-scaling-json", type=Path, default=None)
+    parser.add_argument("--k-scaling-figures", type=Path, default=None)
     parser.add_argument("--benchmark-multiview", action="store_true")
     parser.add_argument(
         "--multiview-resolution",
@@ -883,6 +908,10 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.birth_k_scaling:
+        print("prebirth_k_scaling:")
+        print(json.dumps(run_k_scaling_analysis(args), indent=2, sort_keys=True))
+        return
     if args.benchmark_multiview:
         print("multiview_benchmark:")
         print(json.dumps(run_multiview_analysis(args), indent=2, sort_keys=True))

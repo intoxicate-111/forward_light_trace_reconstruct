@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import math
 import statistics
 import time
@@ -20,12 +21,33 @@ from .fields import (
 )
 from .jacobian import (
     FixedTransportCell,
+    _continuous_sensor,
+    _photon_batch,
     build_fixed_transport_cell,
+    deterministic_directions,
     make_local_basis_field,
     render_fixed_transport_cell,
     sparse_geometry_image_jacobian,
     topology_event_pixels,
 )
+from .locality import (
+    BasisLayout,
+    LocalZeroSet,
+    SupportPairs,
+    hierarchical_surface_points,
+    make_support,
+    support_radius,
+    wendland_gradients,
+    wendland_values,
+)
+from .multiview import (
+    MultiviewConfig,
+    SceneTransportState,
+    multiview_cameras as shared_multiview_cameras,
+    project_camera,
+)
+from .benchmark import BenchmarkGeometry, cuda_environment
+from .tracer import PhotonBatch, first_zero_set_intersections
 
 
 Tensor = torch.Tensor
@@ -1027,3 +1049,1534 @@ def run_birth_experiment(
         },
         "status": "completed",
     }
+
+
+# v0.3b deliberately uses a separate sparse/local path.  The v0.3a functions
+# above remain unchanged so its committed artifact stays reproducible.
+
+
+@dataclass(frozen=True)
+class KScalingConfig:
+    k_values: tuple[int, ...] = (
+        32,
+        64,
+        128,
+        256,
+        512,
+        1024,
+        2048,
+        4096,
+        8192,
+        16384,
+        32768,
+    )
+    views: int = 8
+    resolution: int = 256
+    emitters_per_basis: int = 8
+    packets_per_emitter: int = 8
+    maximum_photons: int = 262144
+    base_support_radius: float = 0.60
+    target_rms_displacement: float = 0.003
+    coefficient_limit: float = 0.015
+    support_margin: float = 0.005
+    baseline_iterations: int = 6
+    cg_iterations: int = 12
+    damping: float = 1e-8
+    oracle_evaluations: int = 17
+    unbiased_oracle_size: int = 128
+    exhaustive_candidate_limit: int = 1024
+    root_samples: int = 32
+    root_bisection_steps: int = 20
+    known_failed_k: int | None = None
+    known_failure_reason: str | None = None
+
+
+@dataclass
+class _ScalingContext:
+    k: int
+    base: SphereField
+    current_layout: BasisLayout
+    target_layout: BasisLayout
+    candidate_layout: BasisLayout
+    current_support: SupportPairs
+    target_support: SupportPairs
+    candidate_support: SupportPairs
+    reference_points: Tensor
+    reference_normals: Tensor
+    colors: Tensor
+    cells: list[FixedTransportCell]
+    cameras: list[PlanarCamera]
+    state: SceneTransportState
+    geometry: BenchmarkGeometry
+    packets_per_emitter: int
+    candidate_labels: list[str]
+    candidate_target_ids: Tensor
+    redundant_id: int
+    invisible_id: int
+
+
+@dataclass
+class _ScalingOptimization:
+    coefficients: Tensor
+    points: Tensor
+    denominator: Tensor
+    images: list[Tensor]
+    loss: float
+    initial_loss: float
+    iterations: int
+    last_step_relative_improvement: float
+    gradient_norm: float
+    root_failures: int
+
+
+def _scaling_packets(k: int, config: KScalingConfig) -> int:
+    emitters = config.emitters_per_basis * k
+    return max(
+        1,
+        min(config.packets_per_emitter, config.maximum_photons // emitters),
+    )
+
+
+def _scaling_layouts(
+    k: int, config: KScalingConfig, device: torch.device
+) -> tuple[BasisLayout, BasisLayout, BasisLayout, list[str], Tensor, int, int]:
+    base = SphereField()
+    # Emitters use the first 8K Sobol points.  The invisible control is taken
+    # beyond that prefix and given a tiny radius, rather than accidentally
+    # placing it exactly on a sampled emitter.
+    master = hierarchical_surface_points(base, 10 * k + 1, device)
+    current_radius = support_radius(config.base_support_radius, k)
+    target_radius = support_radius(config.base_support_radius, 2 * k)
+    current = BasisLayout(
+        master[:k],
+        torch.full((k,), current_radius, dtype=torch.float64, device=device),
+    )
+    target = BasisLayout(
+        master[: 2 * k],
+        torch.full((2 * k,), target_radius, dtype=torch.float64, device=device),
+    )
+    candidate_centers = torch.cat((master[k : 2 * k], master[2 * k : 3 * k]))
+    candidate_radii = torch.full(
+        (2 * k,), target_radius, dtype=torch.float64, device=device
+    )
+    labels = ["missing_detail" for _ in range(k)] + [
+        "distractor" for _ in range(k)
+    ]
+    target_ids = torch.cat(
+        (
+            torch.arange(k, 2 * k, device=device),
+            torch.full((k,), -1, dtype=torch.long, device=device),
+        )
+    )
+    redundant_id = k
+    invisible_id = 2 * k - 1
+    candidate_centers[redundant_id] = current.centers[0]
+    candidate_radii[redundant_id] = current.radii[0]
+    labels[redundant_id] = "redundant_control"
+    candidate_centers[invisible_id] = master[10 * k]
+    candidate_radii[invisible_id] = 0.03 * target_radius
+    labels[invisible_id] = "invisible_control"
+    candidates = BasisLayout(candidate_centers, candidate_radii)
+    return current, target, candidates, labels, target_ids, redundant_id, invisible_id
+
+
+def _build_scaling_context(
+    k: int, config: KScalingConfig, device: torch.device
+) -> _ScalingContext:
+    base = SphereField()
+    (
+        current_layout,
+        target_layout,
+        candidate_layout,
+        labels,
+        target_ids,
+        redundant_id,
+        invisible_id,
+    ) = _scaling_layouts(k, config, device)
+    emitter_count = config.emitters_per_basis * k
+    reference_points = hierarchical_surface_points(base, emitter_count, device)
+    reference_normals = unit_normals(base, reference_points)
+    colors = base.color(reference_points)
+    _, current_support = make_support(
+        reference_points, current_layout, margin=config.support_margin
+    )
+    _, target_support = make_support(
+        reference_points, target_layout, margin=config.support_margin
+    )
+    _, candidate_support = make_support(
+        reference_points, candidate_layout, margin=config.support_margin
+    )
+    packets = _scaling_packets(k, config)
+    directions = deterministic_directions(reference_normals, packets, 128.0)
+    photons = _photon_batch(reference_points, directions, colors, packets)
+    maximum_times = torch.full(
+        (photons.count,), 4.0, dtype=torch.float64, device=device
+    )
+    surface_hits, surface_times = first_zero_set_intersections(
+        base,
+        photons.origins,
+        photons.directions,
+        maximum_times,
+        samples=config.root_samples,
+        bisection_steps=config.root_bisection_steps,
+        chunk_size=8192,
+    )
+    state = SceneTransportState(
+        reference_points,
+        reference_normals,
+        photons,
+        directions,
+        surface_hits,
+        surface_times,
+        torch.ones(emitter_count, dtype=torch.bool, device=device),
+    )
+    cameras = shared_multiview_cameras(
+        "sphere", (config.resolution, config.resolution), device, count=config.views
+    )
+    geometry = BenchmarkGeometry(
+        base, reference_points, reference_normals, colors  # type: ignore[arg-type]
+    )
+    cells = [project_camera(geometry, camera, state, MultiviewConfig(
+        resolution=(config.resolution, config.resolution),
+        emitters=emitter_count,
+        packets_per_emitter=packets,
+        parameter_count=k,
+        cone_power=128.0,
+        root_samples=config.root_samples,
+        bisection_steps=config.root_bisection_steps,
+    )).cell for camera in cameras]
+    return _ScalingContext(
+        k,
+        base,
+        current_layout,
+        target_layout,
+        candidate_layout,
+        current_support,
+        target_support,
+        candidate_support,
+        reference_points,
+        reference_normals,
+        colors,
+        cells,
+        cameras,
+        state,
+        geometry,
+        packets,
+        labels,
+        target_ids,
+        redundant_id,
+        invisible_id,
+    )
+
+
+def _target_coefficients(
+    context: _ScalingContext, config: KScalingConfig, seed: int
+) -> tuple[Tensor, Tensor, float]:
+    indices = torch.arange(
+        2 * context.k, dtype=torch.float64, device=context.reference_points.device
+    )
+    phase = 0.37 * seed
+    raw = torch.sin(1.71 * indices + 0.3 + phase) + 0.55 * torch.cos(
+        0.73 * indices - 0.2 - 0.5 * phase
+    )
+    raw = raw / torch.sqrt((raw * raw).mean())
+    template = LocalZeroSet(
+        context.base,
+        context.target_layout,
+        raw,
+        context.reference_points,
+        context.reference_normals,
+        context.target_support,
+    )
+
+    def evaluate(scale: float) -> tuple[Tensor, Tensor, float, bool]:
+        coefficients = scale * raw
+        target = template.with_coefficients(coefficients)
+        points, success, displacement, _ = target.deform()
+        rms = float(torch.sqrt((displacement * displacement).mean()))
+        return coefficients, points, rms, bool(success.all())
+
+    desired = config.target_rms_displacement
+    low_scale = 0.0
+    high_scale = 0.003
+    best: tuple[Tensor, Tensor, float, bool] | None = None
+    high = evaluate(high_scale)
+    while high[3] and high[2] < desired:
+        low_scale = high_scale
+        best = high
+        high_scale *= 2.0
+        high = evaluate(high_scale)
+        if high_scale > 0.192:
+            raise RuntimeError("target RMS normalization failed to find a bracket")
+
+    # A failed upper endpoint is still useful: bisection locates the largest
+    # valid scale and distinguishes an unreachable target from a poor first guess.
+    for _ in range(24):
+        middle_scale = 0.5 * (low_scale + high_scale)
+        middle = evaluate(middle_scale)
+        if middle[3]:
+            if best is None or abs(middle[2] - desired) < abs(best[2] - desired):
+                best = middle
+            if middle[2] < desired:
+                low_scale = middle_scale
+            else:
+                high_scale = middle_scale
+        else:
+            high_scale = middle_scale
+    if best is None or abs(best[2] - desired) > 1e-6 * desired:
+        achieved = best[2] if best is not None else 0.0
+        raise RuntimeError(
+            "fixed-RMS target is unreachable before the normal-line solve fails "
+            f"(requested={desired:.9g}, largest_valid={achieved:.9g})"
+        )
+    return best[0], best[1], best[2]
+
+
+def _images(cells: list[FixedTransportCell], points: Tensor) -> list[Tensor]:
+    return [render_fixed_transport_cell(cell, points).reshape(-1) for cell in cells]
+
+
+def _image_loss(images: list[Tensor], targets: list[Tensor]) -> float:
+    return 0.5 * sum(float(((image - target) ** 2).sum()) for image, target in zip(images, targets))
+
+
+def _local_sparse_jacobian(
+    layout: BasisLayout,
+    points: Tensor,
+    reference_normals: Tensor,
+    denominator: Tensor,
+    support: SupportPairs,
+    cell: FixedTransportCell,
+    *,
+    threshold: float = 1e-12,
+) -> Tensor:
+    local_points, basis_ids = support.subset_points(cell.emitter_ids)
+    emitter_ids = cell.emitter_ids[local_points]
+    offsets = points[emitter_ids] - layout.centers[basis_ids]
+    basis_values = wendland_values(offsets, layout.radii[basis_ids])
+    in_support = basis_values > 0.0
+    local_points = local_points[in_support]
+    basis_ids = basis_ids[in_support]
+    emitter_ids = emitter_ids[in_support]
+    basis_values = basis_values[in_support]
+
+    directions = cell.fixed_directions
+    camera_denominator = directions @ cell.camera.normal
+    right_gradient = (
+        cell.camera.right
+        - (directions @ cell.camera.right)[:, None]
+        * cell.camera.normal
+        / camera_denominator[:, None]
+    )
+    up_gradient = (
+        cell.camera.up
+        - (directions @ cell.camera.up)[:, None]
+        * cell.camera.normal
+        / camera_denominator[:, None]
+    )
+    rows, columns = cell.camera.resolution
+    sensor_gradient = torch.stack(
+        (
+            columns / cell.camera.width * right_gradient,
+            -rows / cell.camera.height * up_gradient,
+        ),
+        dim=1,
+    )
+    normal_motion = torch.einsum(
+        "qad,qd->qa", sensor_gradient, reference_normals[cell.emitter_ids]
+    )
+    sensor_xy, _ = _continuous_sensor(
+        cell.camera, points[cell.emitter_ids], directions
+    )
+    fractional = sensor_xy - cell.footprint_base_xy.to(sensor_xy.dtype)
+    dx, dy = fractional.unbind(dim=-1)
+    weight_gradient = torch.stack(
+        (
+            torch.stack((-(1.0 - dy), -(1.0 - dx)), dim=-1),
+            torch.stack((1.0 - dy, -dx), dim=-1),
+            torch.stack((-dy, 1.0 - dx), dim=-1),
+            torch.stack((dy, dx), dim=-1),
+        ),
+        dim=1,
+    )
+    ds = -basis_values / denominator[emitter_ids]
+    dweights = torch.einsum(
+        "pfa,pa->pf",
+        weight_gradient[local_points],
+        normal_motion[local_points] * ds[:, None],
+    )
+    values = (
+        dweights[..., None]
+        * cell.emitter_colors[emitter_ids, None, :]
+    )
+    channels = torch.arange(3, device=points.device)
+    output_rows = (
+        cell.footprint_pixels[local_points, :, None] * 3
+        + channels[None, None, :]
+    ).expand(-1, -1, 3)
+    parameter_columns = basis_ids[:, None, None].expand_as(output_rows)
+    touched = (
+        cell.footprint_valid[local_points, :, None]
+        & (values.abs() > threshold)
+    )
+    return torch.sparse_coo_tensor(
+        torch.stack((output_rows[touched], parameter_columns[touched])),
+        values[touched],
+        size=(3 * cell.camera.pixel_count, layout.count),
+        dtype=points.dtype,
+        device=points.device,
+    ).coalesce()
+
+
+def _normal_matvec(matrices: list[Tensor], vector: Tensor, damping: float) -> Tensor:
+    result = damping * vector
+    for matrix in matrices:
+        projected = torch.sparse.mm(matrix, vector[:, None])
+        result = result + torch.sparse.mm(
+            matrix.transpose(0, 1), projected
+        ).flatten()
+    return result
+
+
+def _conjugate_gradient(
+    matrices: list[Tensor], right: Tensor, config: KScalingConfig
+) -> Tensor:
+    solution = torch.zeros_like(right)
+    residual = right.clone()
+    direction = residual.clone()
+    residual_squared = residual @ residual
+    for _ in range(config.cg_iterations):
+        product = _normal_matvec(matrices, direction, config.damping)
+        alpha = residual_squared / (direction @ product).clamp_min(1e-30)
+        solution = solution + alpha * direction
+        next_residual = residual - alpha * product
+        next_squared = next_residual @ next_residual
+        if float(torch.sqrt(next_squared)) < 1e-10:
+            break
+        direction = next_residual + next_squared / residual_squared * direction
+        residual = next_residual
+        residual_squared = next_squared
+    return solution
+
+
+def _active_jacobians(
+    context: _ScalingContext,
+    field: LocalZeroSet,
+    points: Tensor,
+    denominator: Tensor,
+) -> list[Tensor]:
+    return [
+        _local_sparse_jacobian(
+            field.layout,
+            points,
+            context.reference_normals,
+            denominator,
+            field.support,
+            cell,
+        )
+        for cell in context.cells
+    ]
+
+
+def _gradient(
+    matrices: list[Tensor], images: list[Tensor], targets: list[Tensor], k: int
+) -> Tensor:
+    gradient = torch.zeros(k, dtype=torch.float64, device=images[0].device)
+    for matrix, image, target in zip(matrices, images, targets):
+        gradient += torch.sparse.mm(
+            matrix.transpose(0, 1), (image - target)[:, None]
+        ).flatten()
+    return gradient
+
+
+def _optimize_scaling_baseline(
+    context: _ScalingContext,
+    targets: list[Tensor],
+    config: KScalingConfig,
+    *,
+    initial: Tensor | None = None,
+    iterations: int | None = None,
+    line_evaluations: int = 8,
+) -> _ScalingOptimization:
+    coefficients = (
+        torch.zeros(context.k, dtype=torch.float64, device=context.reference_points.device)
+        if initial is None
+        else initial.clone()
+    )
+    field = LocalZeroSet(
+        context.base,
+        context.current_layout,
+        coefficients,
+        context.reference_points,
+        context.reference_normals,
+        context.current_support,
+    )
+    points, success, _, denominator = field.deform()
+    images = _images(context.cells, points)
+    initial_loss = _image_loss(images, targets)
+    loss = initial_loss
+    last_relative = 0.0
+    gradient_norm = math.inf
+    completed = 0
+    for iteration in range(iterations or config.baseline_iterations):
+        field = field.with_coefficients(coefficients)
+        points, success, _, denominator = field.deform()
+        images = _images(context.cells, points)
+        loss = _image_loss(images, targets)
+        matrices = _active_jacobians(context, field, points, denominator)
+        gradient = _gradient(matrices, images, targets, context.k)
+        gradient_norm = float(torch.linalg.vector_norm(gradient))
+        step = _conjugate_gradient(matrices, -gradient, config)
+        accepted_loss = loss
+        accepted = coefficients
+        for trial in range(line_evaluations):
+            scale = 0.5**trial
+            proposal = (coefficients + scale * step).clamp(
+                -config.coefficient_limit, config.coefficient_limit
+            )
+            proposal_field = field.with_coefficients(proposal)
+            proposal_points, proposal_success, _, _ = proposal_field.deform()
+            if not bool(proposal_success.all()):
+                continue
+            proposal_images = _images(context.cells, proposal_points)
+            proposal_loss = _image_loss(proposal_images, targets)
+            if proposal_loss < accepted_loss:
+                accepted_loss = proposal_loss
+                accepted = proposal
+        completed = iteration + 1
+        last_relative = (loss - accepted_loss) / max(loss, 1e-30)
+        coefficients = accepted
+        if accepted_loss >= loss or last_relative < 1e-7 or gradient_norm < 1e-10:
+            break
+    field = field.with_coefficients(coefficients)
+    points, success, _, denominator = field.deform()
+    images = _images(context.cells, points)
+    loss = _image_loss(images, targets)
+    return _ScalingOptimization(
+        coefficients,
+        points,
+        denominator,
+        images,
+        loss,
+        initial_loss,
+        completed,
+        last_relative,
+        gradient_norm,
+        int((~success).sum()),
+    )
+
+
+def _sparse_column_statistics(
+    matrix: Tensor,
+    residual: Tensor,
+    parameter_count: int,
+) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
+    matrix = matrix.coalesce()
+    indices = matrix.indices()
+    values = matrix.values()
+    columns = indices[1]
+    alignment = torch.sparse.mm(
+        matrix.transpose(0, 1), residual[:, None]
+    ).flatten()
+    norm_squared = torch.zeros(
+        parameter_count, dtype=values.dtype, device=values.device
+    )
+    norm_squared.scatter_add_(0, columns, values * values)
+    pixels = torch.div(indices[0], 3, rounding_mode="floor")
+    pixel_parameter = torch.unique(pixels * parameter_count + columns)
+    unique_pixels = torch.div(pixel_parameter, parameter_count, rounding_mode="floor")
+    unique_columns = pixel_parameter % parameter_count
+    affected = torch.bincount(unique_columns, minlength=parameter_count)
+    local_residual = torch.zeros_like(norm_squared)
+    pixel_rgb = (
+        unique_pixels[:, None] * 3
+        + torch.arange(3, device=values.device)[None, :]
+    )
+    local_residual.scatter_add_(
+        0, unique_columns, (residual[pixel_rgb] ** 2).sum(dim=1)
+    )
+    responsive = torch.bincount(columns, minlength=parameter_count) > 0
+    return alignment, norm_squared, affected, local_residual, responsive
+
+
+def _candidate_scores(
+    context: _ScalingContext,
+    baseline: _ScalingOptimization,
+    targets: list[Tensor],
+    config: KScalingConfig,
+) -> tuple[dict[str, Tensor], dict[str, object], list[Tensor]]:
+    count = context.candidate_layout.count
+    field = LocalZeroSet(
+        context.base,
+        context.current_layout,
+        baseline.coefficients,
+        context.reference_points,
+        context.reference_normals,
+        context.current_support,
+    )
+    matrices: list[Tensor] = []
+    alignment = torch.zeros(count, dtype=torch.float64, device=baseline.points.device)
+    norm_squared = torch.zeros_like(alignment)
+    affected_pixels = torch.zeros(count, dtype=torch.long, device=baseline.points.device)
+    local_residual_squared = torch.zeros_like(alignment)
+    affected_views = torch.zeros(count, dtype=torch.long, device=baseline.points.device)
+    jacobian_nnz = 0
+    for cell, image, target in zip(context.cells, baseline.images, targets):
+        matrix = _local_sparse_jacobian(
+            context.candidate_layout,
+            baseline.points,
+            context.reference_normals,
+            baseline.denominator,
+            context.candidate_support,
+            cell,
+        )
+        matrices.append(matrix)
+        local = _sparse_column_statistics(matrix, image - target, count)
+        alignment += local[0]
+        norm_squared += local[1]
+        affected_pixels += local[2]
+        local_residual_squared += local[3]
+        affected_views += local[4].to(torch.long)
+        jacobian_nnz += matrix._nnz()
+    generator = torch.Generator().manual_seed(1701)
+    scores = {
+        "random": torch.rand(count, generator=generator).to(baseline.points.device),
+        "visibility": affected_views.to(torch.float64),
+        "local_residual": torch.sqrt(local_residual_squared),
+        "jacobian_norm": torch.sqrt(norm_squared),
+        "raw_alignment": alignment.abs(),
+        "quadratic_gain": alignment**2 / (norm_squared + config.damping),
+    }
+    responsive = scores["jacobian_norm"] > 1e-12
+    responsive_pixels = affected_pixels[responsive]
+    diagnostics: dict[str, object] = {
+        "affected_views": affected_views,
+        "affected_pixels": affected_pixels,
+        "responsive": responsive,
+        "responsive_fraction": float(responsive.double().mean()),
+        "median_affected_views": float(affected_views[responsive].double().median())
+        if bool(responsive.any())
+        else 0.0,
+        "median_affected_pixels": float(responsive_pixels.double().median())
+        if responsive_pixels.numel()
+        else 0.0,
+        "zero_jacobian_fraction": float((~responsive).double().mean()),
+        "jacobian_nnz": jacobian_nnz,
+    }
+    # Touch the current field explicitly so the denominator provenance is clear.
+    diagnostics["current_parameter_count"] = field.parameter_count
+    return scores, diagnostics, matrices
+
+
+def _cell_weights(cell: FixedTransportCell, points: Tensor) -> Tensor:
+    sensor_xy, _ = _continuous_sensor(
+        cell.camera, points[cell.emitter_ids], cell.fixed_directions
+    )
+    fractional = sensor_xy - cell.footprint_base_xy.to(sensor_xy.dtype)
+    dx, dy = fractional.unbind(dim=-1)
+    return torch.stack(
+        ((1.0 - dx) * (1.0 - dy), dx * (1.0 - dy), (1.0 - dx) * dy, dx * dy),
+        dim=-1,
+    ) * cell.footprint_valid
+
+
+def _candidate_deformation(
+    context: _ScalingContext,
+    baseline: _ScalingOptimization,
+    candidate: int,
+    coefficient: float,
+) -> tuple[Tensor, Tensor, bool]:
+    affected = torch.unique(context.candidate_support.points_for_basis(candidate))
+    if affected.numel() == 0:
+        return affected, baseline.points.new_empty((0, 3)), True
+    local_reference = context.reference_points[affected]
+    local_normals = context.reference_normals[affected]
+    local_point_ids, active_basis = context.current_support.subset_points(affected)
+    displacement = (
+        (baseline.points[affected] - local_reference) * local_normals
+    ).sum(dim=-1)
+    center = context.candidate_layout.centers[candidate]
+    radius = context.candidate_layout.radii[candidate]
+    for _ in range(10):
+        points = local_reference + displacement[:, None] * local_normals
+        values = context.base.value(points)
+        gradients = context.base.gradient(points)
+        active_offsets = points[local_point_ids] - context.current_layout.centers[active_basis]
+        active_radii = context.current_layout.radii[active_basis]
+        active_values = wendland_values(active_offsets, active_radii)
+        active_gradients = wendland_gradients(active_offsets, active_radii)
+        values.scatter_add_(
+            0,
+            local_point_ids,
+            active_values * baseline.coefficients[active_basis],
+        )
+        gradients.scatter_add_(
+            0,
+            local_point_ids[:, None].expand(-1, 3),
+            active_gradients * baseline.coefficients[active_basis, None],
+        )
+        candidate_offsets = points - center
+        candidate_radii = radius.expand(points.shape[0])
+        values = values + coefficient * wendland_values(
+            candidate_offsets, candidate_radii
+        )
+        gradients = gradients + coefficient * wendland_gradients(
+            candidate_offsets, candidate_radii
+        )
+        denominator = (gradients * local_normals).sum(dim=-1)
+        safe = denominator.abs() > 1e-8
+        displacement = (
+            displacement
+            - torch.where(safe, values / denominator, torch.zeros_like(values))
+        ).clamp(-0.015, 0.015)
+    points = local_reference + displacement[:, None] * local_normals
+    return affected, points, bool(torch.isfinite(points).all())
+
+
+def _candidate_image_deltas(
+    context: _ScalingContext,
+    baseline: _ScalingOptimization,
+    candidate: int,
+    coefficient: float,
+    baseline_weights: list[Tensor],
+) -> tuple[list[tuple[Tensor, Tensor]], bool]:
+    affected, changed_points, success = _candidate_deformation(
+        context, baseline, candidate, coefficient
+    )
+    if affected.numel() == 0:
+        empty = torch.empty(0, dtype=torch.long, device=baseline.points.device)
+        return [(empty, baseline.points.new_empty(0)) for _ in context.cells], success
+    deltas: list[tuple[Tensor, Tensor]] = []
+    for cell, old_weights in zip(context.cells, baseline_weights):
+        positions = torch.searchsorted(affected, cell.emitter_ids)
+        safe_positions = positions.clamp_max(affected.numel() - 1)
+        selected = affected[safe_positions] == cell.emitter_ids
+        photon_rows = torch.nonzero(selected, as_tuple=False).flatten()
+        if photon_rows.numel() == 0:
+            empty = torch.empty(0, dtype=torch.long, device=baseline.points.device)
+            deltas.append((empty, baseline.points.new_empty(0)))
+            continue
+        local_ids = safe_positions[photon_rows]
+        sensor_xy, _ = _continuous_sensor(
+            cell.camera,
+            changed_points[local_ids],
+            cell.fixed_directions[photon_rows],
+        )
+        fractional = sensor_xy - cell.footprint_base_xy[photon_rows].to(sensor_xy.dtype)
+        dx, dy = fractional.unbind(dim=-1)
+        new_weights = torch.stack(
+            ((1.0 - dx) * (1.0 - dy), dx * (1.0 - dy), (1.0 - dx) * dy, dx * dy),
+            dim=-1,
+        ) * cell.footprint_valid[photon_rows]
+        weight_delta = new_weights - old_weights[photon_rows]
+        values = (
+            weight_delta[..., None]
+            * cell.emitter_colors[cell.emitter_ids[photon_rows], None, :]
+        )
+        rows = (
+            cell.footprint_pixels[photon_rows, :, None] * 3
+            + torch.arange(3, device=baseline.points.device)[None, None, :]
+        ).expand_as(values)
+        keep = values != 0.0
+        sparse = torch.sparse_coo_tensor(
+            rows[keep][None, :],
+            values[keep],
+            size=(3 * cell.camera.pixel_count,),
+            dtype=values.dtype,
+            device=values.device,
+        ).coalesce()
+        deltas.append((sparse.indices()[0], sparse.values()))
+    return deltas, success
+
+
+def _candidate_loss(
+    baseline_loss: float,
+    residuals: list[Tensor],
+    deltas: list[tuple[Tensor, Tensor]],
+) -> float:
+    change = 0.0
+    for residual, (rows, values) in zip(residuals, deltas):
+        change += float((residual[rows] * values).sum() + 0.5 * (values * values).sum())
+    return baseline_loss + change
+
+
+def _new_only_oracle(
+    context: _ScalingContext,
+    baseline: _ScalingOptimization,
+    targets: list[Tensor],
+    candidate_ids: Tensor,
+    config: KScalingConfig,
+) -> tuple[Tensor, Tensor, int]:
+    gains = torch.full(
+        (context.candidate_layout.count,),
+        torch.nan,
+        dtype=torch.float64,
+        device=baseline.points.device,
+    )
+    best_coefficients = torch.zeros_like(gains)
+    residuals = [image - target for image, target in zip(baseline.images, targets)]
+    baseline_weights = [
+        _cell_weights(cell, baseline.points) for cell in context.cells
+    ]
+    failures = 0
+    samples = torch.linspace(
+        -config.coefficient_limit,
+        config.coefficient_limit,
+        config.oracle_evaluations,
+        dtype=torch.float64,
+    ).tolist()
+    for candidate in candidate_ids.tolist():
+        best_loss = baseline.loss
+        best_coefficient = 0.0
+        for coefficient in samples:
+            deltas, success = _candidate_image_deltas(
+                context,
+                baseline,
+                candidate,
+                coefficient,
+                baseline_weights,
+            )
+            if not success:
+                failures += 1
+                continue
+            loss = _candidate_loss(baseline.loss, residuals, deltas)
+            if loss < best_loss:
+                best_loss = loss
+                best_coefficient = coefficient
+        gains[candidate] = max(0.0, baseline.loss - best_loss)
+        best_coefficients[candidate] = best_coefficient
+    return gains, best_coefficients, failures
+
+
+def _oracle_candidate_ids(
+    context: _ScalingContext,
+    scores: dict[str, Tensor],
+    config: KScalingConfig,
+) -> tuple[Tensor, Tensor, str]:
+    count = context.candidate_layout.count
+    device = context.reference_points.device
+    if count <= config.exhaustive_candidate_limit:
+        ids = torch.arange(count, device=device)
+        return ids, ids, "exhaustive"
+    generator = torch.Generator().manual_seed(8123 + context.k)
+    unbiased = torch.randperm(count, generator=generator)[: min(
+        config.unbiased_oracle_size, count
+    )].to(device)
+    selected = [unbiased]
+    for name in ("random", "local_residual", "jacobian_norm", "raw_alignment", "quadratic_gain"):
+        selected.append(torch.argsort(scores[name], descending=True, stable=True)[:32])
+    selected.extend(
+        (
+            torch.tensor([context.redundant_id, context.invisible_id], device=device),
+        )
+    )
+    ids = torch.unique(torch.cat(selected))
+    return ids, unbiased, "sampled"
+
+
+def _correlations_on(
+    scores: dict[str, Tensor], gains: Tensor, ids: Tensor
+) -> dict[str, dict[str, float]]:
+    valid = ids[torch.isfinite(gains[ids])]
+    return {
+        name: {
+            "spearman": _correlation(scores[name][valid], gains[valid], ranked=True),
+            "pearson": _correlation(scores[name][valid], gains[valid], ranked=False),
+        }
+        for name in ("random", "visibility", "local_residual", "jacobian_norm", "raw_alignment", "quadratic_gain")
+    }
+
+
+def _top_k_sampled(
+    scores: dict[str, Tensor], gains: Tensor
+) -> dict[str, dict[str, object]]:
+    result: dict[str, dict[str, object]] = {}
+    finite_gains = gains[torch.isfinite(gains)]
+    sampled_best = float(finite_gains.max()) if finite_gains.numel() else 0.0
+    for name in ("random", "local_residual", "jacobian_norm", "raw_alignment", "quadratic_gain"):
+        order = torch.argsort(scores[name], descending=True, stable=True)
+        summary: dict[str, object] = {}
+        for count in (1, 3, 5, 10, 32):
+            ids = order[:count]
+            selected = gains[ids]
+            selected = selected[torch.isfinite(selected)]
+            summary[f"top_{count}"] = {
+                "candidate_ids": ids.tolist(),
+                "mean_actual_gain": float(selected.mean()) if selected.numel() else math.nan,
+                "best_actual_gain": float(selected.max()) if selected.numel() else math.nan,
+                "sample_relative_regret": (
+                    sampled_best - float(selected.max()) if selected.numel() else math.nan
+                ),
+            }
+        result[name] = summary
+    return result
+
+
+def _transport_event_fraction(
+    context: _ScalingContext, points: Tensor
+) -> float:
+    if bool(context.state.surface_hits.any()):
+        raise RuntimeError("sphere scaling path unexpectedly contains absorption")
+    emitter_ids = context.state.photons.emitter_ids
+    photons = PhotonBatch(
+        points[emitter_ids],
+        context.state.directions,
+        context.state.photons.colors,
+        context.state.photons.energies,
+        context.state.photons.emit_times,
+        emitter_ids,
+    )
+    state = SceneTransportState(
+        points,
+        context.reference_normals,
+        photons,
+        context.state.directions,
+        context.state.surface_hits,
+        context.state.surface_times,
+        context.state.emitter_root_success,
+    )
+    changed = 0
+    for camera, baseline_cell in zip(context.cameras, context.cells):
+        perturbed = project_camera(
+            context.geometry,
+            camera,
+            state,
+            MultiviewConfig(
+                resolution=camera.resolution,
+                emitters=points.shape[0],
+                packets_per_emitter=context.packets_per_emitter,
+                parameter_count=context.k,
+                cone_power=128.0,
+            ),
+        ).cell
+        changed += int((perturbed.owner_map != baseline_cell.owner_map).sum())
+    return changed / (len(context.cells) * context.cells[0].camera.pixel_count)
+
+
+def _candidate_derivative_validation_scaling(
+    context: _ScalingContext,
+    baseline: _ScalingOptimization,
+    matrices: list[Tensor],
+    scores: dict[str, Tensor],
+    config: KScalingConfig,
+) -> dict[str, object]:
+    responsive = torch.nonzero(
+        scores["jacobian_norm"] > 1e-12, as_tuple=False
+    ).flatten()
+    order = torch.argsort(scores["raw_alignment"], descending=True, stable=True)
+    ids = [int(order[0])]
+    if responsive.numel():
+        responsive_order = responsive[
+            torch.argsort(scores["raw_alignment"][responsive], stable=True)
+        ]
+        ids.extend(
+            [
+                int(responsive_order[responsive_order.numel() // 2]),
+                int(responsive_order[0]),
+            ]
+        )
+    ids.append(context.invisible_id)
+    ids = list(dict.fromkeys(ids))[:4]
+    while len(ids) < 4:
+        candidate = int(order[len(ids)])
+        if candidate not in ids:
+            ids.append(candidate)
+    baseline_weights = [_cell_weights(cell, baseline.points) for cell in context.cells]
+    errors: list[float] = []
+    event_fractions: list[float] = []
+    step = 1e-5
+    for candidate in ids:
+        plus, plus_success = _candidate_image_deltas(
+            context, baseline, candidate, step, baseline_weights
+        )
+        minus, minus_success = _candidate_image_deltas(
+            context, baseline, candidate, -step, baseline_weights
+        )
+        if not (plus_success and minus_success):
+            errors.append(math.inf)
+            event_fractions.append(1.0)
+            continue
+        numerator = torch.zeros((), dtype=torch.float64, device=baseline.points.device)
+        denominator = torch.zeros_like(numerator)
+        for matrix, plus_view, minus_view in zip(matrices, plus, minus):
+            finite = torch.zeros(
+                matrix.shape[0], dtype=torch.float64, device=baseline.points.device
+            )
+            finite.index_add_(0, plus_view[0], plus_view[1] / (2.0 * step))
+            finite.index_add_(0, minus_view[0], -minus_view[1] / (2.0 * step))
+            analytic = _column_dense(matrix, candidate)
+            numerator += ((finite - analytic) ** 2).sum()
+            denominator += (analytic * analytic).sum()
+        errors.append(float(torch.sqrt(numerator / denominator.clamp_min(1e-30))))
+        affected, plus_points, _ = _candidate_deformation(
+            context, baseline, candidate, step
+        )
+        full_plus = baseline.points.clone()
+        full_plus[affected] = plus_points
+        affected, minus_points, _ = _candidate_deformation(
+            context, baseline, candidate, -step
+        )
+        full_minus = baseline.points.clone()
+        full_minus[affected] = minus_points
+        event_fractions.append(
+            max(
+                _transport_event_fraction(context, full_plus),
+                _transport_event_fraction(context, full_minus),
+            )
+        )
+    finite_errors = [value for value in errors if math.isfinite(value)]
+    return {
+        "candidate_ids": ids,
+        "step": step,
+        "median_relative_error": statistics.median(finite_errors),
+        "maximum_relative_error": max(finite_errors),
+        "maximum_transport_event_fraction": max(event_fractions),
+        "numerical_failures": len(errors) - len(finite_errors),
+    }
+
+
+def _active_locality_metrics(
+    context: _ScalingContext,
+    baseline: _ScalingOptimization,
+) -> dict[str, object]:
+    field = LocalZeroSet(
+        context.base,
+        context.current_layout,
+        baseline.coefficients,
+        context.reference_points,
+        context.reference_normals,
+        context.current_support,
+    )
+    pair_offsets = (
+        baseline.points[context.current_support.point_ids]
+        - context.current_layout.centers[context.current_support.basis_ids]
+    )
+    active_pairs = wendland_values(
+        pair_offsets,
+        context.current_layout.radii[context.current_support.basis_ids],
+    ) > 0.0
+    active_bases_per_query = float(active_pairs.sum() / baseline.points.shape[0])
+    matrices = _active_jacobians(
+        context, field, baseline.points, baseline.denominator
+    )
+    pixel_parameter_count = 0
+    affected_observations = 0
+    total_nnz = 0
+    for matrix in matrices:
+        indices = matrix.indices()
+        pixels = torch.div(indices[0], 3, rounding_mode="floor")
+        encoded = torch.unique(pixels * context.k + indices[1])
+        pixel_parameter_count += encoded.numel()
+        affected_observations += torch.unique(pixels).numel()
+        total_nnz += matrix._nnz()
+    return {
+        "active_bases_per_query": active_bases_per_query,
+        "active_parameters_per_affected_pixel": (
+            pixel_parameter_count / max(affected_observations, 1)
+        ),
+        "affected_image_fraction_per_parameter": pixel_parameter_count
+        / (
+            context.k
+            * len(context.cells)
+            * context.cells[0].camera.pixel_count
+        ),
+        "jacobian_nnz": total_nnz,
+        "jacobian_nnz_per_parameter": total_nnz / context.k,
+        "jacobian_density": total_nnz
+        / (
+            3
+            * len(context.cells)
+            * context.cells[0].camera.pixel_count
+            * context.k
+        ),
+    }
+
+
+def _run_k_level(
+    k: int,
+    config: KScalingConfig,
+    *,
+    target_seed: int,
+    secondary: bool,
+) -> dict[str, object]:
+    device = torch.device("cuda")
+    torch.cuda.empty_cache()
+    torch.cuda.reset_peak_memory_stats()
+    level_started = time.perf_counter()
+    context = _build_scaling_context(k, config, device)
+    target_coefficients, target_points, target_rms = _target_coefficients(
+        context, config, target_seed
+    )
+    targets = _images(context.cells, target_points)
+    initial_images = _images(context.cells, context.reference_points)
+    initial_loss = _image_loss(initial_images, targets)
+
+    baseline_started = time.perf_counter()
+    baseline = _optimize_scaling_baseline(context, targets, config)
+    torch.cuda.synchronize()
+    baseline_runtime = time.perf_counter() - baseline_started
+    baseline_geometry_error = float(
+        torch.sqrt(((baseline.points - target_points) ** 2).sum(dim=1).mean())
+    )
+
+    continuation_started = time.perf_counter()
+    continuation = _optimize_scaling_baseline(
+        context,
+        targets,
+        config,
+        initial=baseline.coefficients,
+        iterations=1,
+        line_evaluations=config.oracle_evaluations,
+    )
+    torch.cuda.synchronize()
+    continuation_runtime = time.perf_counter() - continuation_started
+    continuation_gain = max(0.0, baseline.loss - continuation.loss)
+
+    scoring_started = time.perf_counter()
+    scores, diagnostics, candidate_matrices = _candidate_scores(
+        context, baseline, targets, config
+    )
+    torch.cuda.synchronize()
+    scoring_runtime = time.perf_counter() - scoring_started
+    source = context.candidate_target_ids
+    source_strength = torch.where(
+        source >= 0,
+        target_coefficients[source.clamp_min(0)].abs()
+        * scores["jacobian_norm"],
+        torch.zeros_like(scores["jacobian_norm"]),
+    )
+    useful_id = int(source_strength.argmax())
+    context.candidate_labels[useful_id] = "known_missing_detail_control"
+
+    derivative = _candidate_derivative_validation_scaling(
+        context, baseline, candidate_matrices, scores, config
+    )
+    oracle_ids, unbiased_ids, oracle_mode = _oracle_candidate_ids(
+        context, scores, config
+    )
+    oracle_ids = torch.unique(
+        torch.cat(
+            (
+                oracle_ids,
+                torch.tensor([useful_id], device=oracle_ids.device),
+            )
+        )
+    )
+    oracle_started = time.perf_counter()
+    gains, best_coefficients, oracle_failures = _new_only_oracle(
+        context, baseline, targets, oracle_ids, config
+    )
+    torch.cuda.synchronize()
+    oracle_runtime = time.perf_counter() - oracle_started
+    correlations = _correlations_on(scores, gains, unbiased_ids)
+    top_k = _top_k_sampled(scores, gains)
+    locality = _active_locality_metrics(context, baseline)
+    target_event_fraction = _transport_event_fraction(context, target_points)
+    torch.cuda.synchronize()
+    total_runtime = time.perf_counter() - level_started
+
+    def control(candidate: int) -> dict[str, object]:
+        return {
+            "candidate_id": candidate,
+            "jacobian_norm": float(scores["jacobian_norm"][candidate]),
+            "raw_alignment": float(scores["raw_alignment"][candidate]),
+            "actual_gain_new_only": float(gains[candidate])
+            if torch.isfinite(gains[candidate])
+            else None,
+            "best_coefficient": float(best_coefficients[candidate])
+            if torch.isfinite(gains[candidate])
+            else None,
+            "affected_views": int(diagnostics["affected_views"][candidate]),
+            "affected_pixels": int(diagnostics["affected_pixels"][candidate]),
+        }
+
+    row: dict[str, object] = {
+        "target_seed": target_seed,
+        "secondary_target": secondary,
+        "k": k,
+        "k_gt": 2 * k,
+        "candidate_count": 2 * k,
+        "emitters": config.emitters_per_basis * k,
+        "packets_per_emitter": context.packets_per_emitter,
+        "photons": context.state.photons.count,
+        "support_radius": float(context.current_layout.radii[0]),
+        "target_support_radius": float(context.target_layout.radii[0]),
+        "emitters_per_basis": config.emitters_per_basis,
+        "photons_per_basis": context.state.photons.count / k,
+        "target_geometry_rms_displacement": target_rms,
+        "initial_loss": initial_loss,
+        "baseline_final_loss": baseline.loss,
+        "baseline_relative_reduction": (initial_loss - baseline.loss)
+        / max(initial_loss, 1e-30),
+        "baseline_iterations": baseline.iterations,
+        "baseline_last_step_relative_improvement": baseline.last_step_relative_improvement,
+        "baseline_gradient_norm": baseline.gradient_norm,
+        "initial_residual_norm": math.sqrt(2.0 * initial_loss),
+        "residual_norm": math.sqrt(2.0 * baseline.loss),
+        "geometry_rms_error": baseline_geometry_error,
+        "no_birth_continuation_gain": continuation_gain,
+        "no_birth_continuation_runtime_seconds": continuation_runtime,
+        "responsive_candidate_fraction": diagnostics["responsive_fraction"],
+        "responsive_candidates": int(diagnostics["responsive"].sum()),
+        "median_affected_views_per_responsive_candidate": diagnostics[
+            "median_affected_views"
+        ],
+        "median_affected_pixels_per_responsive_candidate": diagnostics[
+            "median_affected_pixels"
+        ],
+        "zero_jacobian_candidate_fraction": diagnostics["zero_jacobian_fraction"],
+        "correlation_sample_size": int(unbiased_ids.numel()),
+        "oracle_evaluated_candidates": int(oracle_ids.numel()),
+        "oracle_mode": oracle_mode,
+        "regret_scope": (
+            "global exhaustive" if oracle_mode == "exhaustive" else "sample-relative"
+        ),
+        "correlations": correlations,
+        "top_k": top_k,
+        "raw_top_1_actual_gain": top_k["raw_alignment"]["top_1"][
+            "mean_actual_gain"
+        ],
+        "raw_top_5_mean_actual_gain": top_k["raw_alignment"]["top_5"][
+            "mean_actual_gain"
+        ],
+        "finite_difference": derivative,
+        "target_transport_event_fraction": target_event_fraction,
+        **locality,
+        "candidate_score_runtime_seconds": scoring_runtime,
+        "baseline_optimization_runtime_seconds": baseline_runtime,
+        "oracle_runtime_seconds": oracle_runtime,
+        "total_runtime_seconds": total_runtime,
+        "peak_allocated_mib": torch.cuda.max_memory_allocated() / 2**20,
+        "peak_reserved_mib": torch.cuda.max_memory_reserved() / 2**20,
+        "numerical_failures": baseline.root_failures
+        + derivative["numerical_failures"]
+        + oracle_failures,
+        "controls": {
+            "redundant": control(context.redundant_id),
+            "known_missing_detail": control(useful_id),
+            "invisible": control(context.invisible_id),
+        },
+        "scene_surface_hits": int(context.state.surface_hits.sum()),
+    }
+    print(
+        json.dumps(
+            {
+                "k": k,
+                "secondary": secondary,
+                "runtime_seconds": total_runtime,
+                "peak_allocated_mib": row["peak_allocated_mib"],
+                "peak_reserved_mib": row["peak_reserved_mib"],
+                "candidate_score_seconds": scoring_runtime,
+                "baseline_seconds": baseline_runtime,
+                "responsive_fraction": row["responsive_candidate_fraction"],
+                "transport_event_fraction": target_event_fraction,
+                "numerical_failures": row["numerical_failures"],
+            },
+            sort_keys=True,
+        ),
+        flush=True,
+    )
+    return row
+
+
+def _power_law(rows: list[dict[str, object]], key: str) -> dict[str, float]:
+    x = torch.log(torch.tensor([row["k"] for row in rows], dtype=torch.float64))
+    y = torch.log(
+        torch.tensor([max(float(row[key]), 1e-30) for row in rows], dtype=torch.float64)
+    )
+    design = torch.stack((torch.ones_like(x), x), dim=1)
+    solution = torch.linalg.lstsq(design, y[:, None]).solution.flatten()
+    predicted = design @ solution
+    total = ((y - y.mean()) ** 2).sum()
+    residual = ((y - predicted) ** 2).sum()
+    return {
+        "exponent": float(solution[1]),
+        "coefficient": float(torch.exp(solution[0])),
+        "r_squared": float(1.0 - residual / total) if total > 0 else 1.0,
+    }
+
+
+def _write_k_scaling_csv(path: Path, rows: list[dict[str, object]]) -> None:
+    columns = (
+        "k",
+        "k_gt",
+        "candidate_count",
+        "emitters",
+        "packets_per_emitter",
+        "photons",
+        "emitters_per_basis",
+        "photons_per_basis",
+        "support_radius",
+        "target_geometry_rms_displacement",
+        "initial_loss",
+        "baseline_final_loss",
+        "baseline_relative_reduction",
+        "baseline_iterations",
+        "baseline_last_step_relative_improvement",
+        "baseline_gradient_norm",
+        "initial_residual_norm",
+        "residual_norm",
+        "geometry_rms_error",
+        "no_birth_continuation_gain",
+        "responsive_candidate_fraction",
+        "median_affected_views_per_responsive_candidate",
+        "median_affected_pixels_per_responsive_candidate",
+        "zero_jacobian_candidate_fraction",
+        "correlation_sample_size",
+        "oracle_evaluated_candidates",
+        "oracle_mode",
+        "regret_scope",
+        "raw_alignment_spearman",
+        "raw_alignment_pearson",
+        "quadratic_spearman",
+        "quadratic_pearson",
+        "local_residual_spearman",
+        "raw_top_1_actual_gain",
+        "raw_top_5_mean_actual_gain",
+        "fd_median_error",
+        "fd_maximum_error",
+        "transport_event_fraction",
+        "active_bases_per_query",
+        "active_parameters_per_affected_pixel",
+        "affected_image_fraction_per_parameter",
+        "jacobian_nnz",
+        "jacobian_nnz_per_parameter",
+        "jacobian_density",
+        "candidate_score_runtime_seconds",
+        "baseline_optimization_runtime_seconds",
+        "oracle_runtime_seconds",
+        "total_runtime_seconds",
+        "peak_allocated_mib",
+        "peak_reserved_mib",
+        "numerical_failures",
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.DictWriter(stream, fieldnames=columns, lineterminator="\n")
+        writer.writeheader()
+        for row in rows:
+            flat = dict(row)
+            flat.update(
+                {
+                    "raw_alignment_spearman": row["correlations"]["raw_alignment"]["spearman"],
+                    "raw_alignment_pearson": row["correlations"]["raw_alignment"]["pearson"],
+                    "quadratic_spearman": row["correlations"]["quadratic_gain"]["spearman"],
+                    "quadratic_pearson": row["correlations"]["quadratic_gain"]["pearson"],
+                    "local_residual_spearman": row["correlations"]["local_residual"]["spearman"],
+                    "fd_median_error": row["finite_difference"]["median_relative_error"],
+                    "fd_maximum_error": row["finite_difference"]["maximum_relative_error"],
+                    "transport_event_fraction": row["target_transport_event_fraction"],
+                }
+            )
+            writer.writerow({name: flat[name] for name in columns})
+
+
+def _write_k_scaling_figures(
+    directory: Path, rows: list[dict[str, object]]
+) -> list[str]:
+    import matplotlib.pyplot as plt
+
+    directory.mkdir(parents=True, exist_ok=True)
+    k = [row["k"] for row in rows]
+    definitions = (
+        (
+            "v03b_spearman_vs_k.png",
+            "Pre-birth ranking across scale",
+            "Spearman correlation",
+            (
+                ("Raw alignment", [row["correlations"]["raw_alignment"]["spearman"] for row in rows]),
+                ("Quadratic", [row["correlations"]["quadratic_gain"]["spearman"] for row in rows]),
+                ("Local residual", [row["correlations"]["local_residual"]["spearman"] for row in rows]),
+            ),
+            "semilogx",
+        ),
+        (
+            "v03b_scoring_runtime_vs_k.png",
+            "Streamed candidate-scoring cost",
+            "seconds",
+            (("Candidate scoring", [row["candidate_score_runtime_seconds"] for row in rows]),),
+            "loglog",
+        ),
+        (
+            "v03b_vram_vs_k.png",
+            "Peak CUDA memory",
+            "MiB",
+            (
+                ("Allocated", [row["peak_allocated_mib"] for row in rows]),
+                ("Reserved", [row["peak_reserved_mib"] for row in rows]),
+            ),
+            "loglog",
+        ),
+        (
+            "v03b_local_connectivity_vs_k.png",
+            "Local geometry connectivity",
+            "mean count",
+            (
+                ("Active bases/query", [row["active_bases_per_query"] for row in rows]),
+                ("Active parameters/affected pixel", [row["active_parameters_per_affected_pixel"] for row in rows]),
+            ),
+            "semilogx",
+        ),
+        (
+            "v03b_affected_fraction_vs_k.png",
+            "Affected image fraction per basis",
+            "fraction",
+            (("Affected fraction", [row["affected_image_fraction_per_parameter"] for row in rows]),),
+            "loglog",
+        ),
+    )
+    paths: list[str] = []
+    for filename, title, ylabel, series, scale in definitions:
+        figure, axis = plt.subplots(figsize=(5.4, 3.8))
+        for label, values in series:
+            getattr(axis, scale)(k, values, "o-", label=label)
+        axis.set_xlabel("active geometry parameters K")
+        axis.set_ylabel(ylabel)
+        axis.set_title(title)
+        axis.grid(alpha=0.25)
+        if len(series) > 1:
+            axis.legend()
+        figure.tight_layout()
+        path = directory / filename
+        figure.savefig(path, dpi=160)
+        plt.close(figure)
+        paths.append(str(path))
+    return paths
+
+
+def run_k_scaling_experiment(
+    config: KScalingConfig = KScalingConfig(),
+    *,
+    csv_path: Path | None = None,
+    json_path: Path | None = None,
+    figure_directory: Path | None = None,
+) -> dict[str, object]:
+    """Run the v0.3b sparse pre-birth evidence scaling experiment."""
+    if not torch.cuda.is_available():
+        raise RuntimeError("LOCAL_CUDA_UNAVAILABLE")
+    primary: list[dict[str, object]] = []
+    failed_attempt: dict[str, object] | None = None
+    for k in config.k_values:
+        if config.known_failed_k == k:
+            failed_attempt = {
+                "k": k,
+                "reason": config.known_failure_reason
+                or "known failure retained from the first attempted run",
+                "reused_from_prior_single_attempt": True,
+            }
+            break
+        try:
+            row = _run_k_level(
+                k, config, target_seed=1, secondary=False
+            )
+        except (RuntimeError, torch.cuda.OutOfMemoryError) as error:
+            failed_attempt = {"k": k, "reason": f"{type(error).__name__}: {error}"}
+            if isinstance(error, torch.cuda.OutOfMemoryError):
+                torch.cuda.empty_cache()
+            break
+        primary.append(row)
+        if float(row["peak_reserved_mib"]) > 0.8 * 15904.875:
+            failed_attempt = {
+                "k": 2 * k,
+                "reason": "projected CUDA memory would exceed 80% policy",
+            }
+            break
+    if not primary:
+        raise RuntimeError(f"no K level completed: {failed_attempt}")
+    maximum_k = int(primary[-1]["k"])
+    sentinel = sorted(set((32, 256, 1024, maximum_k)).intersection(config.k_values))
+    secondary = [
+        _run_k_level(k, config, target_seed=19, secondary=True)
+        for k in sentinel
+        if k <= maximum_k
+    ]
+    fits = {
+        "candidate_scoring": _power_law(primary, "candidate_score_runtime_seconds"),
+        "peak_allocated_vram": _power_law(primary, "peak_allocated_mib"),
+        "affected_fraction": _power_law(
+            primary, "affected_image_fraction_per_parameter"
+        ),
+    }
+    raw_correlations = [
+        float(row["correlations"]["raw_alignment"]["spearman"])
+        for row in primary
+    ]
+    random_correlations = [
+        float(row["correlations"]["random"]["spearman"])
+        for row in primary
+    ]
+    primary_supported = (
+        statistics.median(raw_correlations) > 0.5
+        and raw_correlations[-1] > 0.5
+        and statistics.median(raw_correlations)
+        > statistics.median(random_correlations)
+    )
+    local_counts = [float(row["active_bases_per_query"]) for row in primary]
+    pixel_counts = [
+        float(row["active_parameters_per_affected_pixel"]) for row in primary
+    ]
+    connectivity_supported = (
+        max(local_counts) / max(min(local_counts), 1e-15) < 3.0
+        and max(pixel_counts) / max(min(pixel_counts), 1e-15) < 3.0
+    )
+    report: dict[str, object] = {
+        "experiment": "v0.3b aggressive K-scaling of pre-birth geometry evidence",
+        "environment": cuda_environment(),
+        "configuration": {
+            "k_ladder_requested": list(config.k_values),
+            "views": config.views,
+            "resolution": [config.resolution, config.resolution],
+            "emitters_per_basis": config.emitters_per_basis,
+            "default_packets_per_emitter": config.packets_per_emitter,
+            "maximum_photons": config.maximum_photons,
+            "support_radius_rule": "0.60 * sqrt(32 / K)",
+            "hierarchy": "nested unscrambled Sobol surface prefixes",
+            "target": "K_GT=2K, coefficient-normalized to fixed geometry RMS",
+            "candidate_pool": "K missing target centers + K finer distractors; coefficients remain nonexistent during scoring",
+            "candidate_scoring": "sparse local contributions accumulated directly; no dense observation Jacobian",
+            "oracle": f"nonlinear {config.oracle_evaluations}-sample one-dimensional line search",
+        },
+        "primary_levels": primary,
+        "secondary_target_levels": secondary,
+        "scaling_fits": fits,
+        "maximum_validated_k": maximum_k,
+        "maximum_attempted_k": (
+            int(failed_attempt["k"]) if failed_attempt is not None else maximum_k
+        ),
+        "scaling_stop": failed_attempt or {
+            "reason": "completed natural power-of-two endpoint K=32768"
+        },
+        "primary_verdict": (
+            "PREBIRTH_SIGNAL_K_SCALING_SUPPORTED"
+            if primary_supported
+            else "PREBIRTH_SIGNAL_K_SCALING_NOT_SUPPORTED"
+        ),
+        "local_connectivity_verdict": (
+            "LOCAL_CONNECTIVITY_SCALING_SUPPORTED"
+            if connectivity_supported
+            else "LOCAL_CONNECTIVITY_SCALING_NOT_SUPPORTED"
+        ),
+        "verdict_basis": {
+            "raw_spearman_median": statistics.median(raw_correlations),
+            "raw_spearman_largest_k": raw_correlations[-1],
+            "random_spearman_median": statistics.median(random_correlations),
+            "local_connectivity_max_to_min_ratio": max(local_counts)
+            / max(min(local_counts), 1e-15),
+            "pixel_connectivity_max_to_min_ratio": max(pixel_counts)
+            / max(min(pixel_counts), 1e-15),
+            "affected_fraction_exponent_is_diagnostic_not_connectivity_gate": True,
+        },
+    }
+    if csv_path is not None:
+        _write_k_scaling_csv(csv_path, primary)
+    if figure_directory is not None:
+        report["figures"] = _write_k_scaling_figures(figure_directory, primary)
+    if json_path is not None:
+        json_path.parent.mkdir(parents=True, exist_ok=True)
+        report["artifacts"] = {
+            "csv": str(csv_path) if csv_path is not None else None,
+            "json": str(json_path),
+            "figures": report.get("figures", []),
+        }
+        json_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    return report
