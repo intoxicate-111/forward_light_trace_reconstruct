@@ -187,10 +187,14 @@ def sample_meshfree_zero_set(
     residual_tolerance: float = 1e-9,
     gradient_tolerance: float = 1e-10,
     sobol_scramble_seed: int | None = None,
+    sobol_start_index: int = 0,
+    sampling_cells: Tensor | None = None,
 ) -> MeshFreeSurfaceState:
     """Sample sign-changing cells and project without any mesh scaffold."""
-    if count < 1 or newton_steps < 1:
-        raise ValueError("count and Newton steps must be positive")
+    if count < 1 or newton_steps < 1 or sobol_start_index < 0:
+        raise ValueError(
+            "count/Newton steps must be positive and Sobol start nonnegative"
+        )
     device = field.grid.device
     dtype = field.grid.dtype
     baseline = torch.cuda.memory_allocated(device) if device.type == "cuda" else 0
@@ -198,14 +202,21 @@ def sample_meshfree_zero_set(
         torch.cuda.reset_peak_memory_stats(device)
     _sync(device)
     started = time.perf_counter()
-    cells = sign_changing_cells(field.grid)
+    cells = (
+        sign_changing_cells(field.grid)
+        if sampling_cells is None
+        else sampling_cells
+    )
     if cells.numel() == 0:
         raise RuntimeError("implicit grid contains no sign-changing cells")
-    sequence = torch.quasirandom.SobolEngine(
+    engine = torch.quasirandom.SobolEngine(
         4,
         scramble=sobol_scramble_seed is not None,
         seed=sobol_scramble_seed,
-    ).draw(count)
+    )
+    if sobol_start_index:
+        engine.fast_forward(sobol_start_index)
+    sequence = engine.draw(count)
     sequence = sequence.to(dtype=dtype, device=device)
     choice = torch.floor(sequence[:, 0] * cells.shape[0]).to(torch.long)
     choice.clamp_max_(cells.shape[0] - 1)

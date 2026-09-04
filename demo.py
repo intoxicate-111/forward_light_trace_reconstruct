@@ -737,6 +737,23 @@ def run_sampling_diagnostic_analysis(
     )
 
 
+def run_high_sample_resolution_analysis(
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    from zlt.high_sample import run_high_sample_resolution_control
+    from zlt.mesh_field import obtain_stanford_bunny
+
+    mesh_path = args.bunny_mesh
+    if mesh_path is None:
+        mesh_path = obtain_stanford_bunny(args.bunny_cache)
+    return run_high_sample_resolution_control(
+        mesh_path,
+        args.bunny_artifacts,
+        args.bunny_figures,
+        args.render_output,
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -1108,6 +1125,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--corrected-birth", action="store_true")
     parser.add_argument("--high-bandwidth-birth", action="store_true")
     parser.add_argument("--sampling-diagnostic", action="store_true")
+    parser.add_argument("--high-sample-resolution", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -1133,6 +1151,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.high_sample_resolution:
+        report = run_high_sample_resolution_analysis(args)
+        print("high_sample_resolution_control:")
+        print(json.dumps(report["verdicts"], indent=2, sort_keys=True))
+        return
     if args.sampling_diagnostic:
         report = run_sampling_diagnostic_analysis(args)
         print("high_resolution_sampling_diagnostic:")

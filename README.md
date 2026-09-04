@@ -655,6 +655,64 @@ The required verdicts are: `HIGH_RES_IMAGE_UNDERSAMPLED=true`, `RGB_LOSS_SCALE_R
 
 All thresholds, per-view buffers, raw/normalized RGB metrics, target/predicted/residual energies, score statistics, correlations, exact seeds, timings, and boolean evidence are in [`artifacts/v081_highres_sampling_diagnostic.json`](artifacts/v081_highres_sampling_diagnostic.json) and [`artifacts/v081_highres_sampling_diagnostic.csv`](artifacts/v081_highres_sampling_diagnostic.csv). The ten `v081_` figures are retained under [`figures/`](figures/). The formal local-CUDA run took 179.63 s and peaked at 5,901.64 MiB allocated / 6,310 MiB reserved.
 
+## v0.8.2: Fixed-footprint matched-transport-density resolution control
+
+### 1. Question
+
+v0.8.2 asks whether higher detector resolution provides a better geometry observation signal when transport support per detector degree of freedom is held approximately fixed. The primary treatment keeps the legacy fixed 4×4 pixel-space cubic footprint and adds real emitter samples; it does not use the v0.8.1 enlarged footprint as a substitute for bandwidth.
+
+### 2. Why v0.8 was confounded
+
+At fixed 65,536 emitters, increasing 256² to 1920×1080 reduces footprint writes/pixel from 6.8882 to 0.21770 and unique coverage from 0.29296 to 0.14577. RMSE rises from 0.03224 to 0.10551. Resolution, samples/detector-DoF, and estimator support therefore changed together in the old Full-HD experiment; that result cannot by itself establish that resolution hurts geometry.
+
+### 3. Low-resolution sampling reference
+
+The exact 256²/65,536-emitter/20-view legacy reference is reproduced. Across 1,310,720 view-pixels and 1,310,720 attempted packets, it has 652,940 outward, 564,282 retained/projected events, and 9,028,512 footprint writes. The contribution counts are: coverage 0.2929565, zero 0.7070435, count<2 0.7082268, count<4 0.7102020, mean 6.8882, median 0, p90/p95/p99 23/33/57, and maximum 166; 383,984/382,433/379,844/375,146 pixels have at least 1/2/4/8 writes. The target/prediction energies are 447,613.17/439,484.76; raw SSE is 4,086.94, half-SSE 2,043.47, MSE 0.00103936, RMSE 0.032239, and MAE 0.005704. The median remains zero because the aggregate includes the black image background; density is assessed jointly with foreground coverage and the full count distribution. The [actual reference RGB](render_res/v082_low_reference_rgb.png) is archived.
+
+### 4. Streaming renderer validation
+
+The new path generates one global Sobol surface sequence, slices it into emitter chunks, performs outward filtering, zero-set visibility, projection, fixed-footprint splatting, and detector accumulation one view/chunk at a time, then discards chunk-local events. It never materializes the complete 41.47M-packet graph. The training set is the unscrambled prefix and independent MC sets use scrambles 101 and 211; every resolution uses `[0,N)` so larger settings are nested prefixes. Against an 8,192-emitter monolithic 64²/two-view reference, chunk sizes 1,024 and 2,048 both give exactly zero point, normal, base-image, target-image, event-count, and footprint-write differences (image tolerance 2e−6). Thus `STREAMING_TRANSPORT_VALIDATED`, `CHUNK_SIZE_INVARIANT`, and `COMMON_RANDOM_NUMBERS_VALIDATED` are true.
+
+### 5. Matched-density construction
+
+The pixel-ratio estimates passed all declared gates on their first transport calibration, so no adjustment was required:
+
+| Resolution | Emitters | Attempted packets | Retained events | Writes/pixel | Coverage | Gate |
+|---:|---:|---:|---:|---:|---:|---:|
+| 256² | 65,536 | 1,310,720 | 564,282 | 6.88821 | 0.29296 | pass |
+| 512² | 262,144 | 5,242,880 | 2,257,273 | 6.88865 | 0.28108 | pass |
+| 960×540 | 518,400 | 10,368,000 | 4,463,891 | 6.88872 | 0.27806 | pass |
+| 1920×1080 | 2,073,600 | 41,472,000 | 17,855,026 | 6.88851 | 0.27361 | pass |
+
+At Full HD, the relative density error is 0.0000443, while coverage, zero-count, count<2, and median differences are 0.01935, 0.01935, 0.01832, and 0, all inside the 10%/0.03/0.03/0.05/one-count gates. Hence `LOW_RES_REFERENCE_DENSE=true` and `FULLHD_MATCHED_DENSITY_ACHIEVED=true`. See [density](figures/v082_density_vs_resolution.png), [emitter scaling](figures/v082_emitters_vs_resolution.png), and [count histograms](figures/v082_contribution_histograms.png).
+
+### 6. Fixed-sample vs matched-density resolution test
+
+| Resolution | Fixed-sample coverage / RMSE | Matched-density coverage / RMSE |
+|---:|---:|---:|
+| 256² | 0.29296 / 0.03224 | 0.29296 / 0.03224 |
+| 512² | 0.27986 / 0.07213 | 0.28108 / 0.03526 |
+| 960×540 | 0.26482 / 0.10616 | 0.27806 / 0.03573 |
+| 1920×1080 | 0.14577 / 0.10551 | 0.27361 / 0.04077 |
+
+Real sample scaling recovers Full-HD coverage by 0.12784 and density by 31.64× relative to the fixed-sample control, so `FIXED_SAMPLE_HIGHRES_DEGRADES=true` and `REAL_SAMPLE_INCREASE_NEEDED_FOR_HIGH_BANDWIDTH=true`. The matched images are visually continuous rather than the sparse v0.8 render, as shown by the [RGB/support montage](figures/v082_rgb_montage.png), [surface crops](figures/v082_rgb_zoom_crops.png), [count maps](figures/v082_transport_count_maps.png), and [weight maps](figures/v082_weight_maps.png). However, matched RMSE still increases 0.03224→0.04077; its max/min ratio is 1.26448, just above the declared 1.25 stability gate. Therefore `MATCHED_DENSITY_HIGHRES_IMAGE_STABLE=false`; this negative result is retained.
+
+### 7. Monte-Carlo self-noise
+
+Independent Sobol scrambles 101 and 211 give MC self-MSE 1.3895e−4, 2.0776e−4, 5.8519e−5, and 3.4340e−4 from low to high resolution (RMSE 0.01179, 0.01441, 0.00765, 0.01853). The max/min MSE ratio is 5.8682, failing the 1.25 gate, despite both independent sets having matched aggregate density to within 0.03%. The support-XOR fractions are only 0.000777/0.000604/0.000266/0.000690, while common-support MSE decreases 9.09e−5→9.74e−6. This implicates detector-support threshold/footprint phase changes in a very small set of pixels, rather than a failure to match total writes. `MC_SELF_NOISE_STABLE_AT_MATCHED_DENSITY=false`, so the protocol stops before geometry optimization and birth. See the [MC plot](figures/v082_mc_self_noise.png).
+
+### 8. Geometry result
+
+Only the required fixed imperfect geometry was evaluated: symmetric Chamfer 0.00451335, P2S mean/p95 0.00264811/0.00705907, surface RMS 0.00546712, and normal error 0.0149405 at every detector resolution. No resolution-dependent geometry optimization was run after the failed MC prerequisite; moreover, the existing explicit sparse Jacobian is not memory-safe at 2.07M emitters without a differentiable streaming/factored implementation. Accordingly `MATCHED_DENSITY_HIGHRES_GEOMETRY_IMPROVES=false` means **not established/not tested**, not measured degradation. The flat fixed-geometry line is shown in the [geometry control](figures/v082_fixed_vs_matched_density_geometry.png).
+
+### 9. Small birth result
+
+The K=32→64 birth comparison and five-seed follow-up were not executed because MC self-noise stability is a mandatory prerequisite. Consequently `HIGH_RES_BIRTH_SIGNAL_STRONGER=false`, `HIGH_RES_BIRTH_BEATS_RANDOM=false`, and `HIGH_RES_BIRTH_HELDOUT_SUPPORTED=false` are explicitly `NOT_TESTED_PREREQUISITE_FAILED` (MC ratio 5.8682 versus 1.25), not negative birth observations.
+
+### 10. Scientific verdict
+
+This run establishes that millions of real emitter samples can make fixed-footprint Full-HD transport quantitatively comparable to the 256² reference: all contribution-density gates pass, and streaming keeps peak allocation/reservation to 1,306.29/1,374 MiB. It also shows that matching aggregate writes and count distributions is not yet sufficient for a clean geometry-bandwidth claim: matched RGB narrowly misses its stability gate and independent-sample image error varies strongly because the hard support threshold amplifies rare sample-dependent support changes. The v0.8 sample-starvation confound is removed, but whether higher detector resolution improves geometry reconstruction or child selection remains unresolved. The next prerequisite is a threshold-robust detector estimator plus a streaming/factored Jacobian, followed by the same low/high K=32→64 and five-seed protocol. Exact metrics, seeds, gates, timings, and evidence are in the [JSON](artifacts/v082_high_sample_resolution_control.json) and [CSV](artifacts/v082_high_sample_resolution_control.csv); [runtime scaling](figures/v082_runtime_scaling.png) reports the practical cost.
+
 ## Limitations
 
 v0.8 is one controlled Bunny run, not a general benchmark or a real-photo reconstruction. Its 20 direct Fibonacci packet directions are also its detector directions; it preserves a shared scene-centric transport state but does not validate arbitrary off-atlas cameras. The 8,192-element candidate dictionary is only a safety envelope. Visibility, ownership, and footprint topology remain frozen within each Jacobian cell. The 2×2 ablation changes the deterministic sampled target support with photon density, has no repeated stochastic trials, and uses a simplified one-shot K=1024 comparison; its signed effects are descriptive, not confidence intervals. In particular, a million attempted packets aggregated over 20 Full-HD views does not imply dense observations per pixel. The strict negative high-bandwidth verdict applies to this optimizer, dictionary, renderer approximation, and controlled target—not to every possible observation-driven birth method.
