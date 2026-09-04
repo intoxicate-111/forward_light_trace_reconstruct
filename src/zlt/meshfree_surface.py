@@ -186,6 +186,7 @@ def sample_meshfree_zero_set(
     newton_steps: int = 32,
     residual_tolerance: float = 1e-9,
     gradient_tolerance: float = 1e-10,
+    sobol_scramble_seed: int | None = None,
 ) -> MeshFreeSurfaceState:
     """Sample sign-changing cells and project without any mesh scaffold."""
     if count < 1 or newton_steps < 1:
@@ -200,7 +201,11 @@ def sample_meshfree_zero_set(
     cells = sign_changing_cells(field.grid)
     if cells.numel() == 0:
         raise RuntimeError("implicit grid contains no sign-changing cells")
-    sequence = torch.quasirandom.SobolEngine(4, scramble=False).draw(count)
+    sequence = torch.quasirandom.SobolEngine(
+        4,
+        scramble=sobol_scramble_seed is not None,
+        seed=sobol_scramble_seed,
+    ).draw(count)
     sequence = sequence.to(dtype=dtype, device=device)
     choice = torch.floor(sequence[:, 0] * cells.shape[0]).to(torch.long)
     choice.clamp_max_(cells.shape[0] - 1)

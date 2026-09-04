@@ -1,6 +1,6 @@
 # Zero-Set Forward Light Tracing
 
-This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4 separates photon-arrival visualization from visibility-aware camera image formation, v0.5 factors image formation through a frozen camera-independent outgoing boundary field, v0.6 removes the renderer's mesh surface scaffold and adds depth-sensitive forward RGB transport, v0.7 removes unnecessary attenuation from the default and retests geometry birth against the corrected RGB operator, and v0.8 stress-tests that birth mechanism at Full HD, 20 views, and 1.31 million attempted forward packets. This project makes no claim of novelty.
+This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4 separates photon-arrival visualization from visibility-aware camera image formation, v0.5 factors image formation through a frozen camera-independent outgoing boundary field, v0.6 removes the renderer's mesh surface scaffold and adds depth-sensitive forward RGB transport, v0.7 removes unnecessary attenuation from the default and retests geometry birth against the corrected RGB operator, v0.8 stress-tests that birth mechanism at Full HD, 20 views, and 1.31 million attempted forward packets, and v0.8.1 audits the resulting image-sampling pathology and adds an opt-in resolution-aware footprint. This project makes no claim of novelty.
 
 ## Model
 
@@ -575,6 +575,85 @@ The 20-view 2×2 ablation uses a simplified one-shot K=1024 selection and separa
 Increasing photon density improves raw Chamfer at both resolutions (−0.002958 at 256² and −0.002781 at 1080p), so `PHOTON_DENSITY_GEOMETRY_EFFECT_SUPPORTED` is true. Increasing resolution worsens raw Chamfer at both photon budgets (+0.000790/+0.000968), so `RESOLUTION_GEOMETRY_EFFECT_NOT_SUPPORTED` is true. The normalized image objective is not comparable as a pure reconstruction score across photon budgets at 1080p because the target support itself becomes denser: increasing photons reveals many more non-black residual pixels. The defensible bandwidth verdict is therefore only `OBSERVATION_BANDWIDTH_LIMIT_PARTIALLY_REDUCED`: photon density reduces geometry error, but nominal resolution does not, and aggregate million-packet count still leaves sparse per-pixel support.
 
 The dominant bottleneck has shifted toward optimization plus footprint coverage, not dictionary capacity. Quadratic candidate scoring and Gram checks take 8.65 s versus 59.47 s in optimization, yet hundreds of units of predicted joint gain produce zero accepted improvement after the first round. Frozen visibility/support makes the local Jacobian blind to topology changes, and each view receives only about 28k retained events for 2.07M pixels. The next useful experiment is therefore not a larger K or still higher resolution: it is denser per-view transport support together with a trust-region/blocked optimizer that can validate and realize large-batch steps, followed by a repeated-seed/random-policy check. Exact rows and signed factorial effects are in the [JSON](artifacts/v08_high_bandwidth.json) and [CSV](artifacts/v08_high_bandwidth.csv). See [quality-vs-DoF/time](figures/v08_high_bandwidth_quality_curves.png), [predictor calibration](figures/v08_high_bandwidth_predictor_calibration.png), [batch trajectory](figures/v08_high_bandwidth_batch_trajectory.png), [birth geography](figures/v08_high_bandwidth_birth_geography.png), [factor ablation](figures/v08_bandwidth_factor_ablation.png), and the [four-view target/reconstruction montage](render_res/v08_high_bandwidth_multiview.png).
+
+## v0.8.1: Full-HD sampling and RGB-loss diagnostic
+
+v0.8.1 does not rerun or rewrite the v0.8 experiment. It first audits the exact image operator used there. An outward, visible event is projected into orthographic pixel coordinates and written through a separable cubic B-spline. In the legacy path,
+
+\[
+w_{ip}=B(r_p-r_i)B(c_p-c_i),\qquad
+I_p=\operatorname{clamp}\!\left(g\frac{\sum_i w_{ip}C_i\ell_i}{\sum_i w_{ip}},0,1\right),
+\]
+
+where each one-dimensional kernel has support radius two **pixels**. Thus one event has at most 16 writes, regardless of detector resolution. RGB is a normalized weighted average rather than an energy sum or pixel-area integral. Neither packet count, pixel area, resolution, view count, nor RGB-channel count normalizes the archived objective
+
+\[
+L=\tfrac12\sum_{v,p,c}(I_{vpc}-T_{vpc})^2,
+\qquad \nabla_aL=\sum_vJ_v^T(I_v-T_v).
+\]
+
+Target and reconstruction use the same deterministic surface identities, direction atlas, equations, and common sample realization, while visibility and support are constructed for their respective geometry and then frozen inside a Jacobian cell.
+
+### Observation
+
+With 65,536 emitters and 20 views fixed, the geometry is numerically identical at every resolution (symmetric Chamfer 0.00451335), but the detector estimator is not:
+
+| Resolution | Half raw SSE | MSE / RGB scalar | RMSE | Unique coverage | Footprint writes / pixel | Residual / target energy |
+|---:|---:|---:|---:|---:|---:|---:|
+| 256² | 2,043.47 | 0.001039 | 0.03224 | 0.29296 | 6.8882 | 0.00913 |
+| 512² | 40,912.78 | 0.005202 | 0.07213 | 0.27986 | 1.7221 | 0.05340 |
+| 960×540 | 175,280.14 | 0.011271 | 0.10616 | 0.26482 | 0.8708 | 0.17174 |
+| 1920×1080 | 692,587.41 | 0.011133 | 0.10551 | 0.14577 | 0.2177 | 0.55346 |
+
+The Full-HD half-SSE is 338.93× the 256² value. Of that change, 31.64× is the increase in pixel count, while normalized MSE still worsens by 10.71×. Therefore 692k is partly a sum-reduction scale effect and partly a genuine resolution-dependent estimator failure; it is not a comparable cross-resolution quality number by itself.
+
+Exactly zero-support Full-HD pixels contain only 7.06% of loss and 3.91% of target energy, so `RGB_RESIDUAL_DOMINATED_BY_UNCOVERED_PIXELS=false` under the declared count≥1 definition. The pathology is nevertheless weak support: pixels with fewer than two contributions contain 69.59% of loss, and those with fewer than four contain 97.97%. The [coverage/contribution panel](figures/v081_target_render_coverage_contributions.png) and [covered/uncovered residual panel](figures/v081_covered_uncovered_residual.png) retain the exact diagnostic buffers.
+
+Repeating the identical render with identical samples gives raw SSE exactly zero. Independent Sobol scrambles, rendered with one fixed scene-centered detector so that only samples change, give MSE 0.02667 at 256² and 0.02800 at Full HD. The Full-HD independent-sample self-SSE is 2.560× the measured geometry-reconstruction SSE. Common random numbers are therefore necessary and are already used by v0.8: independent Monte Carlo noise would dominate, but it does not directly enter the deterministic production objective. Held-out samples remain necessary for validation.
+
+At approximately matched footprint-write density, 256²/4,096, 512²/16,384, and 1024²/65,536 emitters hold unique coverage within 0.00518 and density near 0.431 writes/pixel. RMSE still rises 0.06133→0.08265→0.11082. This rejects a packet-count-only explanation and points to the detector-space kernel scale. See the [matched-density control](figures/v081_matched_density_resolution.png).
+
+### Inference and fix
+
+The legacy four-pixel-wide footprint shrinks in normalized detector coordinates as resolution rises. v0.8.1 therefore adds an opt-in reference-resolution footprint. For $s_h=H/256$ and $s_w=W/256$,
+
+\[
+w_{ip}=\frac{B((r_p-r_i)/s_h)B((c_p-c_i)/s_w)}{s_hs_w},
+\]
+
+with analytic motion derivatives scaled consistently and the support threshold divided by $s_hs_w$. This is a change of reconstruction-kernel coordinates, not arbitrary post-render blur. The reciprocal area factor cancels in normalized RGB but preserves density/support semantics. Legacy behavior remains the default, so the v0.7/v0.8 operator and artifacts are unchanged.
+
+| Resolution | Legacy coverage / RMSE | Aware coverage / RMSE | Aware footprint area |
+|---:|---:|---:|---:|
+| 256² | 0.28920 / 0.05736 | 0.28920 / 0.05736 | 16.0 px |
+| 512² | 0.21693 / 0.08334 | 0.28914 / 0.05737 | 64.0 px |
+| 960×540 | 0.14861 / 0.08033 | 0.28915 / 0.05730 | 126.60 px |
+
+Across the three aware controls the coverage range is only $6.23\times10^{-5}$ and the RMSE range is $6.79\times10^{-5}$, which is direct numerical evidence for `FOOTPRINT_RESOLUTION_SCALING_BUG_FOUND=true`. A Full-HD aware-Jacobian run is deliberately not forced on this 16 GiB GPU because the explicit sparse stencil would grow by 31.64×; the controlled 960×540 test is the safe highest non-square level. A future Full-HD production implementation should stream or factor this expanded stencil.
+
+### Candidate and post-fix birth result
+
+Sparse Full-HD rendering does not make the 480 inactive quadratic scores indiscriminately tied: all are positive, but only 0.208% lie within 50%, 75%, or 90% of the best and the coefficient of variation is 2.94. The quadratic score has weak negative Spearman correlation with local zero-coverage fraction (−0.0766), moderate correlation with local RGB residual (0.2896), and positive correlation with independent geometry error (0.3708). Consequently the evidence rejects “score follows coverage holes” and supports a reduced but nonzero geometry association. The exact low/Full-HD distributions are in the [coverage](figures/v081_candidate_score_vs_coverage.png) and [geometry-error](figures/v081_candidate_score_vs_geometry_error.png) plots.
+
+The minimal post-fix test uses 512², 20 views, 16,384 training emitters (Sobol scramble 101), an independent 16,384-emitter held-out realization (211), a fixed 256-entry dictionary, K=32→64, and only two post-birth optimization steps. The resolution-aware analytic Jacobian passes central finite differences with maximum relative error 0.05740 below the 0.08 gate.
+
+| Method | Half raw SSE | Normalized MSE | Chamfer | P2S mean | Normal error | Same-sample gain | Held-out gain |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| no birth, K32 | 26,375.34 | 0.0033538 | 0.0071666 | 0.0025189 | 0.014929 | — | — |
+| random, K64 | 26,345.80 | 0.0033500 | 0.0071580 | 0.0025077 | 0.014867 | 29.53 | 36.31 |
+| fixed-space, K64 | 26,302.96 | 0.0033446 | 0.0071463 | 0.0024848 | 0.014867 | 72.38 | 59.31 |
+| raw birth, K64 | 26,265.46 | 0.0033398 | **0.0071450** | **0.0024844** | 0.014695 | 109.88 | **106.54** |
+| quadratic birth, K64 | **26,265.22** | **0.0033398** | 0.0071468 | 0.0024855 | **0.014678** | **110.12** | 105.77 |
+
+For batch sizes 1/4/16/32, raw same-sample gains are 59.13/77.99/96.59/109.88 and held-out gains are 40.87/69.51/93.12/106.54; quadratic gives 14.20/79.80/97.26/110.12 and 15.96/67.51/93.10/105.77. The [gain plot](figures/v081_predicted_realized_same_heldout.png) shows that the recovered signal generalizes rather than merely fitting one realization.
+
+### Updated scientific verdict
+
+The evidence materially changes the interpretation of v0.8. Its strict `BIRTH_SUPPORTED=false` result remains an accurate record for that exact renderer/configuration, but it is **not a clean test of the underlying geometry-birth hypothesis**: the Full-HD detector footprint was resolution-inconsistent, and a small corrected control recovers observation-driven benefit over random on both training and held-out RGB as well as Chamfer. Optimizer failure is therefore not needed to explain the diagnostic result, although this test does not prove that every v0.8 large-batch optimization effect disappears.
+
+The required verdicts are: `HIGH_RES_IMAGE_UNDERSAMPLED=true`, `RGB_LOSS_SCALE_RESOLUTION_DEPENDENT=true`, `RGB_RESIDUAL_DOMINATED_BY_UNCOVERED_PIXELS=false`, `MC_NOISE_FLOOR_DOMINATES_RGB_OBJECTIVE=false`, `FOOTPRINT_RESOLUTION_SCALING_BUG_FOUND=true`, `COMMON_RANDOM_NUMBERS_NEEDED=true` (and already used), `CANDIDATE_SCORE_CORRELATES_WITH_COVERAGE_HOLES=false`, `CANDIDATE_SCORE_CORRELATES_WITH_GEOMETRY_ERROR=true`, `BIRTH_FAILURE_EXPLAINED_BY_IMAGE_SAMPLING=true` in the material/partial sense above, `OPTIMIZER_FAILURE_STILL_NEEDED_TO_EXPLAIN_RESULTS=false`, `MATCHED_DENSITY_RESOLUTION_EFFECT_SUPPORTED=true`, and `BIRTH_SIGNAL_RECOVERS_AFTER_IMAGE_FIX=true`. Independent samples would dominate if substituted into the training objective, recorded separately as `INDEPENDENT_MC_WOULD_DOMINATE_RGB_OBJECTIVE=true`.
+
+All thresholds, per-view buffers, raw/normalized RGB metrics, target/predicted/residual energies, score statistics, correlations, exact seeds, timings, and boolean evidence are in [`artifacts/v081_highres_sampling_diagnostic.json`](artifacts/v081_highres_sampling_diagnostic.json) and [`artifacts/v081_highres_sampling_diagnostic.csv`](artifacts/v081_highres_sampling_diagnostic.csv). The ten `v081_` figures are retained under [`figures/`](figures/). The formal local-CUDA run took 179.63 s and peaked at 5,901.64 MiB allocated / 6,310 MiB reserved.
 
 ## Limitations
 

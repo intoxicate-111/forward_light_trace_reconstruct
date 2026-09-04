@@ -45,6 +45,8 @@ class CorrectedBirthConfig:
     views: int = 8
     resolution: int = 256
     resolution_width: int | None = None
+    surface_scramble_seed: int | None = None
+    footprint_reference_resolution: int | None = None
     base_support_radius: float = 0.45
     support_margin: float = 0.005
     coefficient_limit: float = 0.03
@@ -75,6 +77,16 @@ class CorrectedBirthConfig:
     @property
     def resolution_shape(self) -> tuple[int, int]:
         return (self.resolution, self.resolution_width or self.resolution)
+
+    @property
+    def footprint_scale(self) -> tuple[float, float]:
+        reference = self.footprint_reference_resolution
+        if reference is None:
+            return (1.0, 1.0)
+        if reference <= 0:
+            raise ValueError("footprint_reference_resolution must be positive")
+        rows, columns = self.resolution_shape
+        return (rows / reference, columns / reference)
 
 
 @dataclass(frozen=True)
@@ -327,6 +339,14 @@ def _visibility_cells(
         ((source_relative - boundary_relative) * event_right).sum(1).abs(),
         ((source_relative - boundary_relative) * event_up).sum(1).abs(),
     )
+    per_view_outward = [
+        int(((normals @ atlas.directions[index]) > 1e-8).sum())
+        for index in range(config.views)
+    ]
+    per_view_retained = [
+        int((events.direction_ids == index).sum())
+        for index in range(config.views)
+    ]
     cells: list[ForwardRGBCell] = []
     for direction_id in range(config.views):
         keep = events.direction_ids == direction_id
@@ -348,7 +368,14 @@ def _visibility_cells(
         "retained": events.count,
         "digest": events.digest,
         "seconds": events.scene_seconds,
-        "per_view_retained": [int(cell.owner_ids.numel()) for cell in cells],
+        "per_view_outward": per_view_outward,
+        "per_view_absorbed": [
+            outward - retained
+            for outward, retained in zip(
+                per_view_outward, per_view_retained
+            )
+        ],
+        "per_view_retained": per_view_retained,
         "transverse_source_boundary_max_error": float(
             transverse_error.max()
         ),
@@ -372,9 +399,23 @@ def _render_cell(
     row = (0.5 - vertical / cell.extent) * rows - 0.5
     base_row = torch.floor(row).to(torch.long)
     base_column = torch.floor(column).to(torch.long)
-    offsets = torch.arange(-1, 3, dtype=torch.long, device=points.device)
-    row_ids = base_row[:, None] + offsets[None, :]
-    column_ids = base_column[:, None] + offsets[None, :]
+    row_scale, column_scale = config.footprint_scale
+    row_radius = math.ceil(2.0 * row_scale)
+    column_radius = math.ceil(2.0 * column_scale)
+    row_offsets = torch.arange(
+        -row_radius + 1,
+        row_radius + 1,
+        dtype=torch.long,
+        device=points.device,
+    )
+    column_offsets = torch.arange(
+        -column_radius + 1,
+        column_radius + 1,
+        dtype=torch.long,
+        device=points.device,
+    )
+    row_ids = base_row[:, None] + row_offsets[None, :]
+    column_ids = base_column[:, None] + column_offsets[None, :]
 
     def cubic(distance: Tensor) -> tuple[Tensor, Tensor]:
         absolute = distance.abs()
@@ -389,21 +430,34 @@ def _render_cell(
         )
         return values, derivatives
 
-    row_weights, row_derivatives = cubic(row[:, None] - row_ids)
-    column_weights, column_derivatives = cubic(
-        column[:, None] - column_ids
+    row_weights, row_derivatives = cubic(
+        (row[:, None] - row_ids) / row_scale
     )
-    pixel_rows = row_ids[:, :, None].expand(-1, 4, 4).reshape(-1, 16)
-    pixel_columns = column_ids[:, None, :].expand(-1, 4, 4).reshape(-1, 16)
+    row_weights /= row_scale
+    row_derivatives /= row_scale * row_scale
+    column_weights, column_derivatives = cubic(
+        (column[:, None] - column_ids) / column_scale
+    )
+    column_weights /= column_scale
+    column_derivatives /= column_scale * column_scale
+    row_count = int(row_ids.shape[1])
+    column_count = int(column_ids.shape[1])
+    footprint_area = row_count * column_count
+    pixel_rows = row_ids[:, :, None].expand(
+        -1, row_count, column_count
+    ).reshape(-1, footprint_area)
+    pixel_columns = column_ids[:, None, :].expand(
+        -1, row_count, column_count
+    ).reshape(-1, footprint_area)
     weights = (
         row_weights[:, :, None] * column_weights[:, None, :]
-    ).reshape(-1, 16)
+    ).reshape(-1, footprint_area)
     weight_row_derivatives = (
         row_derivatives[:, :, None] * column_weights[:, None, :]
-    ).reshape(-1, 16)
+    ).reshape(-1, footprint_area)
     weight_column_derivatives = (
         row_weights[:, :, None] * column_derivatives[:, None, :]
-    ).reshape(-1, 16)
+    ).reshape(-1, footprint_area)
     valid = (
         (pixel_rows >= 0)
         & (pixel_rows < rows)
@@ -435,7 +489,10 @@ def _render_cell(
     support_mask = (
         cell.support_mask
         if cell.support_mask is not None
-        else mass >= config.support_threshold
+        else (
+            mass
+            >= config.support_threshold / (row_scale * column_scale)
+        )
     )
     unclipped = (raw > 0.0) & (raw < 1.0) & support_mask[:, None]
     image = torch.where(
@@ -1729,7 +1786,11 @@ def _build_context(
     device = torch.device("cuda")
     base = prepared.base_field.to(device)
     target_field = prepared.gt_field.to(device)
-    surface = sample_meshfree_zero_set(base, config.surface_samples)
+    surface = sample_meshfree_zero_set(
+        base,
+        config.surface_samples,
+        sobol_scramble_seed=config.surface_scramble_seed,
+    )
     reference_points = surface.points
     reference_normals = surface.normals
     layout, levels = _layout(reference_points, config)
@@ -1831,20 +1892,28 @@ def _build_context(
     context.cells = [
         replace(
             cell,
-            support_mask=render.mass >= config.support_threshold,
+            support_mask=render.mass
+            >= config.support_threshold
+            / math.prod(config.footprint_scale),
         )
         for cell, render in zip(cells, base_renders)
     ]
+    del base_renders
+    torch.cuda.empty_cache()
     _, target_renders = _render(
         target_points, target_normals, context, target_cells
     )
     target_cells = [
         replace(
             cell,
-            support_mask=render.mass >= config.support_threshold,
+            support_mask=render.mass
+            >= config.support_threshold
+            / math.prod(config.footprint_scale),
         )
         for cell, render in zip(target_cells, target_renders)
     ]
+    del target_renders
+    torch.cuda.empty_cache()
     target_images, _ = _render(
         target_points, target_normals, context, target_cells
     )
@@ -1869,9 +1938,16 @@ def _finite_difference_gate(
     errors = []
     epsilon = 2e-5
     for parameter in tested:
-        coefficients = state.coefficients.clone()
-        coefficients[parameter] += epsilon
-        perturbed = _evaluate(context, active, coefficients, (layout, support))
+        plus_coefficients = state.coefficients.clone()
+        minus_coefficients = state.coefficients.clone()
+        plus_coefficients[parameter] += epsilon
+        minus_coefficients[parameter] -= epsilon
+        plus = _evaluate(
+            context, active, plus_coefficients, (layout, support)
+        )
+        minus = _evaluate(
+            context, active, minus_coefficients, (layout, support)
+        )
         analytic = torch.cat(
             [
                 torch.sparse.mm(
@@ -1886,8 +1962,8 @@ def _finite_difference_gate(
         )
         finite = torch.cat(
             [
-                (right - left) / epsilon
-                for right, left in zip(perturbed.images, state.images)
+                (right - left) / (2.0 * epsilon)
+                for right, left in zip(plus.images, minus.images)
             ]
         )
         errors.append(
@@ -1898,6 +1974,8 @@ def _finite_difference_gate(
         )
     return {
         "parameters": list(tested),
+        "scheme": "central",
+        "epsilon": epsilon,
         "relative_errors": errors,
         "maximum_relative_error": max(errors),
         "passed": max(errors) < 0.08,
