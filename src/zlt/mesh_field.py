@@ -291,20 +291,54 @@ def _signed_grid(
 
 
 def _grid_field(
-    values: np.ndarray, lower: float, upper: float
+    values: np.ndarray,
+    lower: float,
+    upper: float,
+    *,
+    build_surface_scaffold: bool = True,
 ) -> tuple[GridZeroSetField, dict[str, object]]:
-    import trimesh
-    from skimage.measure import marching_cubes
-
     spacing = (upper - lower) / (values.shape[0] - 1)
-    vertices, faces, _, _ = marching_cubes(
-        values, level=0.0, spacing=(spacing, spacing, spacing)
-    )
-    vertices += lower
-    mesh = trimesh.Trimesh(vertices, faces, process=False)
-    areas = np.asarray(mesh.area_faces, dtype=np.float64)
-    cdf = np.cumsum(areas)
-    cdf /= cdf[-1]
+    if build_surface_scaffold:
+        import trimesh
+        from skimage.measure import marching_cubes
+
+        vertices, faces, _, _ = marching_cubes(
+            values, level=0.0, spacing=(spacing, spacing, spacing)
+        )
+        vertices += lower
+        mesh = trimesh.Trimesh(vertices, faces, process=False)
+        areas = np.asarray(mesh.area_faces, dtype=np.float64)
+        cdf = np.cumsum(areas)
+        cdf /= cdf[-1]
+        surface_metadata: dict[str, object] = {
+            "vertices": int(len(vertices)),
+            "faces": int(len(faces)),
+            "watertight": bool(mesh.is_watertight),
+            "surface_area": float(mesh.area),
+            "bounds": np.asarray(mesh.bounds).tolist(),
+            "scaffold": "marching_cubes",
+        }
+    else:
+        vertices = np.empty((0, 3), dtype=np.float64)
+        faces = np.empty((0, 3), dtype=np.int64)
+        cdf = np.empty(0, dtype=np.float64)
+        inside = np.argwhere(values <= 0.0)
+        approximate_bounds = (
+            [
+                (lower + inside.min(axis=0) * spacing).tolist(),
+                (lower + inside.max(axis=0) * spacing).tolist(),
+            ]
+            if len(inside)
+            else None
+        )
+        surface_metadata = {
+            "vertices": 0,
+            "faces": 0,
+            "watertight": None,
+            "surface_area": None,
+            "bounds": approximate_bounds,
+            "scaffold": "omitted_mesh_free",
+        }
     gradients = np.stack(
         np.gradient(values.astype(np.float64), spacing, edge_order=2), axis=-1
     )
@@ -318,11 +352,7 @@ def _grid_field(
         torch.from_numpy(cdf),
     )
     metadata = {
-        "vertices": int(len(vertices)),
-        "faces": int(len(faces)),
-        "watertight": bool(mesh.is_watertight),
-        "surface_area": float(mesh.area),
-        "bounds": np.asarray(mesh.bounds).tolist(),
+        **surface_metadata,
         "grid_minimum": float(values.min()),
         "grid_maximum": float(values.max()),
     }
@@ -335,6 +365,7 @@ def prepare_stanford_bunny(
     grid_resolution: int = 160,
     base_smoothing_sigma: float = 1.5,
     grid_bound: float = 1.2,
+    build_surface_scaffold: bool = True,
 ) -> PreparedBunny:
     """Create original-reference, watertight-proxy, GT-grid, and coarse-base data."""
     import trimesh
@@ -361,8 +392,18 @@ def prepare_stanford_bunny(
         grid_bound,
     )
     base_values = gaussian_filter(gt_values, sigma=base_smoothing_sigma)
-    gt_field, gt_stats = _grid_field(gt_values, -grid_bound, grid_bound)
-    base_field, base_stats = _grid_field(base_values, -grid_bound, grid_bound)
+    gt_field, gt_stats = _grid_field(
+        gt_values,
+        -grid_bound,
+        grid_bound,
+        build_surface_scaffold=build_surface_scaffold,
+    )
+    base_field, base_stats = _grid_field(
+        base_values,
+        -grid_bound,
+        grid_bound,
+        build_surface_scaffold=build_surface_scaffold,
+    )
     metadata: dict[str, object] = {
         "source": (
             "Stanford University Computer Graphics Laboratory, "
@@ -401,6 +442,9 @@ def prepare_stanford_bunny(
             "construction": (
                 "Open3D closest-triangle signed field sampled once; "
                 "trilinear generic zero-set evaluation"
+            ),
+            "render_surface_scaffold": (
+                "marching_cubes" if build_surface_scaffold else "omitted_mesh_free"
             ),
             "gt_surface": gt_stats,
         },

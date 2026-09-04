@@ -662,6 +662,21 @@ def run_camera_independent_analysis(args: argparse.Namespace) -> dict[str, objec
     )
 
 
+def run_meshfree_rgb_analysis(args: argparse.Namespace) -> dict[str, object]:
+    from zlt.mesh_field import obtain_stanford_bunny
+    from zlt.meshfree_rgb import run_meshfree_rgb_experiment
+
+    mesh_path = args.bunny_mesh
+    if mesh_path is None:
+        mesh_path = obtain_stanford_bunny(args.bunny_cache)
+    return run_meshfree_rgb_experiment(
+        mesh_path,
+        args.bunny_artifacts,
+        args.bunny_figures,
+        args.render_output,
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -813,11 +828,13 @@ def run_verification() -> dict[str, object]:
     from zlt.natural import natural_cpu_verification
     from zlt.image_formation import image_formation_cpu_verification
     from zlt.camera_independent import camera_independent_cpu_cuda_verification
+    from zlt.meshfree_rgb import meshfree_rgb_cpu_cuda_verification
 
     bandwidth_report = bandwidth_cpu_verification()
     natural_report = natural_cpu_verification()
     image_formation_report = image_formation_cpu_verification()
     camera_independent_report = camera_independent_cpu_cuda_verification()
+    meshfree_rgb_report = meshfree_rgb_cpu_cuda_verification()
     return {
         **v01_report,
         **v02_report,
@@ -828,6 +845,7 @@ def run_verification() -> dict[str, object]:
         "gate_z_natural_multiview_nesting": natural_report,
         "gate_aa_visibility_aware_image_formation": image_formation_report,
         "gate_ab_camera_independent_boundary_field": camera_independent_report,
+        "gate_ac_meshfree_forward_rgb": meshfree_rgb_report,
     }
 
 
@@ -1025,6 +1043,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--natural-multiview", action="store_true")
     parser.add_argument("--image-formation", action="store_true")
     parser.add_argument("--camera-independent", action="store_true")
+    parser.add_argument("--meshfree-rgb", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -1050,6 +1069,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.meshfree_rgb:
+        report = run_meshfree_rgb_analysis(args)
+        print("meshfree_rgb_analysis:")
+        print(json.dumps(report["verdicts"], indent=2, sort_keys=True))
+        return
     if args.camera_independent:
         report = run_camera_independent_analysis(args)
         print("camera_independent_analysis:")

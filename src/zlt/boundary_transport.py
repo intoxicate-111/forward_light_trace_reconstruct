@@ -204,6 +204,11 @@ def build_boundary_transport(
     collision_chunk_size: int = 8192,
     epsilon: float = 2e-4,
     constant_radiance: float = 0.72,
+    surface_colors: Tensor | None = None,
+    emission_strengths: Tensor | None = None,
+    distance_sigma: float = 0.0,
+    cosine_power: float = 0.0,
+    ambient_emission: float = 1.0,
 ) -> BoundaryTransportEvents:
     """Trace global outgoing directions to Sigma without detector knowledge."""
     if (
@@ -213,6 +218,14 @@ def build_boundary_transport(
         raise ValueError("surface points/normals must be matching Nx3 tensors")
     if surface_points.device != atlas.directions.device:
         raise ValueError("surface state and direction atlas must share a device")
+    if surface_colors is not None and surface_colors.shape != surface_points.shape:
+        raise ValueError("surface colors must be an Nx3 tensor")
+    if emission_strengths is not None and emission_strengths.shape != surface_points.shape[:1]:
+        raise ValueError("emission strengths must contain one scalar per surface sample")
+    if distance_sigma < 0.0 or cosine_power < 0.0:
+        raise ValueError("attenuation sigma and cosine power must be nonnegative")
+    if not 0.0 <= ambient_emission <= 1.0:
+        raise ValueError("ambient emission must lie in [0, 1]")
     device = surface_points.device
     baseline = torch.cuda.memory_allocated(device) if device.type == "cuda" else 0
     if device.type == "cuda":
@@ -250,6 +263,32 @@ def build_boundary_transport(
         survivor_owner = owner[survive]
         survivor_length = maximum[survive]
         survivor_position = origins[survive] + survivor_length[:, None] * direction
+        base_color = (
+            surface_colors[survivor_owner]
+            if surface_colors is not None
+            else torch.full(
+                (survivor_owner.numel(), 3),
+                constant_radiance,
+                dtype=surface_points.dtype,
+                device=device,
+            )
+        )
+        cosine = (surface_normals[survivor_owner] @ direction).clamp_min(0.0)
+        lobe = (
+            ambient_emission
+            + (1.0 - ambient_emission) * cosine.pow(cosine_power)
+            if cosine_power > 0.0
+            else torch.ones_like(cosine)
+        )
+        strength = (
+            emission_strengths[survivor_owner]
+            if emission_strengths is not None
+            else torch.ones_like(cosine)
+        )
+        attenuation = torch.exp(-distance_sigma * survivor_length)
+        transmitted_rgb = base_color * (
+            strength * lobe * attenuation
+        )[:, None]
         count = int(survivor_owner.numel())
         emitted += int(owner.numel())
         absorbed += int(hit.sum())
@@ -257,11 +296,7 @@ def build_boundary_transport(
         direction_ids.append(
             torch.full((count,), direction_id, dtype=torch.long, device=device)
         )
-        radiance.append(
-            torch.full(
-                (count, 3), constant_radiance, dtype=surface_points.dtype, device=device
-            )
-        )
+        radiance.append(transmitted_rgb)
         weights.append(torch.ones(count, dtype=surface_points.dtype, device=device))
         owners.append(survivor_owner)
         lengths.append(survivor_length)
@@ -362,6 +397,77 @@ def restrict_events_by_owner(
         surface_sample_count,
         emitted,
         absorbed,
+        0.0,
+        0.0,
+        digest,
+    )
+
+
+def reweight_boundary_transport_rgb(
+    events: BoundaryTransportEvents,
+    surface_colors: Tensor,
+    surface_normals: Tensor,
+    *,
+    distance_sigma: float,
+    cosine_power: float = 0.0,
+    ambient_emission: float = 1.0,
+    emission_strengths: Tensor | None = None,
+) -> BoundaryTransportEvents:
+    """Change RGB transport energy without repeating zero-set visibility."""
+    if surface_colors.shape != surface_normals.shape or surface_colors.shape[1:] != (3,):
+        raise ValueError("surface colors and normals must be matching Nx3 tensors")
+    if surface_colors.shape[0] < events.surface_sample_count:
+        raise ValueError("surface attributes do not cover every event owner")
+    if (
+        emission_strengths is not None
+        and emission_strengths.shape != surface_colors.shape[:1]
+    ):
+        raise ValueError("emission strengths must contain one scalar per sample")
+    if distance_sigma < 0.0 or cosine_power < 0.0:
+        raise ValueError("attenuation sigma and cosine power must be nonnegative")
+    if not 0.0 <= ambient_emission <= 1.0:
+        raise ValueError("ambient emission must lie in [0, 1]")
+    directions = events.atlas.directions[events.direction_ids]
+    cosine = (
+        surface_normals[events.owner_ids] * directions
+    ).sum(1).clamp_min(0.0)
+    lobe = (
+        ambient_emission
+        + (1.0 - ambient_emission) * cosine.pow(cosine_power)
+        if cosine_power > 0.0
+        else torch.ones_like(cosine)
+    )
+    attenuation = torch.exp(-distance_sigma * events.path_lengths)
+    strength = (
+        emission_strengths[events.owner_ids]
+        if emission_strengths is not None
+        else torch.ones_like(attenuation)
+    )
+    radiance = surface_colors[events.owner_ids] * (
+        strength * lobe * attenuation
+    )[:, None]
+    digest = _event_digest(
+        events.boundary_positions,
+        events.direction_ids,
+        radiance,
+        events.weights,
+        events.owner_ids,
+        events.path_lengths,
+        events.atlas,
+        events.boundary,
+    )
+    return BoundaryTransportEvents(
+        events.boundary_positions,
+        events.direction_ids,
+        radiance,
+        events.weights,
+        events.owner_ids,
+        events.path_lengths,
+        events.atlas,
+        events.boundary,
+        events.surface_sample_count,
+        events.emitted_count,
+        events.absorbed_count,
         0.0,
         0.0,
         digest,

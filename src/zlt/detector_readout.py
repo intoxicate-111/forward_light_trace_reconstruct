@@ -163,12 +163,15 @@ def read_light_field(
     angular_bandwidth_radians: float = 0.08,
     spatial_bandwidth_pixels: float = 0.0,
     support_threshold: float = 0.5,
+    sensor_gain: float = 1.0,
 ) -> LightFieldReadout:
     """Apply M_c to H_Sigma; only boundary ray states and H are inspected."""
     if angular_neighbors < 1 or angular_neighbors > field.atlas.count:
         raise ValueError("invalid angular neighbor count")
     if not 0.0 <= support_threshold <= 1.0:
         raise ValueError("support threshold must lie in [0, 1]")
+    if sensor_gain <= 0.0:
+        raise ValueError("sensor gain must be positive")
     device = field.keys.device
     baseline = torch.cuda.memory_allocated(device) if device.type == "cuda" else 0
     if device.type == "cuda":
@@ -223,7 +226,8 @@ def read_light_field(
             direct_found = weighted_support >= support_threshold
     confidence = torch.where(rays.valid, support_sum, torch.zeros_like(support_sum))
     mask = confidence >= support_threshold
-    image = color_sum / support_sum[:, None].clamp_min(1e-30)
+    image = sensor_gain * color_sum / support_sum[:, None].clamp_min(1e-30)
+    image = image.clamp(0.0, 1.0)
     image = torch.where(mask[:, None], image, torch.zeros_like(image))
     _sync(device)
     seconds = time.perf_counter() - started
