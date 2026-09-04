@@ -63,6 +63,11 @@ from .multiview import (
     validate_multiview_equivalence,
 )
 from .locality import locality_cpu_verification
+from .sequential import (
+    RepeatedBirthConfig,
+    run_repeated_birth_experiment,
+    sequential_cpu_verification,
+)
 
 __all__ = [
     "PhotonBatch",
@@ -116,4 +121,7 @@ __all__ = [
     "run_multiview_benchmark",
     "validate_multiview_equivalence",
     "locality_cpu_verification",
+    "RepeatedBirthConfig",
+    "run_repeated_birth_experiment",
+    "sequential_cpu_verification",
 ]

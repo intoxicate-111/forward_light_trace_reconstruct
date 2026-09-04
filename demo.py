@@ -19,6 +19,7 @@ from zlt import (  # noqa: E402
     BirthConfig,
     GeometryJacobian,
     KScalingConfig,
+    RepeatedBirthConfig,
     LocalBasisField,
     MultiviewConfig,
     PhotonBatch,
@@ -47,8 +48,10 @@ from zlt import (  # noqa: E402
     render_first_arrival,
     run_birth_experiment,
     run_k_scaling_experiment,
+    run_repeated_birth_experiment,
     run_multiview_benchmark,
     support_report,
+    sequential_cpu_verification,
     trace_photons,
     unit_normals,
 )
@@ -556,6 +559,19 @@ def run_k_scaling_analysis(args: argparse.Namespace) -> dict[str, object]:
     )
 
 
+def run_repeated_birth_analysis(args: argparse.Namespace) -> dict[str, object]:
+    config = RepeatedBirthConfig(
+        budget=args.repeated_birth_budget,
+        run_oracle=not args.skip_oracle_greedy,
+    )
+    return run_repeated_birth_experiment(
+        config,
+        csv_path=args.repeated_birth_csv,
+        json_path=args.repeated_birth_json,
+        figure_directory=args.repeated_birth_figures,
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -702,11 +718,13 @@ def run_verification() -> dict[str, object]:
     v02_report = run_v02_verification()
     multiview_report = multiview_cpu_verification()
     locality_report = locality_cpu_verification()
+    sequential_report = sequential_cpu_verification()
     return {
         **v01_report,
         **v02_report,
         "gate_v_shared_multiview_equivalence": multiview_report,
         "gate_w_sparse_locality_equivalence": locality_report,
+        "gate_x_true_parameter_birth": sequential_report,
     }
 
 
@@ -892,6 +910,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--k-scaling-csv", type=Path, default=None)
     parser.add_argument("--k-scaling-json", type=Path, default=None)
     parser.add_argument("--k-scaling-figures", type=Path, default=None)
+    parser.add_argument("--repeated-birth", action="store_true")
+    parser.add_argument("--repeated-birth-budget", type=int, default=256)
+    parser.add_argument("--repeated-birth-csv", type=Path, default=None)
+    parser.add_argument("--repeated-birth-json", type=Path, default=None)
+    parser.add_argument("--repeated-birth-figures", type=Path, default=None)
+    parser.add_argument("--skip-oracle-greedy", action="store_true")
     parser.add_argument("--benchmark-multiview", action="store_true")
     parser.add_argument(
         "--multiview-resolution",
@@ -908,6 +932,24 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.repeated_birth:
+        report = run_repeated_birth_analysis(args)
+        print("repeated_birth_analysis:")
+        print(
+            json.dumps(
+                {
+                    "primary_verdict": report["primary_verdict"],
+                    "parameter_efficiency_verdict": report[
+                        "parameter_efficiency_verdict"
+                    ],
+                    "verdict_basis": report["verdict_basis"],
+                    "artifacts": report.get("artifacts"),
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return
     if args.birth_k_scaling:
         print("prebirth_k_scaling:")
         print(json.dumps(run_k_scaling_analysis(args), indent=2, sort_keys=True))
