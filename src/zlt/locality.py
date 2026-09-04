@@ -15,13 +15,16 @@ Tensor = torch.Tensor
 
 
 def hierarchical_surface_points(
-    field: SphereField | TorusField,
+    field: ZeroSetField,
     count: int,
     device: torch.device,
 ) -> Tensor:
     """Map a nested Sobol prefix to a deterministic analytic surface."""
     if count <= 0:
         raise ValueError("surface point count must be positive")
+    sampler = getattr(field, "hierarchical_surface_points", None)
+    if sampler is not None:
+        return sampler(count, device)
     parameters = torch.quasirandom.SobolEngine(2, scramble=False).draw(count)
     parameters = parameters.to(dtype=torch.float64, device=device)
     first, second = parameters.unbind(dim=-1)

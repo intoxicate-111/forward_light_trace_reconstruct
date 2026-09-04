@@ -12,3 +12,5 @@ runs/
 !figures/v022_multiview_*.png
 !figures/v03b_*.png
 !figures/v03c_*.png
+!figures/v03d_bunny_*.png
+data/stanford_bunny/cache/

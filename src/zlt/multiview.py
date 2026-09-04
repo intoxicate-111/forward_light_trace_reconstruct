@@ -85,12 +85,12 @@ def multiview_cameras(
     count: int = 20,
 ) -> list[PlanarCamera]:
     """Create a deterministic Fibonacci-sphere camera set with no duplicates."""
-    if scene not in {"sphere", "torus"}:
-        raise ValueError("scene must be 'sphere' or 'torus'")
+    if scene not in {"sphere", "torus", "bunny"}:
+        raise ValueError("scene must be 'sphere', 'torus', or 'bunny'")
     if count < 1:
         raise ValueError("camera count must be positive")
-    distance = 3.0 if scene == "sphere" else 3.5
-    extent = 4.0 if scene == "sphere" else 4.5
+    distance = {"sphere": 3.0, "torus": 3.5, "bunny": 3.0}[scene]
+    extent = {"sphere": 4.0, "torus": 4.5, "bunny": 2.8}[scene]
     golden_angle = math.pi * (3.0 - math.sqrt(5.0))
     cameras: list[PlanarCamera] = []
     for index in range(count):

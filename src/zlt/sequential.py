@@ -10,6 +10,7 @@ import time
 from dataclasses import dataclass, replace
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Callable
 
 import torch
 
@@ -74,18 +75,24 @@ class RepeatedBirthConfig:
     convergence_tolerance: float = 1e-7
     root_samples: int = 32
     root_bisection_steps: int = 20
+    deformation_iterations: int = 10
     oracle_master_count: int = 256
     oracle_births: int = 32
     oracle_evaluations: int = 5
     run_oracle: bool = True
+    oracle_subset_size: int = 0
+    oracle_checkpoints: tuple[int, ...] = ()
 
     def __post_init__(self) -> None:
         if not (32 <= self.initial_count < self.budget <= self.master_count):
             raise ValueError("require 32 <= initial_count < budget <= master_count")
         if self.master_count & (self.master_count - 1):
             raise ValueError("master_count must be a power of two")
-        if any(regime not in {"sparse", "distributed"} for regime in self.target_regimes):
-            raise ValueError("target regimes must be sparse or distributed")
+        if any(
+            regime not in {"sparse", "distributed", "bunny"}
+            for regime in self.target_regimes
+        ):
+            raise ValueError("target regimes must be sparse, distributed, or bunny")
 
 
 @dataclass
@@ -101,6 +108,7 @@ class SequentialContext:
     cells: list
     state: SceneTransportState
     geometry: BenchmarkGeometry
+    geometry_evaluator: Callable[[Tensor], dict[str, float]] | None = None
 
 
 @dataclass
@@ -115,6 +123,8 @@ class ActiveState:
     last_relative_improvement: float
     gradient_norm: float
     root_failures: int
+    line_search_failures: int = 0
+    cg_failures: int = 0
 
 
 def _hierarchical_layout(
@@ -277,7 +287,10 @@ def _evaluate_active(
         context.reference_normals,
         support,
     )
-    points, success, _, denominator = field.deform(max_offset=0.03)
+    points, success, _, denominator = field.deform(
+        iterations=context.config.deformation_iterations,
+        max_offset=0.03,
+    )
     images = _images(context.cells, points)
     loss = _image_loss(images, targets) if targets is not None else math.nan
     return ActiveState(
@@ -416,6 +429,8 @@ def _optimize(
     coefficients = state.coefficients.clone()
     result = state
     completed = 0
+    line_search_failures = state.line_search_failures
+    cg_failures = state.cg_failures
     components = _active_components(context, state.active_ids)
     for _ in range(steps):
         result = _evaluate_active(
@@ -427,6 +442,9 @@ def _optimize(
         )
         gradient_norm = float(torch.linalg.vector_norm(gradient))
         step = _conjugate_gradient(matrices, -gradient, context.config)  # type: ignore[arg-type]
+        if not bool(torch.isfinite(step).all()):
+            cg_failures += 1
+            break
         accepted = coefficients
         accepted_loss = result.loss
         for trial in range(context.config.line_evaluations):
@@ -442,6 +460,8 @@ def _optimize(
                 accepted = proposal
                 accepted_loss = proposal_state.loss
         relative = (result.loss - accepted_loss) / max(result.loss, 1e-30)
+        if accepted_loss >= result.loss:
+            line_search_failures += 1
         coefficients = accepted
         completed += 1
         result.last_relative_improvement = relative
@@ -458,6 +478,8 @@ def _optimize(
     result.optimizer_steps = state.optimizer_steps + completed
     result.last_relative_improvement = relative if completed else 0.0
     result.gradient_norm = gradient_norm if completed else math.inf
+    result.line_search_failures = line_search_failures
+    result.cg_failures = cg_failures
     torch.cuda.synchronize() if result.points.is_cuda else None
     return result, time.perf_counter() - started
 
@@ -476,6 +498,8 @@ def _candidate_scores(
     local_residual_squared = torch.zeros_like(alignment)
     affected_views = torch.zeros(count, dtype=torch.long, device=device)
     nnz = 0
+    active_pairs = 0
+    active_pixels = 0
     for cell, image, target in zip(context.cells, state.images, targets):
         matrix = _local_sparse_jacobian(
             context.master_layout,
@@ -492,6 +516,18 @@ def _candidate_scores(
         local_residual_squared += local[3]
         affected_views += local[4].long()
         nnz += matrix._nnz()
+        coalesced = matrix.coalesce()
+        columns = coalesced.indices()[1]
+        active_mask = torch.zeros(count, dtype=torch.bool, device=device)
+        active_mask[state.active_ids] = True
+        selected = active_mask[columns]
+        if bool(selected.any()):
+            pixels = torch.div(
+                coalesced.indices()[0, selected], 3, rounding_mode="floor"
+            )
+            encoded = pixels * count + columns[selected]
+            active_pairs += int(torch.unique(encoded).numel())
+            active_pixels += int(torch.unique(pixels).numel())
         del matrix
     scores = {
         "raw": alignment.abs(),
@@ -502,6 +538,7 @@ def _candidate_scores(
     inactive = torch.ones(count, dtype=torch.bool, device=device)
     inactive[state.active_ids] = False
     responsive = (scores["jacobian_norm"] > 1e-12) & inactive
+    maximum_norm = float(scores["jacobian_norm"][inactive].max())
     diagnostics = {
         "responsive_fraction": float(
             responsive.sum() / max(int(inactive.sum()), 1)
@@ -511,6 +548,18 @@ def _candidate_scores(
             / max(int(inactive.sum()), 1)
         ),
         "candidate_jacobian_nnz": float(nnz),
+        "active_parameters_per_affected_pixel": active_pairs
+        / max(active_pixels, 1),
+        "near_null_candidate_fraction": float(
+            (
+                (scores["jacobian_norm"] <= 1e-8 * maximum_norm)
+                & inactive
+            ).sum()
+            / max(int(inactive.sum()), 1)
+        ),
+        "nonfinite_candidate_score_count": float(
+            sum(int((~torch.isfinite(value[inactive])).sum()) for value in scores.values())
+        ),
         "best_remaining_quadratic": float(scores["quadratic"][inactive].max()),
         "median_affected_pixels": float(
             affected_pixels[responsive].double().median()
@@ -581,6 +630,67 @@ def _new_only_gain(
     return float(gains[candidate])
 
 
+def _candidate_oracle_checkpoint(
+    context: SequentialContext,
+    state: ActiveState,
+    targets: list[Tensor],
+    scores: dict[str, Tensor],
+) -> tuple[dict[str, object], float]:
+    started = time.perf_counter()
+    inactive = torch.ones(
+        context.config.master_count,
+        dtype=torch.bool,
+        device=state.active_ids.device,
+    )
+    inactive[state.active_ids] = False
+    available = torch.nonzero(inactive, as_tuple=False).flatten()
+    count = min(context.config.oracle_subset_size, available.numel())
+    positions = torch.div(
+        torch.arange(count, device=available.device) * available.numel(),
+        max(count, 1),
+        rounding_mode="floor",
+    )
+    candidate_ids = available[positions]
+    adapter = _oracle_context_adapter(context, state)
+    baseline = _ScalingOptimization(
+        state.coefficients,
+        state.points,
+        state.denominator,
+        state.images,
+        state.loss,
+        state.loss,
+        0,
+        0.0,
+        state.gradient_norm,
+        state.root_failures,
+    )
+    oracle_config = KScalingConfig(
+        k_values=(state.active_ids.numel(),),
+        coefficient_limit=context.config.coefficient_limit,
+        oracle_evaluations=context.config.oracle_evaluations,
+    )
+    gains, _, failures = _new_only_oracle(
+        adapter, baseline, targets, candidate_ids, oracle_config
+    )
+    actual = gains[candidate_ids]
+    report = {
+        "active_k": int(state.active_ids.numel()),
+        "candidate_ids": candidate_ids.detach().cpu().tolist(),
+        "actual_new_only_gains": actual.detach().cpu().tolist(),
+        "oracle_failures": failures,
+        "quadratic_spearman": _correlation(
+            scores["quadratic"][candidate_ids], actual, True
+        ),
+        "quadratic_pearson": _correlation(
+            scores["quadratic"][candidate_ids], actual, False
+        ),
+        "raw_spearman": _correlation(scores["raw"][candidate_ids], actual, True),
+        "raw_pearson": _correlation(scores["raw"][candidate_ids], actual, False),
+    }
+    torch.cuda.synchronize() if state.points.is_cuda else None
+    return report, time.perf_counter() - started
+
+
 def _checkpoint_row(
     context: SequentialContext,
     target: dict[str, object],
@@ -601,7 +711,7 @@ def _checkpoint_row(
             ((state.points - target["points"]) ** 2).sum(dim=1).mean()  # type: ignore[operator]
         )
     )
-    return {
+    row = {
         "method": method,
         "target_regime": target["regime"],
         "target_seed": target["seed"],
@@ -630,9 +740,29 @@ def _checkpoint_row(
         "zero_jacobian_candidate_fraction": diagnostics["zero_jacobian_fraction"],
         "median_affected_pixels": diagnostics["median_affected_pixels"],
         "median_affected_views": diagnostics["median_affected_views"],
+        "candidate_jacobian_nnz": diagnostics["candidate_jacobian_nnz"],
+        "active_parameters_per_affected_pixel": diagnostics[
+            "active_parameters_per_affected_pixel"
+        ],
+        "active_bases_per_query": _active_components(
+            context, state.active_ids
+        )[1].count
+        / context.reference_points.shape[0],
+        "near_null_candidate_fraction": diagnostics[
+            "near_null_candidate_fraction"
+        ],
+        "nonfinite_candidate_score_count": diagnostics[
+            "nonfinite_candidate_score_count"
+        ],
         "no_birth_continuation_gain": continuation_gain,
         "root_failures": state.root_failures,
+        "minimum_denominator_magnitude": float(state.denominator.abs().min()),
+        "line_search_failures": state.line_search_failures,
+        "cg_failures": state.cg_failures,
     }
+    if context.geometry_evaluator is not None:
+        row.update(context.geometry_evaluator(state.points))
+    return row
 
 
 def _run_trajectory(
@@ -664,6 +794,8 @@ def _run_trajectory(
     births: list[dict[str, object]] = []
     checkpoints: list[dict[str, object]] = []
     selected_ids: list[int] = []
+    checkpoint_oracles: list[dict[str, object]] = []
+    oracle_diagnostic_time = 0.0
     scores, diagnostics, score_seconds = _candidate_scores(
         context, state, target["images"]  # type: ignore[arg-type]
     )
@@ -688,6 +820,16 @@ def _run_trajectory(
             max(0.0, state.loss - continuation.loss),
         )
     )
+    if (
+        method == "quadratic"
+        and context.config.oracle_subset_size
+        and int(state.active_ids.numel()) in context.config.oracle_checkpoints
+    ):
+        oracle_report, seconds = _candidate_oracle_checkpoint(
+            context, state, target["images"], scores  # type: ignore[arg-type]
+        )
+        checkpoint_oracles.append(oracle_report)
+        oracle_diagnostic_time += seconds
     while state.active_ids.numel() < context.config.budget:
         before_loss = state.loss
         candidate = _choose_candidate(
@@ -725,6 +867,8 @@ def _run_trajectory(
             context, born_ids, born_coefficients, target["images"]  # type: ignore[arg-type]
         )
         at_birth.optimizer_steps = state.optimizer_steps
+        at_birth.line_search_failures = state.line_search_failures
+        at_birth.cg_failures = state.cg_failures
         birth["birth_geometry_jump"] = float(
             torch.linalg.vector_norm(at_birth.points - state.points)
         )
@@ -760,7 +904,7 @@ def _run_trajectory(
                     state,
                     scoring_time,
                     optimization_time,
-                    time.perf_counter() - started,
+                    time.perf_counter() - started - oracle_diagnostic_time,
                     torch.cuda.max_memory_allocated() / 2**20
                     if device.type == "cuda"
                     else 0.0,
@@ -772,6 +916,19 @@ def _run_trajectory(
                     max(0.0, state.loss - continuation.loss),
                 )
             )
+            if (
+                method == "quadratic"
+                and context.config.oracle_subset_size
+                and active_k in context.config.oracle_checkpoints
+            ):
+                oracle_report, oracle_seconds = _candidate_oracle_checkpoint(
+                    context,
+                    state,
+                    target["images"],  # type: ignore[arg-type]
+                    scores,
+                )
+                checkpoint_oracles.append(oracle_report)
+                oracle_diagnostic_time += oracle_seconds
         if state.root_failures:
             break
     predicted_quad = torch.tensor(
@@ -789,7 +946,7 @@ def _run_trajectory(
         "raw_spearman": _correlation(predicted_raw, realized, True),
         "raw_pearson": _correlation(predicted_raw, realized, False),
     }
-    return {
+    row = {
         "method": method,
         "target_regime": target["regime"],
         "target_seed": target["seed"],
@@ -797,12 +954,16 @@ def _run_trajectory(
         "checkpoints": checkpoints,
         "births": births,
         "selected_ids": selected_ids,
+        "checkpoint_candidate_oracles": checkpoint_oracles,
+        "oracle_diagnostic_seconds": oracle_diagnostic_time,
         "predictor_correlations": correlations,
         "candidate_scoring_fraction": scoring_time
-        / max(time.perf_counter() - started, 1e-30),
+        / max(time.perf_counter() - started - oracle_diagnostic_time, 1e-30),
         "cumulative_scoring_seconds": scoring_time,
         "cumulative_optimization_seconds": optimization_time,
-        "total_runtime_seconds": time.perf_counter() - started,
+        "total_runtime_seconds": time.perf_counter()
+        - started
+        - oracle_diagnostic_time,
         "duplicate_births": len(selected_ids) - len(set(selected_ids)),
         "invisible_birth_fraction": statistics.mean(
             float(birth["jacobian_norm"] <= 1e-12) for birth in births
@@ -818,12 +979,15 @@ def _run_trajectory(
             (float(birth["birth_geometry_jump"]) for birth in births), default=0.0
         ),
     }
+    return row
 
 
 def _rank(values: Tensor) -> Tensor:
     order = torch.argsort(values, stable=True)
     ranks = torch.empty_like(values, dtype=torch.float64)
-    ranks[order] = torch.arange(values.numel(), dtype=torch.float64)
+    ranks[order] = torch.arange(
+        values.numel(), dtype=torch.float64, device=values.device
+    )
     return ranks
 
 
@@ -865,7 +1029,7 @@ def _run_fixed(
             ((state.points - target["points"]) ** 2).sum(dim=1).mean()  # type: ignore[operator]
         )
     )
-    return {
+    row = {
         "method": "fixed_space",
         "target_regime": target["regime"],
         "target_seed": target["seed"],
@@ -894,9 +1058,23 @@ def _run_fixed(
         "zero_jacobian_candidate_fraction": None,
         "median_affected_pixels": None,
         "median_affected_views": None,
+        "candidate_jacobian_nnz": None,
+        "active_parameters_per_affected_pixel": None,
+        "active_bases_per_query": _active_components(
+            context, state.active_ids
+        )[1].count
+        / context.reference_points.shape[0],
+        "near_null_candidate_fraction": None,
+        "nonfinite_candidate_score_count": None,
         "no_birth_continuation_gain": None,
         "root_failures": state.root_failures,
+        "minimum_denominator_magnitude": float(state.denominator.abs().min()),
+        "line_search_failures": state.line_search_failures,
+        "cg_failures": state.cg_failures,
     }
+    if context.geometry_evaluator is not None:
+        row.update(context.geometry_evaluator(state.points))
+    return row
 
 
 def _normalized_auc(rows: list[dict[str, object]], x_key: str, y_key: str) -> float:
