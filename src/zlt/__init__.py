@@ -45,6 +45,18 @@ from .benchmark import (
     cuda_equivalence_report,
 )
 from .birth import BirthConfig, run_birth_experiment
+from .multiview import (
+    CAMERA_COUNTS,
+    CameraTransport,
+    MultiviewConfig,
+    SceneTransportState,
+    build_scene_transport,
+    multiview_cameras,
+    multiview_cpu_verification,
+    project_camera,
+    run_multiview_benchmark,
+    validate_multiview_equivalence,
+)
 
 __all__ = [
     "PhotonBatch",
@@ -85,4 +97,14 @@ __all__ = [
     "cuda_equivalence_report",
     "BirthConfig",
     "run_birth_experiment",
+    "CAMERA_COUNTS",
+    "CameraTransport",
+    "MultiviewConfig",
+    "SceneTransportState",
+    "build_scene_transport",
+    "multiview_cameras",
+    "multiview_cpu_verification",
+    "project_camera",
+    "run_multiview_benchmark",
+    "validate_multiview_equivalence",
 ]

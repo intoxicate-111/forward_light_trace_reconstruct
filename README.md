@@ -1,6 +1,6 @@
 # Zero-Set Forward Light Tracing
 
-This experimental research prototype asks three deliberately narrow questions: can samples of a zero set act as local directional emitters, does a compact local parameterization induce a sparse geometry-to-image Jacobian, and can differential evidence predict the utility of a geometry parameter before it exists? Version 0.1 isolates transport, v0.2–v0.2.1 validate local geometry derivatives and CUDA scaling, and v0.3a falsifies one pre-birth scoring rule in a controlled inverse problem. This project makes no claim of novelty.
+This experimental research prototype asks three deliberately narrow questions: can samples of a zero set act as local directional emitters, does a compact local parameterization induce a sparse geometry-to-image Jacobian, and can differential evidence predict the utility of a geometry parameter before it exists? Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, and v0.3a falsifies one pre-birth scoring rule in a controlled inverse problem. This project makes no claim of novelty.
 
 ## Model
 
@@ -65,6 +65,7 @@ python demo.py --observability --scene sphere --analysis-output outputs/diagnost
 python demo.py --benchmark-cuda --scene sphere
 python demo.py --benchmark-cuda --scene torus --cuda-resolution 1920 1080
 python demo.py --benchmark-scaling
+python demo.py --benchmark-multiview --multiview-output artifacts/v022_multiview.json --multiview-figures figures
 python demo.py --birth --birth-csv artifacts/v03a_candidates.csv --birth-figures figures
 ```
 
@@ -140,6 +141,36 @@ Torus scaling under the same configuration:
 | 1920×1080 | 2,073,600 | 162 | 23 | 648 / 1.22e-6 | 2,124 / 1.07e-5 | 22.12 / 1.07e-5 | 176.4 | 28.94 |
 
 In isolated fresh processes, Full-HD cold/warm times were 272.8/25.9 ms for the sphere and 291.1/30.1 ms for the torus. Peak allocated/reserved memory was 176.4/204 MiB and 176.4/202 MiB, respectively. The sphere warm stage breakdown in milliseconds was emitter update 11.25, photon generation 0.60, camera intersection 0.57, collision 6.94, arrival/footprint 1.22, sparse transport 3.47, and sparse Jacobian 1.07. Torus values were 13.13, 0.67, 0.57, 8.24, 1.22, 4.57, and 1.52 ms. At 256², the same sparse operator path measured 60.53 ms on CPU and 23.10 ms on CUDA, a 2.62× speedup. No custom kernel or targeted optimization was needed: resolution growth leaves raw Jacobian nnz almost constant while its density decreases sharply.
+
+## v0.2.2: shared multiview transport
+
+The multiview path makes the camera-independent boundary explicit. One `SceneTransportState` contains deformed zero-set emitters, deterministic photon directions, and each packet's earliest positive surface-hit time. A camera then performs only plane intersection, the physical survival test (t^{cam}<t^{surf}), first-arrival reduction, and sparse COO image construction. The strict independent baseline invokes the identical scene-state builder separately for every camera. A fixed 4-unit root interval covers the maximum 3.3-unit torus chord; across all 20 benchmark poses this scene-space collision rule exactly matched the legacy camera-bounded tracer, including all 224 torus absorptions.
+
+The final CUDA experiment used 20 distinct Fibonacci-sphere cameras, Full HD, 256 emitters, eight packets per emitter (2,048 photons), (K=32), five warm-ups, and ten measured repetitions per mode and count. Dense images were streamed one camera at a time; they were not retained as a 20-image batch. Every shared image, hit index, owner, absorption state, camera time, and coalesced transport operator matched its independent counterpart exactly. The Jacobian was intentionally not timed because it was not needed to answer the transport question.
+
+Sphere results:
+
+| Views | Independent ms | Shared ms | Speedup | Geometry ms | Detector ms | Incremental ms/view | T nnz | Peak alloc./reserved MiB | Max error |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 23.60 | 23.22 | 1.02× | 18.18 | 5.11 | — | 722 | 205.4 / 288 | 0 |
+| 2 | 43.45 | 29.26 | 1.49× | 18.64 | 10.52 | 6.04 | 1,828 | 221.5 / 288 | 0 |
+| 4 | 85.06 | 38.89 | 2.19× | 18.36 | 20.30 | 4.82 | 3,368 | 221.9 / 288 | 0 |
+| 8 | 171.12 | 66.35 | 2.58× | 18.17 | 47.97 | 6.86 | 6,898 | 221.9 / 288 | 0 |
+| 16 | 337.23 | 108.53 | 3.11× | 18.08 | 89.88 | 5.27 | 13,372 | 221.9 / 288 | 0 |
+| 20 | 419.29 | 126.21 | **3.32×** | 17.98 | 107.52 | 4.42 | 16,414 | 221.9 / 288 | 0 |
+
+Torus results:
+
+| Views | Independent ms | Shared ms | Speedup | Geometry ms | Detector ms | Incremental ms/view | T nnz | Peak alloc./reserved MiB | Max error |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 27.17 | 27.16 | 1.00× | 20.62 | 6.41 | — | 428 | 205.4 / 286 | 0 |
+| 2 | 51.72 | 34.81 | 1.49× | 20.25 | 14.39 | 7.65 | 828 | 221.5 / 288 | 0 |
+| 4 | 96.17 | 47.87 | 2.01× | 20.31 | 27.46 | 6.53 | 2,218 | 221.9 / 288 | 0 |
+| 8 | 190.35 | 73.43 | 2.59× | 20.47 | 52.56 | 6.39 | 5,722 | 221.9 / 288 | 0 |
+| 16 | 377.42 | 115.51 | 3.27× | 20.53 | 94.59 | 5.26 | 12,474 | 221.9 / 288 | 0 |
+| 20 | 466.86 | 141.01 | **3.31×** | 20.45 | 119.88 | 6.37 | 14,788 | 221.9 / 288 | 0 |
+
+A linear fit (T_{shared}=a+bN) gives (a=18.61) ms and (b=5.51) ms/camera for the sphere ((R^2=0.997)), and (a=23.38) ms and (b=5.87) ms/camera for the torus ((R^2=0.998)). Shared 1→20 scaling was 5.44×/5.19×, versus 17.77×/17.18× independently; the latter is 11.2%/14.1% below ideal (20T_1), rather than perfectly linear. Reuse saved 293.09/325.86 ms at 20 views. Transport nnz grew with the cumulative camera set while density stayed around (10^{-6}); the 1→20 nnz factors were 22.73× and 34.55× because the heterogeneous poses do not receive equal numbers of packets. Peak memory was approximately constant because outputs were streamed. The result supports shared **sparse scene-centric transport**, not free dense multiview rendering. Full measurements and all camera frames are in [`artifacts/v022_multiview.json`](artifacts/v022_multiview.json), the compact rows are in [`artifacts/v022_multiview.csv`](artifacts/v022_multiview.csv), and the required runtime and speedup plots are in [`figures/`](figures/).
 
 ## v0.3a: utility of a nonexistent geometry DoF
 

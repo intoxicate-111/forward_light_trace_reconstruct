@@ -19,6 +19,7 @@ from zlt import (  # noqa: E402
     BirthConfig,
     GeometryJacobian,
     LocalBasisField,
+    MultiviewConfig,
     PhotonBatch,
     PlanarCamera,
     SphereField,
@@ -39,9 +40,11 @@ from zlt import (  # noqa: E402
     locality_perturbation_report,
     make_scene,
     make_local_basis_field,
+    multiview_cpu_verification,
     observability_report,
     render_first_arrival,
     run_birth_experiment,
+    run_multiview_benchmark,
     support_report,
     trace_photons,
     unit_normals,
@@ -540,6 +543,20 @@ def run_birth_analysis(args: argparse.Namespace) -> dict[str, object]:
     )
 
 
+def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
+    config = MultiviewConfig(
+        resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
+        warm_runs=args.warm_runs,
+        measured_runs=args.measured_runs,
+        collision_batch_size=args.batch_size,
+    )
+    return run_multiview_benchmark(
+        config=config,
+        output_path=args.multiview_output,
+        figure_directory=args.multiview_figures,
+    )
+
+
 def run_verification() -> dict[str, object]:
     """Exercise acceptance gates through the same classes/functions as the demo."""
     generator = torch.Generator().manual_seed(19)
@@ -670,7 +687,12 @@ def run_verification() -> dict[str, object]:
         "gate_g_determinism": "passed",
     }
     v02_report = run_v02_verification()
-    return {**v01_report, **v02_report}
+    multiview_report = multiview_cpu_verification()
+    return {
+        **v01_report,
+        **v02_report,
+        "gate_v_shared_multiview_equivalence": multiview_report,
+    }
 
 
 def run_v02_verification() -> dict[str, object]:
@@ -845,11 +867,26 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--birth-oracle-iterations", type=int, default=5)
     parser.add_argument("--birth-csv", type=Path, default=None)
     parser.add_argument("--birth-figures", type=Path, default=None)
+    parser.add_argument("--benchmark-multiview", action="store_true")
+    parser.add_argument(
+        "--multiview-resolution",
+        type=int,
+        nargs=2,
+        metavar=("WIDTH", "HEIGHT"),
+        default=(1920, 1080),
+    )
+    parser.add_argument("--measured-runs", type=int, default=10)
+    parser.add_argument("--multiview-output", type=Path, default=None)
+    parser.add_argument("--multiview-figures", type=Path, default=None)
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
+    if args.benchmark_multiview:
+        print("multiview_benchmark:")
+        print(json.dumps(run_multiview_analysis(args), indent=2, sort_keys=True))
+        return
     if args.birth:
         print("candidate_birth_analysis:")
         print(json.dumps(run_birth_analysis(args), indent=2, sort_keys=True))

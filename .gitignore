@@ -9,3 +9,4 @@ outputs/
 runs/
 *.png
 !figures/v03a_*.png
+!figures/v022_multiview_*.png
