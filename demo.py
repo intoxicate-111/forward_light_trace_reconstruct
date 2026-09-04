@@ -677,6 +677,35 @@ def run_meshfree_rgb_analysis(args: argparse.Namespace) -> dict[str, object]:
     )
 
 
+def run_appearance_ablation_analysis(
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    from zlt.appearance import run_appearance_ablation
+    from zlt.mesh_field import obtain_stanford_bunny
+
+    mesh_path = args.bunny_mesh
+    if mesh_path is None:
+        mesh_path = obtain_stanford_bunny(args.bunny_cache)
+    return run_appearance_ablation(
+        mesh_path, args.bunny_artifacts, args.render_output
+    )
+
+
+def run_corrected_birth_analysis(args: argparse.Namespace) -> dict[str, object]:
+    from zlt.corrected_birth import run_corrected_birth_experiment
+    from zlt.mesh_field import obtain_stanford_bunny
+
+    mesh_path = args.bunny_mesh
+    if mesh_path is None:
+        mesh_path = obtain_stanford_bunny(args.bunny_cache)
+    return run_corrected_birth_experiment(
+        mesh_path,
+        args.bunny_artifacts,
+        args.bunny_figures,
+        args.render_output,
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -1044,6 +1073,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--image-formation", action="store_true")
     parser.add_argument("--camera-independent", action="store_true")
     parser.add_argument("--meshfree-rgb", action="store_true")
+    parser.add_argument("--appearance-ablation", action="store_true")
+    parser.add_argument("--corrected-birth", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -1069,6 +1100,27 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.corrected_birth:
+        report = run_corrected_birth_analysis(args)
+        print("corrected_forward_rgb_birth:")
+        print(json.dumps(report["judgment"], indent=2, sort_keys=True))
+        return
+    if args.appearance_ablation:
+        report = run_appearance_ablation_analysis(args)
+        print("appearance_ablation:")
+        print(
+            json.dumps(
+                {
+                    "verdict": report["verdict"],
+                    "main_formulation_decision": report[
+                        "main_formulation_decision"
+                    ],
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return
     if args.meshfree_rgb:
         report = run_meshfree_rgb_analysis(args)
         print("meshfree_rgb_analysis:")

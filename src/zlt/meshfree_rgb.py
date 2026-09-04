@@ -70,7 +70,10 @@ ABLATIONS = (
     RGBTransportConfig("cosine_lobe_no_attenuation", 0.0, 1.0, 0.35),
     RGBTransportConfig("selected_mild_attenuation_cosine_lobe", 0.55, 1.0, 0.35),
 )
-SELECTED = ABLATIONS[-1]
+# v0.7's paired A/B/C/D study showed that cosine lighting retains the Bunny's
+# internal structure without exponential path attenuation.  Keep attenuated
+# entries above as diagnostics, but make the cleaner C formulation the default.
+SELECTED = ABLATIONS[3]
 
 
 @dataclass(frozen=True)
