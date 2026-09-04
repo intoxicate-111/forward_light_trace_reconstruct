@@ -17,6 +17,8 @@ runs/
 !figures/v03f_*.png
 !figures/v03g_*.png
 !figures/v04_*.png
+!figures/v05_*.png
 !render_res/
 !render_res/v04_*.png
+!render_res/v05_*.png
 data/stanford_bunny/cache/
