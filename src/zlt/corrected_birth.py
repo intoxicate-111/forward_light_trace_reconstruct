@@ -44,6 +44,7 @@ class CorrectedBirthConfig:
     surface_samples: int = 32768
     views: int = 8
     resolution: int = 256
+    resolution_width: int | None = None
     base_support_radius: float = 0.45
     support_margin: float = 0.005
     coefficient_limit: float = 0.03
@@ -65,6 +66,15 @@ class CorrectedBirthConfig:
     maximum_peak_allocated_mib: float = 14_000.0
     maximum_pairwise_coupling: float = 0.95
     maximum_batch_rho_off: float = 4.0
+    dynamic_batch: bool = False
+    dynamic_score_floor_fraction: float = 0.05
+    dynamic_predicted_gain_fraction: float = 0.95
+    require_geometry_flattening: bool = False
+    geometry_flattening_gain: float = 1e-7
+
+    @property
+    def resolution_shape(self) -> tuple[int, int]:
+        return (self.resolution, self.resolution_width or self.resolution)
 
 
 @dataclass(frozen=True)
@@ -329,7 +339,7 @@ def _visibility_cells(
                 events.owner_ids[keep],
                 boundary.center,
                 2.8,
-                (config.resolution, config.resolution),
+                config.resolution_shape,
             )
         )
     return cells, {
@@ -895,6 +905,93 @@ def _select_observation_batch(
     return torch.tensor(selected, dtype=torch.long, device=state.points.device)
 
 
+def _select_dynamic_observation_batch(
+    context: CorrectedContext,
+    state: CorrectedState,
+    scores: dict[str, Tensor],
+    score_key: str = "quadratic",
+) -> tuple[Tensor, dict[str, object]]:
+    inactive = torch.ones(
+        context.config.dictionary_count,
+        dtype=torch.bool,
+        device=state.points.device,
+    )
+    inactive[state.active_ids] = False
+    values = torch.where(
+        inactive,
+        scores[score_key],
+        torch.full_like(scores[score_key], -math.inf),
+    )
+    order = torch.argsort(values, descending=True, stable=True)
+    best = float(values[order[0]])
+    floor = context.config.dynamic_score_floor_fraction * best
+    eligible = order[torch.isfinite(values[order]) & (values[order] >= floor)]
+    if eligible.numel() == 0:
+        eligible = order[:1]
+    eligible_scores = values[eligible].clamp_min(0.0)
+    total_gain = eligible_scores.sum()
+    if float(total_gain) > 0.0:
+        cumulative = torch.cumsum(eligible_scores, 0)
+        saturation = context.config.dynamic_predicted_gain_fraction * total_gain
+        desired = int(torch.searchsorted(cumulative, saturation).item()) + 1
+    else:
+        desired = 1
+    p_max_raw = 100 * int(state.active_ids.numel())
+    desired = min(desired, p_max_raw, int(inactive.sum()))
+    selected: list[int] = []
+    spatial_rejections = 0
+    for item in eligible:
+        candidate = int(item)
+        if selected:
+            previous = torch.tensor(selected, device=item.device)
+            distances = torch.linalg.vector_norm(
+                context.master_layout.centers[previous]
+                - context.master_layout.centers[candidate],
+                dim=1,
+            )
+            separation = 0.20 * torch.minimum(
+                context.master_layout.radii[previous],
+                context.master_layout.radii[candidate],
+            )
+            if bool((distances < separation).any()):
+                spatial_rejections += 1
+                continue
+        selected.append(candidate)
+        if len(selected) == desired:
+            break
+    if not selected:
+        selected.append(int(order[0]))
+    selected_tensor = torch.tensor(
+        selected, dtype=torch.long, device=state.points.device
+    )
+    selected_gain = float(values[selected_tensor].clamp_min(0.0).sum())
+    return selected_tensor, {
+        "dynamic_p_max_raw": p_max_raw,
+        "dynamic_eligible_candidates": int(eligible.numel()),
+        "dynamic_saturation_target_size": desired,
+        "dynamic_score_floor": floor,
+        "dynamic_score_floor_fraction": (
+            context.config.dynamic_score_floor_fraction
+        ),
+        "dynamic_score_policy": score_key,
+        "dynamic_predicted_gain_fraction": (
+            context.config.dynamic_predicted_gain_fraction
+        ),
+        "dynamic_selected_gain_fraction_of_eligible": selected_gain
+        / max(float(total_gain), 1e-30),
+        "dynamic_spatial_rejections": spatial_rejections,
+        "dynamic_selection_limiter": (
+            "p_max"
+            if desired == p_max_raw
+            else (
+                "dictionary"
+                if desired == int(inactive.sum())
+                else "predicted_gain_saturation"
+            )
+        ),
+    }
+
+
 def _coupling_statistics(gram: Tensor) -> dict[str, float]:
     if gram.shape[0] < 2:
         return {
@@ -966,45 +1063,55 @@ def _batch_gram(
 def _coupling_checked_batch(
     context: CorrectedContext,
     state: CorrectedState,
-    scores: dict[str, Tensor],
     selected: Tensor,
 ) -> tuple[Tensor, Tensor, dict[str, object], float]:
     initial_count = int(selected.numel())
     gram, seconds = _batch_gram(context, state, selected)
-    keep = torch.arange(selected.numel(), device=selected.device)
-    rejections = 0
-    while keep.numel() > 1:
-        trial = gram[keep][:, keep]
-        statistics = _coupling_statistics(trial)
-        if (
-            statistics["pairwise_max"]
-            <= context.config.maximum_pairwise_coupling
-            and statistics["rho_off"] <= context.config.maximum_batch_rho_off
-        ):
-            break
-        diagonal = torch.diagonal(trial).clamp_min(0.0)
-        cosine = trial.abs() / torch.sqrt(
-            (diagonal[:, None] * diagonal[None, :]).clamp_min(1e-30)
+    diagonal = torch.diagonal(gram).clamp_min(0.0)
+    keep_list: list[int] = []
+    pairwise_rejections = 0
+    rho_rejections = 0
+    diagonal_norm_squared = 0.0
+    off_diagonal_norm_squared = 0.0
+    for candidate in range(initial_count):
+        if keep_list:
+            previous = torch.tensor(keep_list, device=selected.device)
+            correlations = gram[candidate, previous].abs() / torch.sqrt(
+                (diagonal[candidate] * diagonal[previous]).clamp_min(1e-30)
+            )
+            if (
+                float(correlations.max())
+                > context.config.maximum_pairwise_coupling
+            ):
+                pairwise_rejections += 1
+                continue
+            proposed_off = off_diagonal_norm_squared + 2.0 * float(
+                gram[candidate, previous].square().sum()
+            )
+        else:
+            proposed_off = 0.0
+        proposed_diagonal = diagonal_norm_squared + float(
+            diagonal[candidate].square()
         )
-        cosine.fill_diagonal_(0.0)
-        pair = torch.nonzero(
-            cosine == cosine.max(), as_tuple=False
-        )[0]
-        first = keep[pair[0]]
-        second = keep[pair[1]]
-        remove = (
-            first
-            if scores["quadratic"][selected[first]]
-            < scores["quadratic"][selected[second]]
-            else second
+        proposed_rho = math.sqrt(proposed_off) / max(
+            math.sqrt(proposed_diagonal), 1e-30
         )
-        keep = keep[keep != remove]
-        rejections += 1
+        if proposed_rho > context.config.maximum_batch_rho_off:
+            rho_rejections += 1
+            continue
+        keep_list.append(candidate)
+        diagonal_norm_squared = proposed_diagonal
+        off_diagonal_norm_squared = proposed_off
+    if not keep_list:
+        keep_list.append(0)
+    keep = torch.tensor(keep_list, dtype=torch.long, device=selected.device)
     selected = selected[keep]
     gram = gram[keep][:, keep]
     return selected, gram, {
         "coupling_candidates_before_pruning": initial_count,
-        "coupling_rejections": rejections,
+        "coupling_rejections": pairwise_rejections + rho_rejections,
+        "pairwise_coupling_rejections": pairwise_rejections,
+        "rho_off_coupling_rejections": rho_rejections,
         **_coupling_statistics(gram),
     }, seconds
 
@@ -1054,18 +1161,27 @@ def _metrics(
     extra: dict[str, object] | None = None,
 ) -> dict[str, object]:
     config = context.config
-    image_stack = torch.stack(state.images)
-    target_stack = torch.stack(context.target_images)
-    difference = image_stack - target_stack
-    rgb_mse = float(difference.square().mean())
-    image_mask = image_stack.reshape(config.views, -1, 3).abs().amax(2) > 0.0
-    target_mask = target_stack.reshape(config.views, -1, 3).abs().amax(2) > 0.0
-    intersection = (image_mask & target_mask).sum()
-    union = (image_mask | target_mask).sum()
-    precision_denominator = image_mask.sum()
-    recall_denominator = target_mask.sum()
-    precision = float(intersection / precision_denominator.clamp_min(1))
-    recall = float(intersection / recall_denominator.clamp_min(1))
+    rows, columns = config.resolution_shape
+    squared_error = 0.0
+    absolute_error = 0.0
+    intersection_count = 0
+    union_count = 0
+    image_support_count = 0
+    target_support_count = 0
+    for image, target in zip(state.images, context.target_images):
+        difference = image - target
+        squared_error += float(difference.square().sum())
+        absolute_error += float(difference.abs().sum())
+        image_mask = image.reshape(-1, 3).abs().amax(1) > 0.0
+        target_mask = target.reshape(-1, 3).abs().amax(1) > 0.0
+        intersection_count += int((image_mask & target_mask).sum())
+        union_count += int((image_mask | target_mask).sum())
+        image_support_count += int(image_mask.sum())
+        target_support_count += int(target_mask.sum())
+    scalar_count = config.views * rows * columns * 3
+    rgb_mse = squared_error / scalar_count
+    precision = intersection_count / max(image_support_count, 1)
+    recall = intersection_count / max(target_support_count, 1)
     result: dict[str, object] = {
         "method": method,
         "birth_round": round_index,
@@ -1073,10 +1189,10 @@ def _metrics(
         "image_loss": state.loss,
         "normalized_rgb_mse": 2.0
         * state.loss
-        / (config.views * config.resolution * config.resolution * 3),
-        "rgb_mae": float(difference.abs().mean()),
+        / (config.views * rows * columns * 3),
+        "rgb_mae": absolute_error / scalar_count,
         "rgb_psnr": -10.0 * math.log10(max(rgb_mse, 1e-30)),
-        "silhouette_iou": float(intersection / union.clamp_min(1)),
+        "silhouette_iou": intersection_count / max(union_count, 1),
         "silhouette_f1": 2.0
         * precision
         * recall
@@ -1104,7 +1220,15 @@ def _metrics(
 
 def _run_observation_trajectory(
     context: CorrectedContext,
+    score_policy: str = "quadratic",
 ) -> tuple[dict[str, object], CorrectedState]:
+    if score_policy not in {"quadratic", "raw"}:
+        raise ValueError("score_policy must be quadratic or raw")
+    method = (
+        "observation_driven"
+        if score_policy == "quadratic"
+        else "raw_alignment_dynamic"
+    )
     device = context.reference_points.device
     torch.cuda.empty_cache()
     torch.cuda.reset_peak_memory_stats()
@@ -1122,7 +1246,7 @@ def _run_observation_trajectory(
         _metrics(
             context,
             state,
-            "observation_driven",
+            method,
             0,
             0.0,
             optimization,
@@ -1136,9 +1260,22 @@ def _run_observation_trajectory(
     stop_reason = "DICTIONARY_EXHAUSTED"
     while state.active_ids.numel() < context.config.dictionary_count:
         scores, diagnostics, score_seconds = _score_candidates(context, state)
-        selected = _select_observation_batch(context, state, scores)
+        if context.config.dynamic_batch:
+            selected, selection_diagnostics = (
+                _select_dynamic_observation_batch(
+                    context, state, scores, score_policy
+                )
+            )
+        else:
+            if score_policy != "quadratic":
+                raise ValueError("raw policy requires dynamic_batch=True")
+            selected = _select_observation_batch(context, state, scores)
+            selection_diagnostics = {
+                "dynamic_selection_limiter": "legacy_schedule",
+                "dynamic_saturation_target_size": int(selected.numel()),
+            }
         selected, gram, coupling, gram_seconds = _coupling_checked_batch(
-            context, state, scores, selected
+            context, state, selected
         )
         score_seconds += gram_seconds
         scoring += score_seconds
@@ -1148,7 +1285,10 @@ def _run_observation_trajectory(
             scores, selected, gram, context.config.damping
         )
         raw = float(scores["raw"][selected].sum())
+        predicted_policy_score = predicted if score_policy == "quadratic" else raw
+        previous_state = state
         before = state.loss
+        previous_chamfer = float(rows[-1]["symmetric_chamfer"])
         born = CorrectedState(
             torch.cat((state.active_ids, selected)),
             torch.cat(
@@ -1173,13 +1313,36 @@ def _run_observation_trajectory(
         at_birth.optimizer_steps = state.optimizer_steps
         at_birth.line_search_failures = state.line_search_failures
         at_birth.cg_failures = state.cg_failures
+        birth_only_geometry_jump = float(
+            torch.linalg.vector_norm(
+                at_birth.points - previous_state.points, dim=1
+            ).max()
+        )
+        # Full-HD states retain dense RGB/numerator/mass buffers per view.
+        # Once the exact zero-coefficient birth jump and counters are recorded,
+        # the pre-birth state must be released before line-search proposals.
+        del previous_state, born, state
+        torch.cuda.empty_cache()
         state, optimize_seconds = _optimize(
             context, at_birth, context.config.post_birth_steps
         )
+        del at_birth
         optimization += optimize_seconds
         realized = max(0.0, before - state.loss)
         relative_gain = realized / max(before, 1e-30)
         relative_gains.append(relative_gain)
+        current_metrics = _metrics(
+            context,
+            state,
+            method,
+            len(batches) + 1,
+            scoring,
+            optimization,
+            time.perf_counter() - started,
+        )
+        geometry_gain = previous_chamfer - float(
+            current_metrics["symmetric_chamfer"]
+        )
         batch = {
             "birth_round": len(batches) + 1,
             "active_before": int(state.active_ids.numel() - selected.numel()),
@@ -1193,34 +1356,28 @@ def _run_observation_trajectory(
             "predicted_raw_alignment": raw,
             "realized_gain": realized,
             "relative_realized_gain": relative_gain,
+            "realized_geometry_gain": geometry_gain,
+            "birth_only_geometry_jump": birth_only_geometry_jump,
             "top25_error_region_fraction": float(
                 torch.isin(selected, context.detail_ids).double().mean()
             ),
             "top10_error_region_fraction": float(
                 torch.isin(selected, context.top_detail_ids).double().mean()
             ),
+            **selection_diagnostics,
             **coupling,
             **diagnostics,
             "round_scoring_seconds": score_seconds,
             "round_optimization_seconds": optimize_seconds,
         }
         batches.append(batch)
-        rows.append(
-            _metrics(
-                context,
-                state,
-                "observation_driven",
-                len(batches),
-                scoring,
-                optimization,
-                time.perf_counter() - started,
-                batch,
-            )
-        )
+        current_metrics.update(batch)
+        rows.append(current_metrics)
         print(
             json.dumps(
                 {
                     "phase": "corrected_birth",
+                    "score_policy": score_policy,
                     "round": len(batches),
                     "active": int(state.active_ids.numel()),
                     "loss": state.loss,
@@ -1235,12 +1392,29 @@ def _run_observation_trajectory(
             >= context.config.minimum_active_before_stopping
         )
         window = relative_gains[-context.config.flattening_window :]
+        geometry_window = [
+            abs(float(item["realized_geometry_gain"]))
+            for item in batches[-context.config.flattening_window :]
+        ]
+        geometry_flat = (
+            not context.config.require_geometry_flattening
+            or (
+                len(geometry_window) == context.config.flattening_window
+                and max(geometry_window)
+                < context.config.geometry_flattening_gain
+            )
+        )
         if (
             enough
             and len(window) == context.config.flattening_window
             and max(window) < context.config.flattening_relative_gain
+            and geometry_flat
         ):
-            stop_reason = "MARGINAL_IMAGE_GAIN_FLATTENED"
+            stop_reason = (
+                "MARGINAL_IMAGE_AND_GEOMETRY_GAIN_FLATTENED"
+                if context.config.require_geometry_flattening
+                else "MARGINAL_IMAGE_GAIN_FLATTENED"
+            )
             break
         if enough and score_seconds > context.config.maximum_scoring_seconds_per_round:
             stop_reason = "CANDIDATE_SCORING_RUNTIME_PROHIBITIVE"
@@ -1255,11 +1429,20 @@ def _run_observation_trajectory(
         if state.root_failures or state.cg_failures:
             stop_reason = "NUMERICAL_FAILURE"
             break
-        if int(selected.numel()) == 1 and predicted <= 1e-12:
+        if int(selected.numel()) == 1 and predicted_policy_score <= 1e-12:
             stop_reason = "NO_RESPONSIVE_CANDIDATE"
             break
     predicted = torch.tensor(
-        [float(item["predicted_joint_gain"]) for item in batches]
+        [
+            float(
+                item[
+                    "predicted_joint_gain"
+                    if score_policy == "quadratic"
+                    else "predicted_raw_alignment"
+                ]
+            )
+            for item in batches
+        ]
     )
     realized = torch.tensor([float(item["realized_gain"]) for item in batches])
     all_selected = torch.tensor(
@@ -1268,7 +1451,8 @@ def _run_observation_trajectory(
         device=device,
     )
     report = {
-        "method": "observation_driven",
+        "method": method,
+        "score_policy": score_policy,
         "rows": rows,
         "batches": batches,
         "batch_schedule": [int(item["batch_size"]) for item in batches],
@@ -1291,6 +1475,9 @@ def _run_observation_trajectory(
         ),
         "maximum_batch_rho_off": max(
             float(item["rho_off"]) for item in batches
+        ),
+        "maximum_birth_only_geometry_jump": max(
+            float(item["birth_only_geometry_jump"]) for item in batches
         ),
         "predicted_realized_spearman": _correlation(predicted, realized, True),
         "predicted_realized_pearson": _correlation(predicted, realized, False),
@@ -1393,6 +1580,7 @@ def _run_raw_baseline(
         context, state, context.config.initial_optimization_steps
     )
     scoring = 0.0
+    batches: list[dict[str, object]] = []
     rows = [
         _metrics(
             context,
@@ -1417,6 +1605,7 @@ def _run_raw_baseline(
             torch.full_like(scores["raw"], -math.inf),
         )
         selected = torch.argsort(values, descending=True, stable=True)[:count]
+        predicted_raw = float(scores["raw"][selected].sum())
         before = state.loss
         state = _evaluate(
             context,
@@ -1429,6 +1618,16 @@ def _run_raw_baseline(
             context, state, context.config.post_birth_steps
         )
         optimization += optimize_seconds
+        realized = max(0.0, before - state.loss)
+        batch = {
+            "birth_round": round_index,
+            "batch_size": count,
+            "selected_ids": selected.detach().cpu().tolist(),
+            "predicted_raw_alignment": predicted_raw,
+            "realized_gain": realized,
+            **diagnostics,
+        }
+        batches.append(batch)
         rows.append(
             _metrics(
                 context,
@@ -1439,20 +1638,31 @@ def _run_raw_baseline(
                 optimization,
                 time.perf_counter() - started,
                 {
-                    "batch_size": count,
-                    "realized_gain": max(0.0, before - state.loss),
-                    **diagnostics,
+                    **batch,
                 },
             )
         )
+    predicted = torch.tensor(
+        [float(item["predicted_raw_alignment"]) for item in batches]
+    )
+    realized = torch.tensor(
+        [float(item["realized_gain"]) for item in batches]
+    )
     return {
         "method": "raw_alignment_matched",
         "rows": rows,
+        "batches": batches,
         "birth_rounds": len(schedule),
         "batch_schedule": schedule,
         "total_seconds": time.perf_counter() - started,
         "cumulative_scoring_seconds": scoring,
         "cumulative_optimization_seconds": optimization,
+        "predicted_realized_spearman": _correlation(
+            predicted, realized, True
+        ),
+        "predicted_realized_pearson": _correlation(
+            predicted, realized, False
+        ),
         "maximum_validated_active_dofs": int(state.active_ids.numel()),
     }, state
 
@@ -1473,21 +1683,27 @@ def _run_fixed_references(
     final_state: CorrectedState | None = None
     started = time.perf_counter()
     for level in sorted(set(levels)):
+        # A Full-HD state owns dense RGB, numerator, and mass buffers for every
+        # view.  Retaining the previous fixed-K state while optimizing the next
+        # level makes line search hold three dense states at once.
+        if final_state is not None:
+            del final_state
+            final_state = None
         torch.cuda.empty_cache()
         torch.cuda.reset_peak_memory_stats()
         active = torch.arange(level, device=context.reference_points.device)
-        state = _evaluate(
+        final_state = _evaluate(
             context,
             active,
             torch.zeros(level, dtype=torch.float64, device=active.device),
         )
-        state, seconds = _optimize(
-            context, state, context.config.fixed_optimization_steps
+        final_state, seconds = _optimize(
+            context, final_state, context.config.fixed_optimization_steps
         )
         rows.append(
             _metrics(
                 context,
-                state,
+                final_state,
                 "fixed_space_cold",
                 0,
                 0.0,
@@ -1496,7 +1712,6 @@ def _run_fixed_references(
                 {"fixed_k": level},
             )
         )
-        final_state = state
     assert final_state is not None
     return {
         "method": "fixed_space_cold",
@@ -1596,7 +1811,19 @@ def _build_context(
         detail_ids,
         top_detail_ids,
         evaluator,
-        {"base": base_visibility, "target": target_visibility},
+        {
+            "base": base_visibility,
+            "target": target_visibility,
+            "camera_atlas": {
+                "construction": "deterministic Fibonacci sphere",
+                "views": config.views,
+                "digest": atlas.digest,
+                "directions": atlas.directions.detach().cpu().tolist(),
+            },
+            "attempted_packets": config.surface_samples * config.views,
+            "packets_per_emitter": config.views,
+            "emitters": config.surface_samples,
+        },
     )
     _, base_renders = _render(
         reference_points, reference_normals, context, cells
@@ -1685,14 +1912,11 @@ def _save_images(
     import matplotlib.pyplot as plt
 
     panels: list[tuple[str, np.ndarray]] = []
-    target = context.target_images[3].reshape(
-        context.config.resolution, context.config.resolution, 3
-    )
+    rows, columns = context.config.resolution_shape
+    target = context.target_images[3].reshape(rows, columns, 3)
     panels.append(("target corrected forward RGB", target.detach().cpu().numpy()))
     for label, state in states:
-        image = state.images[3].reshape(
-            context.config.resolution, context.config.resolution, 3
-        )
+        image = state.images[3].reshape(rows, columns, 3)
         panels.append((label, image.detach().cpu().numpy()))
     figure, axes = plt.subplots(
         1,

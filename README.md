@@ -1,6 +1,6 @@
 # Zero-Set Forward Light Tracing
 
-This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4 separates photon-arrival visualization from visibility-aware camera image formation, v0.5 factors image formation through a frozen camera-independent outgoing boundary field, v0.6 removes the renderer's mesh surface scaffold and adds depth-sensitive forward RGB transport, and v0.7 removes unnecessary attenuation from the default and retests geometry birth against the corrected RGB operator through 1,664 active DoFs. This project makes no claim of novelty.
+This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4 separates photon-arrival visualization from visibility-aware camera image formation, v0.5 factors image formation through a frozen camera-independent outgoing boundary field, v0.6 removes the renderer's mesh surface scaffold and adds depth-sensitive forward RGB transport, v0.7 removes unnecessary attenuation from the default and retests geometry birth against the corrected RGB operator, and v0.8 stress-tests that birth mechanism at Full HD, 20 views, and 1.31 million attempted forward packets. This project makes no claim of novelty.
 
 ## Model
 
@@ -79,6 +79,7 @@ python demo.py --camera-independent --bunny-artifacts artifacts --bunny-figures 
 python demo.py --meshfree-rgb --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 python demo.py --appearance-ablation --bunny-artifacts artifacts --render-output render_res
 python demo.py --corrected-birth --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
+python demo.py --high-bandwidth-birth --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 ```
 
 The reference fields are an analytic sphere and analytic torus; the optional Bunny path adds a fixed mesh-derived trilinear level-set evaluator. With the default seed, the sphere is the convex normal/camera sanity check. The side-view torus activates non-convex self-occlusion: some rays emitted from its inner wall cross the hole and re-intersect the opposite tube before reaching the detector. Every run reports zero-set and normal errors, hit and absorption fractions, sparse shape/nnz/density, operator fan-in/fan-out, direct-versus-sparse error, and measured pipeline runtime. `--verify` additionally runs deterministic hand checks for all acceptance gates through production code.
@@ -523,7 +524,61 @@ The run reaches **1,664 active DoFs** in 20 rounds with mean/median/maximum batc
 
 The [scaling curves](figures/v07_corrected_birth_scaling.png) and [target/reconstruction comparison](render_res/v07_corrected_birth_reconstruction.png) show all matched methods. Cold fixed-space references are independently optimized at K=256/512/1024/1664. Exact per-round rows, selected IDs, predicted/realized gains, coupling diagnostics, geometry metrics, timings, VRAM, visibility hashes, configuration, and limitations are retained in the [JSON report](artifacts/v07_corrected_birth.json) and [CSV summary](artifacts/v07_corrected_birth.csv).
 
+## v0.8: Full-HD high-bandwidth birth stress test
+
+v0.8 keeps the corrected C appearance path unchanged: no attenuation, analytic position color, and the $0.35+0.65\max(0,n^T\omega)$ normal-lighting term. The controlled Bunny run uses 65,536 mesh-free zero-set emitters, 20 deterministic Fibonacci directions/views, and 1920×1080 images. One direct packet is attempted per emitter and view, so `packets_per_emitter=20` and the aggregate is 1,310,720 attempted packets. The exact camera-direction digest is `e89f33d73a9319b92784990452552a6864798236a1574ba4bb12c68074d86acf`. Of 652,940 outward base events, 564,282 survive re-intersection visibility. This is only 0.0136 retained events per view-pixel before the 4×4 cubic footprint, an important distinction between aggregate million-packet scale and per-view Full-HD coverage. The optional 131,072-emitter/2.62M-attempt level was not run: this main optimization already peaked at 12.28 GiB allocated and about 14.0 GiB process-resident on the 16 GiB Quadro RTX 5000, so doubling event storage lacked safe local headroom.
+
+The run starts at K=32 inside an 8,192-candidate multiscale dictionary. Its allowable capacity is $p_{max}=100K$, but each actual batch is the smallest score-ordered prefix that captures 95% of the mass above 5% of the best score, followed by spatial exclusion and explicit Gram pair-cosine/off-diagonal gates. It stops after three consecutive rounds with both relative RGB gain below $2\times10^{-4}$ and absolute Chamfer gain below $10^{-7}$, once K≥1024. The analytic corrected-RGB Jacobian passes four finite-difference columns with maximum relative error 0.0231.
+
+| Matched method at K=4,963 | RGB loss | PSNR | Chamfer | P2S mean | P2S p95 | surface RMS | normal error | Time (s) | Peak MiB |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| quadratic dynamic birth | 692355.04 | 19.5352 | 0.0049231 | 0.0031504 | 0.0082018 | 0.0058564 | 0.015322 | 73.36 | 12282 |
+| raw-alignment matched birth | **692307.55** | **19.5355** | 0.0049182 | 0.0031439 | 0.0081557 | 0.0058526 | 0.015333 | 69.79 | 12212 |
+| uniform matched | 692340.38 | 19.5353 | 0.0049749 | 0.0032110 | 0.0084523 | 0.0059140 | 0.015373 | 63.78 | 12229 |
+| random matched | 692325.59 | 19.5354 | **0.0048212** | **0.0030301** | **0.0078520** | **0.0057521** | **0.015224** | **61.70** | 12220 |
+
+Raw selection retains a small RGB advantage and beats uniform in both RGB loss and Chamfer, but random has the best geometry. Quadratic is worse than raw on both reported final errors and almost entirely fails to realize its predicted gains. Its predicted-versus-realized Pearson/Spearman correlations are 0.089/−0.200; raw gives 0.450/−0.200. There are only four batches, so these correlations are a diagnostic rather than a population estimate. Under the strict requirement that an observation policy beat both uniform and random in image and geometry quality, `BIRTH_SUPPORTED`, `OBSERVATION_DRIVEN_BIRTH_SUPPORTED`, `RAW_ALIGNMENT_BEST_SUPPORTED`, and `HIGH_BANDWIDTH_BIRTH_SUPPORTED` are false. `QUADRATIC_BEST_NOT_SUPPORTED` and `COMPUTE_EFFICIENCY_NOT_SUPPORTED` are true. Raw is DoF-efficient only in the narrower matched-uniform trajectory-AUC comparison; neither global quality nor compute superiority is established.
+
+The dynamic quadratic batches are genuinely score-driven rather than capped at 32:
+
+| Round | K before→after | Batch | Best/floor quadratic score | Pair max / $\rho_{off}$ | Predicted joint gain | Realized RGB gain | Chamfer gain | Birth-only jump |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 32→129 | 97 | 83.992 / 4.200 | 0.915 / 0.932 | 697.72 | 0.01754 | −1.31e−4 | 1.68e−16 |
+| 2 | 129→1,022 | 893 | 10.479 / 0.524 | 0.928 / 0.783 | 1152.00 | 0 | 0 | 6.21e−16 |
+| 3 | 1,022→1,788 | 766 | 5.795 / 0.290 | 0.758 / 0.011 | 336.26 | 0 | 0 | 4.71e−16 |
+| 4 | 1,788→4,963 | 3,175 | 0.442 / 0.022 | 0.940 / 0.083 | 408.06 | 0 | 0 | 6.21e−16 |
+
+Every round is limited by predicted-gain saturation, never by $p_{max}$. The coupling gates reject only 0/0/2/1 candidates. Thus v0.7's repeated 32 was the legacy `_batch_size` rule below K=256, not a natural capacity of this candidate family. The v0.8 mean/median/maximum batch sizes are 1232.75/829.5/3175. The scientific stop is `MARGINAL_IMAGE_AND_GEOMETRY_GAIN_FLATTENED`; it is not a dictionary, runtime, or VRAM stop. Birth-only jumps remain at floating-point zero, showing that adding zero-coefficient parameters is continuous. The selected geography is mildly observation-related—30.85% of births lie in an independently defined top error quartile and 13.28% in the top decile—but it becomes spatially broad by round four.
+
+Cold fixed-space optimization exposes substantial image-fitting headroom that birth does not reach:
+
+| Fixed K | Cold RGB loss | Cold Chamfer | Warm RGB loss | Warm Chamfer |
+|---:|---:|---:|---:|---:|
+| 256 | 691218.10 | 0.0049343 | 691218.10 | 0.0049343 |
+| 512 | 690768.53 | 0.0049585 | 691217.26 | 0.0049365 |
+| 1024 | 689395.07 | 0.0049423 | 691212.86 | 0.0049397 |
+| 2048 | 689932.30 | 0.0049919 | 691212.86 | 0.0049397 |
+| 4096 | 689532.39 | 0.0050094 | 691212.86 | 0.0049397 |
+| 4963 | **689111.18** | 0.0049801 | 691212.86 | 0.0049397 |
+
+Even cold K=256 fits the images better than every K=4963 birth policy, while geometry is non-monotone and random matched birth gives the lowest Chamfer. Quality advantage, DoF efficiency, and compute efficiency therefore cannot be collapsed into one claim: birth loses the image-quality headroom comparison; raw has a limited AUC advantage over uniform but not random; and scoring makes raw/quadratic slower than their matched controls. Warm continuation itself flattens after K=1024, another sign that optimizer path dependence is material.
+
+The 20-view 2×2 ablation uses a simplified one-shot K=1024 selection and separately includes fixed K=256 and K=1024. Values below are normalized RGB MSE / symmetric Chamfer:
+
+| Resolution / photons | Raw | Uniform | Fixed K256 | Fixed K1024 |
+|---|---:|---:|---:|---:|
+| 256² / 327,680 | 0.00322168 / 0.0069479 | 0.00323633 / 0.0069486 | 0.00326970 / 0.0069908 | 0.00323602 / 0.0069514 |
+| 256² / 1,310,720 | 0.00093181 / **0.0039896** | 0.00094149 / 0.0040550 | 0.00096365 / 0.0042399 | 0.00094162 / 0.0040482 |
+| 1080p / 327,680 | 0.00343465 / 0.0077381 | 0.00345205 / 0.0074029 | 0.00345817 / 0.0073469 | 0.00344229 / 0.0077120 |
+| 1080p / 1,310,720 | 0.01112844 / 0.0049572 | 0.01112894 / 0.0048932 | 0.01111140 / 0.0049343 | 0.01108210 / 0.0049423 |
+
+Increasing photon density improves raw Chamfer at both resolutions (−0.002958 at 256² and −0.002781 at 1080p), so `PHOTON_DENSITY_GEOMETRY_EFFECT_SUPPORTED` is true. Increasing resolution worsens raw Chamfer at both photon budgets (+0.000790/+0.000968), so `RESOLUTION_GEOMETRY_EFFECT_NOT_SUPPORTED` is true. The normalized image objective is not comparable as a pure reconstruction score across photon budgets at 1080p because the target support itself becomes denser: increasing photons reveals many more non-black residual pixels. The defensible bandwidth verdict is therefore only `OBSERVATION_BANDWIDTH_LIMIT_PARTIALLY_REDUCED`: photon density reduces geometry error, but nominal resolution does not, and aggregate million-packet count still leaves sparse per-pixel support.
+
+The dominant bottleneck has shifted toward optimization plus footprint coverage, not dictionary capacity. Quadratic candidate scoring and Gram checks take 8.65 s versus 59.47 s in optimization, yet hundreds of units of predicted joint gain produce zero accepted improvement after the first round. Frozen visibility/support makes the local Jacobian blind to topology changes, and each view receives only about 28k retained events for 2.07M pixels. The next useful experiment is therefore not a larger K or still higher resolution: it is denser per-view transport support together with a trust-region/blocked optimizer that can validate and realize large-batch steps, followed by a repeated-seed/random-policy check. Exact rows and signed factorial effects are in the [JSON](artifacts/v08_high_bandwidth.json) and [CSV](artifacts/v08_high_bandwidth.csv). See [quality-vs-DoF/time](figures/v08_high_bandwidth_quality_curves.png), [predictor calibration](figures/v08_high_bandwidth_predictor_calibration.png), [batch trajectory](figures/v08_high_bandwidth_batch_trajectory.png), [birth geography](figures/v08_high_bandwidth_birth_geography.png), [factor ablation](figures/v08_bandwidth_factor_ablation.png), and the [four-view target/reconstruction montage](render_res/v08_high_bandwidth_multiview.png).
+
 ## Limitations
+
+v0.8 is one controlled Bunny run, not a general benchmark or a real-photo reconstruction. Its 20 direct Fibonacci packet directions are also its detector directions; it preserves a shared scene-centric transport state but does not validate arbitrary off-atlas cameras. The 8,192-element candidate dictionary is only a safety envelope. Visibility, ownership, and footprint topology remain frozen within each Jacobian cell. The 2×2 ablation changes the deterministic sampled target support with photon density, has no repeated stochastic trials, and uses a simplified one-shot K=1024 comparison; its signed effects are descriptive, not confidence intervals. In particular, a million attempted packets aggregated over 20 Full-HD views does not imply dense observations per pixel. The strict negative high-bandwidth verdict applies to this optimizer, dictionary, renderer approximation, and controlled target—not to every possible observation-driven birth method.
 
 The historical statement below that adaptive stopping is omitted applies through v0.6; v0.7 adds a declared three-round marginal-gain stop after a minimum of 1,024 active DoFs. Its 4,096-element dictionary is a finite safety envelope, so the experiment is not evidence for unbounded scaling. The v0.7 birth path uses eight direct atlas directions and a differentiable cubic spatial light-slab readout rather than v0.6's auxiliary-direction angular blend. Visibility is recomputed for the base and target but frozen during each local optimization, so the Jacobian cannot predict disocclusion or owner changes. The 1,664-DoF plateau is established only for this controlled Bunny, dictionary, sampling bandwidth, and optimizer; raw-alignment superiority should not be generalized beyond them.
 
