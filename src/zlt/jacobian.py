@@ -110,6 +110,44 @@ def deterministic_directions(
     return directions.reshape(-1, 3)
 
 
+def nested_deterministic_directions(
+    normals: Tensor, packets_per_emitter: int, cone_power: float
+) -> Tensor:
+    """Deterministic cosine-power directions with exact packet prefixes.
+
+    Unlike the historical stratified construction above, each sample depends
+    only on its packet index.  Consequently the first p directions of a q
+    packet run are bit-identical whenever p <= q.
+    """
+    if packets_per_emitter < 1:
+        raise ValueError("packets_per_emitter must be positive")
+    emitters = normals.shape[0]
+    packet = torch.arange(
+        packets_per_emitter, dtype=normals.dtype, device=normals.device
+    )
+    sobol = torch.quasirandom.SobolEngine(dimension=1, scramble=False)
+    radial = sobol.draw(packets_per_emitter + 1, dtype=normals.dtype)[1:, 0]
+    radial = radial.to(normals.device)
+    cos_theta = radial.pow(1.0 / (cone_power + 1.0)).expand(emitters, -1)
+    sin_theta = torch.sqrt((1.0 - cos_theta**2).clamp_min(0.0))
+    golden_ratio = (1.0 + 5.0**0.5) / 2.0
+    emitter = torch.arange(
+        emitters, dtype=normals.dtype, device=normals.device
+    )[:, None]
+    phase = torch.frac(packet[None, :] / golden_ratio + emitter / golden_ratio**2)
+    azimuth = 2.0 * torch.pi * phase
+    tangent, bitangent = _tangent_basis(normals)
+    directions = (
+        cos_theta[..., None] * normals[:, None, :]
+        + (sin_theta * torch.cos(azimuth))[..., None] * tangent[:, None, :]
+        + (sin_theta * torch.sin(azimuth))[..., None] * bitangent[:, None, :]
+    )
+    directions = directions / torch.linalg.vector_norm(
+        directions, dim=-1, keepdim=True
+    )
+    return directions.reshape(-1, 3)
+
+
 def _photon_batch(
     points: Tensor, directions: Tensor, colors: Tensor, packets_per_emitter: int
 ) -> PhotonBatch:

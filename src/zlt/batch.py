@@ -365,6 +365,7 @@ def _run_batch_trajectory(
         predicted_joint, predicted_sum, prediction_ratio = _batch_prediction(
             context, scores, columns, selected, gram
         )
+        selected_scores = scores["quadratic"][selected]
         predicted_raw = float(scores["raw"][selected].sum())
         before_loss = state.loss
         born_ids = torch.cat((state.active_ids, selected))
@@ -399,6 +400,12 @@ def _run_batch_trajectory(
             "predicted_batch_gain": predicted_joint,
             "independent_sum_gain": predicted_sum,
             "joint_to_independent_ratio": prediction_ratio,
+            "selected_score_max": float(selected_scores.max()),
+            "selected_score_median": float(selected_scores.median()),
+            "selected_score_min": float(selected_scores.min()),
+            "selected_score_min_to_max": float(
+                selected_scores.min() / selected_scores.max().clamp_min(1e-30)
+            ),
             "realized_gain": realized_gain,
             "birth_geometry_jump": jump,
             "top25_fraction": _target_membership(target, selected, "detail_ids"),
@@ -446,6 +453,9 @@ def _run_batch_trajectory(
                 "predicted_batch_gain": predicted_joint,
                 "independent_sum_gain": predicted_sum,
                 "joint_to_independent_ratio": prediction_ratio,
+                "selected_score_min_to_max": batch[
+                    "selected_score_min_to_max"
+                ],
                 "birth_top25_fraction": batch["top25_fraction"],
                 "birth_top10_fraction": batch["top10_fraction"],
             }
