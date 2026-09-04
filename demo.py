@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from zlt import (  # noqa: E402
     RESOLUTION_SWEEP,
+    BirthConfig,
     GeometryJacobian,
     LocalBasisField,
     PhotonBatch,
@@ -40,6 +41,7 @@ from zlt import (  # noqa: E402
     make_local_basis_field,
     observability_report,
     render_first_arrival,
+    run_birth_experiment,
     support_report,
     trace_photons,
     unit_normals,
@@ -524,6 +526,20 @@ def run_cuda_benchmark(args: argparse.Namespace) -> dict[str, object]:
     }
 
 
+def run_birth_analysis(args: argparse.Namespace) -> dict[str, object]:
+    config = BirthConfig(
+        candidates=args.birth_candidates,
+        views=args.birth_views,
+        resolution=args.birth_resolution,
+        oracle_iterations=args.birth_oracle_iterations,
+    )
+    return run_birth_experiment(
+        config,
+        csv_path=args.birth_csv,
+        figure_directory=args.birth_figures,
+    )
+
+
 def run_verification() -> dict[str, object]:
     """Exercise acceptance gates through the same classes/functions as the demo."""
     generator = torch.Generator().manual_seed(19)
@@ -822,11 +838,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--warm-runs", type=int, default=5)
     parser.add_argument("--batch-size", type=int, default=4096)
     parser.add_argument("--cuda-output", type=Path, default=None)
+    parser.add_argument("--birth", action="store_true")
+    parser.add_argument("--birth-candidates", type=int, default=64)
+    parser.add_argument("--birth-views", type=int, default=8)
+    parser.add_argument("--birth-resolution", type=int, default=256)
+    parser.add_argument("--birth-oracle-iterations", type=int, default=5)
+    parser.add_argument("--birth-csv", type=Path, default=None)
+    parser.add_argument("--birth-figures", type=Path, default=None)
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
+    if args.birth:
+        print("candidate_birth_analysis:")
+        print(json.dumps(run_birth_analysis(args), indent=2, sort_keys=True))
+        return
     if args.benchmark_cuda or args.benchmark_scaling:
         print("cuda_benchmark:")
         print(json.dumps(run_cuda_benchmark(args), indent=2, sort_keys=True))

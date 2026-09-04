@@ -44,6 +44,7 @@ from .benchmark import (
     cuda_environment,
     cuda_equivalence_report,
 )
+from .birth import BirthConfig, run_birth_experiment
 
 __all__ = [
     "PhotonBatch",
@@ -82,4 +83,6 @@ __all__ = [
     "benchmark_cuda_resolution",
     "cuda_environment",
     "cuda_equivalence_report",
+    "BirthConfig",
+    "run_birth_experiment",
 ]

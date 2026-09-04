@@ -1,6 +1,6 @@
 # Zero-Set Forward Light Tracing
 
-This experimental research prototype asks two deliberately narrow questions: can samples of a zero set act as local directional emitters, and does a compact local parameterization induce a sparse, stable geometry-to-image Jacobian? Version 0.1 isolates forward transport; version 0.2 adds local geometry parameters and derivative analysis without inverse reconstruction or a conventional lighting model. This project makes no claim of novelty.
+This experimental research prototype asks three deliberately narrow questions: can samples of a zero set act as local directional emitters, does a compact local parameterization induce a sparse geometry-to-image Jacobian, and can differential evidence predict the utility of a geometry parameter before it exists? Version 0.1 isolates transport, v0.2–v0.2.1 validate local geometry derivatives and CUDA scaling, and v0.3a falsifies one pre-birth scoring rule in a controlled inverse problem. This project makes no claim of novelty.
 
 ## Model
 
@@ -65,6 +65,7 @@ python demo.py --observability --scene sphere --analysis-output outputs/diagnost
 python demo.py --benchmark-cuda --scene sphere
 python demo.py --benchmark-cuda --scene torus --cuda-resolution 1920 1080
 python demo.py --benchmark-scaling
+python demo.py --birth --birth-csv artifacts/v03a_candidates.csv --birth-figures figures
 ```
 
 The two implemented fields are exactly an analytic sphere and analytic torus. With the default seed, the sphere is the convex normal/camera sanity check. The side-view torus activates non-convex self-occlusion: some rays emitted from its inner wall cross the hole and re-intersect the opposite tube before reaching the detector. Every run reports zero-set and normal errors, hit and absorption fractions, sparse shape/nnz/density, operator fan-in/fan-out, direct-versus-sparse error, and measured pipeline runtime. `--verify` additionally runs deterministic hand checks for all acceptance gates through production code.
@@ -140,6 +141,26 @@ Torus scaling under the same configuration:
 
 In isolated fresh processes, Full-HD cold/warm times were 272.8/25.9 ms for the sphere and 291.1/30.1 ms for the torus. Peak allocated/reserved memory was 176.4/204 MiB and 176.4/202 MiB, respectively. The sphere warm stage breakdown in milliseconds was emitter update 11.25, photon generation 0.60, camera intersection 0.57, collision 6.94, arrival/footprint 1.22, sparse transport 3.47, and sparse Jacobian 1.07. Torus values were 13.13, 0.67, 0.57, 8.24, 1.22, 4.57, and 1.52 ms. At 256², the same sparse operator path measured 60.53 ms on CPU and 23.10 ms on CUDA, a 2.62× speedup. No custom kernel or targeted optimization was needed: resolution growth leaves raw Jacobian nnz almost constant while its density decreases sharply.
 
+## v0.3a: utility of a nonexistent geometry DoF
+
+This falsification experiment distinguishes a hypothetical candidate direction from an active optimization parameter. The current model contains only 32 coefficients. Each of 64 finer candidate bases is appended with coefficient zero only long enough to evaluate its eight-view Jacobian column and score it. The persistent checkpoint remains 32-dimensional. For the oracle, exactly one candidate is then instantiated in a temporary 33-dimensional model, optimized from the same checkpoint, measured, and discarded before the next candidate.
+
+The deterministic CUDA experiment used a 64-DoF synthetic sphere target, eight 256×256 views, 256 emitters, and eight packets per emitter. The current model reduced loss from 0.0182427 to 0.0117430 over its conservative 64-step budget; its final per-step relative improvement was $9.41\times10^{-5}$. Four candidate columns matched central finite differences with maximum relative error $1.58\times10^{-9}$. Both target and candidate validation transport-event fractions were $3.05\times10^{-5}$.
+
+| Pre-birth score | Spearman | Pearson | Top-1 actual gain | Top-5 mean gain | Top-5 regret |
+|---|---:|---:|---:|---:|---:|
+| Random | -0.157 | -0.110 | 6.91e-4 | 1.66e-4 | 5.26e-3 |
+| Visibility | 0.330 | 0.094 | 2.41e-4 | 5.92e-5 | 5.71e-3 |
+| Local residual | 0.829 | 0.722 | 8.29e-6 | 2.62e-3 | 0 |
+| Jacobian norm | 0.649 | 0.358 | 1.81e-3 | 1.62e-3 | 0 |
+| Raw alignment | **0.972** | 0.852 | 5.95e-3 | 2.97e-3 | 0 |
+| Quadratic gain | 0.896 | 0.997 | 5.95e-3 | **3.05e-3** | 0 |
+| Orthogonalized gain | 0.901 | **0.999** | **5.95e-3** | **3.05e-3** | 0 |
+
+The orthogonalized score selected candidate 2, which was also the true best candidate, reduced loss by 0.005946 (50.6%), and had novelty ratio 0.999997. It also correctly suppressed the redundant control (novelty ratio $3.70\times10^{-8}$) and invisible control (zero Jacobian). The current multiview Jacobian had rank 32, and 55 candidates increased rank. Scoring took 0.20 s, all new-only and joint oracles took 47.81 s, and peak allocated/reserved VRAM was 68.7/92 MiB.
+
+The result is nevertheless **not supportive under the stated falsification rule**. Orthogonalization had excellent Pearson correlation and top-k selection, but its 0.901 Spearman correlation did not outperform the much simpler raw residual alignment score at 0.972, and it tied the single-DoF quadratic baseline on top-5 mean gain. The result therefore does not justify implementing repeated dynamic birth. Candidate-level results are in [`artifacts/v03a_candidates.csv`](artifacts/v03a_candidates.csv); the three compact diagnostics are in [`figures/`](figures/).
+
 ## Limitations
 
-The prototype deliberately omits inverse reconstruction, differentiability across collision/visibility topology changes, dynamic geometry parameter birth, optimized basis centers or radii, neural fields, secondary reflection, indirect illumination, refraction, participating media, physical camera lenses, and physically calibrated radiometry. It also misses tangent zero-set intersections that touch without a sign change. The v0.1 renderer uses finite Monte Carlo emission; v0.2 derivative analysis instead uses fixed deterministic directions. Detector misses produce no contribution, deformations must retain the intended local normal-line root, and only sphere- and torus-based fields are supported. With the intentionally fixed 256 emitters, Full-HD images are extremely sparse; this benchmark tests operator scaling rather than image reconstruction quality.
+The prototype deliberately omits differentiability across collision/visibility topology changes, repeated dynamic geometry birth, merge/prune policies, optimized basis centers or radii, neural fields, secondary reflection, indirect illumination, refraction, participating media, physical camera lenses, and physically calibrated radiometry. It also misses tangent zero-set intersections that touch without a sign change. The v0.3a oracle is a controlled local inverse experiment inside one fixed transport cell, not a production reconstruction system; the K=32 baseline stopped at a conservative iteration budget, so the small joint gain shared by redundant and invisible controls comes from continued optimization of existing parameters. Detector misses produce no contribution, deformations must retain the intended local normal-line root, and only sphere- and torus-based fields are supported. With the intentionally fixed 256 emitters, Full-HD images are extremely sparse; that benchmark tests operator scaling rather than image reconstruction quality.

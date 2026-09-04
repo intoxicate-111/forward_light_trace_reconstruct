@@ -8,3 +8,4 @@ dist/
 outputs/
 runs/
 *.png
+!figures/v03a_*.png
