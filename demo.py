@@ -853,6 +853,23 @@ def run_geodesic_source_chart_analysis(
     )
 
 
+def run_emitter_scaling_analysis(
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    from zlt.emitter_scaling import run_emitter_scaling_experiment
+    from zlt.mesh_field import obtain_stanford_bunny
+
+    mesh_path = args.bunny_mesh
+    if mesh_path is None:
+        mesh_path = obtain_stanford_bunny(args.bunny_cache)
+    return run_emitter_scaling_experiment(
+        mesh_path,
+        args.bunny_artifacts,
+        args.bunny_figures,
+        args.render_output,
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -1231,6 +1248,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--finite-packet-transport", action="store_true")
     parser.add_argument("--continuous-source-field", action="store_true")
     parser.add_argument("--geodesic-source-charts", action="store_true")
+    parser.add_argument("--emitter-scaling", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -1256,6 +1274,17 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.emitter_scaling:
+        report = run_emitter_scaling_analysis(args)
+        print("decoupled_geodesic_emitter_scaling:")
+        print(json.dumps(report["verdicts"], indent=2, sort_keys=True))
+        print(f"PRIMARY_LIMITATION={report['PRIMARY_LIMITATION']}")
+        selection = report["selection"]
+        print(f"BEST_K={selection['best_k']}")
+        print(f"BEST_M={selection['best_m']}")
+        print(f"BEST_TOTAL_EMITTERS={selection['best_total_emitters']}")
+        print(f"BEST_QUADRATURE_FORMULATION={selection['best_quadrature_formulation']}")
+        return
     if args.geodesic_source_charts:
         report = run_geodesic_source_chart_analysis(args)
         print("parameter_attached_geodesic_source_charts:")

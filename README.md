@@ -1,6 +1,6 @@
 # Zero-Set Forward Light Tracing
 
-This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4–v0.7 establish camera-independent mesh-free RGB transport, and v0.8–v0.8.4 diagnose high-resolution sampling and adopt continuous detector integration. v0.8.5 tests finite-support, root-free zero-set attenuation; v0.8.6 removes geometry-dependent source resampling with fixed 3D latent anchors; v0.8.7 replaces the volume proposal with persistent parameter-attached 2D geodesic charts and compares overlap-energy semantics. Source topology and energy invariance improve, while source MC variance and thin-feature fidelity remain unresolved. This project makes no claim of novelty.
+This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4–v0.7 establish camera-independent mesh-free RGB transport, and v0.8–v0.8.4 diagnose high-resolution sampling and adopt continuous detector integration. v0.8.5 tests finite-support, root-free zero-set attenuation; v0.8.6 removes geometry-dependent source resampling with fixed 3D latent anchors; v0.8.7 introduces persistent parameter-attached 2D geodesic charts; v0.8.8 separates chart sampling density from source energy and diagnoses the remaining failure as primarily per-chart quadrature limited rather than chart-center limited. This project makes no claim of novelty.
 
 ## Model
 
@@ -82,6 +82,7 @@ python demo.py --corrected-birth --bunny-artifacts artifacts --bunny-figures fig
 python demo.py --high-bandwidth-birth --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 python demo.py --continuous-source-field --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 python demo.py --geodesic-source-charts --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
+python demo.py --emitter-scaling --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 ```
 
 The reference fields are an analytic sphere and analytic torus; the optional Bunny path adds a fixed mesh-derived trilinear level-set evaluator. With the default seed, the sphere is the convex normal/camera sanity check. The side-view torus activates non-convex self-occlusion: some rays emitted from its inner wall cross the hole and re-intersect the opposite tube before reaching the detector. Every run reports zero-set and normal errors, hit and absorption fractions, sparse shape/nnz/density, operator fan-in/fan-out, direct-versus-sparse error, and measured pipeline runtime. `--verify` additionally runs deterministic hand checks for all acceptance gates through production code.
@@ -1315,6 +1316,112 @@ PRIMARY_SOURCE=UNRESOLVED
 ```
 
 The formal Quadro RTX 5000 run took 62.55 s. Main chart construction took 0.6985 s, the main render 0.2016 s, and measured throughput was 40,632 packets/s, 31.84 million interaction evaluations/s, and 1,420 detector measurements/s. It peaked at 423.86 MiB allocated / 538 MiB reserved and 2,039.39 MiB CPU RSS. Full results and all 31 evidence-backed verdicts are in the [JSON report](artifacts/v087_geodesic_source_charts.json) and [CSV record](artifacts/v087_geodesic_source_charts.csv); 19 figures use `figures/v087_*.png`, and the [RGB comparison](render_res/v087_geodesic_source_rgb_comparison.png) is copied into the dedicated render directory.
+
+## v0.8.8: decoupled geodesic emitter-density scaling
+
+### Source energy is no longer a lambda-local radial profile
+
+v0.8.8 retains the successful v0.8.7 chart identity, projected-reference tangent frame, four-step projected geodesic walk, finite-support v0.8.5 transport, and continuous v0.8.4 detector. It changes the source operator to
+
+$$x_{km}(F)=\Phi_k(F,\xi_m),\qquad E^{source}_{km}=G(x_{km},F)w^{quad}_{km}.$$
+
+The first 64 chart centers exactly reproduce v0.8.7. Additional nested centers are sampling-only potential geometry locations whose coefficients remain locked at zero; active geometry stays fixed at $K_{geom}=64$ for every control. No $\lambda$ amplitude occurs in source energy. Chart distance may organize proposal support, but Q2–Q4 compensate it through quadrature rather than making distant points intrinsically darker.
+
+### Reference source-measure derivation
+
+The successful v0.8.4/v0.8.5 renderer does not estimate calibrated surface-area radiance. It selects each sign-changing grid cell with equal latent probability, draws three Sobol coordinates uniformly in that cell, and applies its deterministic Newton projection with edge fallback. Its finite empirical measure is
+
+$$\mu_{ref,N}(F)=\frac1N\sum_{j=1}^N\delta_{\Phi_F(C_{\lfloor u_{j0}N_{cell}\rfloor},u_{j,1:3})},$$
+
+and its renderer multiplies accumulated detector energy by $g_{sensor}HW/N$. The reference integral is therefore
+
+$$S_{ref}(F)=\int G(x,F)\,d\mu_{ref,F}(x),$$
+
+an algorithmic sign-cell latent push-forward probability measure, not exactly $dA$. v0.8.8 matches this measure first; a frozen kNN area approximation is reported separately as a physical-surface-area control.
+
+### Nested chart centers and radius screening
+
+Normal-aware approximate-geodesic farthest-point insertion creates frozen prefixes $K_{chart}=64,128,256,512,1024$ without using images or residuals. The metric is chord distance times $1+0.5(1-n_i^Tn_j)$. Local fourth-neighbor spacing $h_{chart}$ controls radius, with $R_{chart}/h_{chart}=1,1.5,2$ screened. The smallest passing factor is 1.0. At $K=64,M=16$, the p95 mapping residual is 0.00106, while at $K=512,M=16$ it is $7.30\times10^{-5}$; both have zero coverage holes. Chart/sample matrix density falls from 0.1529 to 0.01374 as K increases.
+
+### Quadrature formulations
+
+Five source weights are compared at $K=256,M=32$:
+
+| Formulation | Source mass | MSE to historical measure | Thin response |
+|---|---:|---:|---:|
+| v0.8.7 radial area-corrected kernel | 9.0949 | 1.0004 | 0.3357 |
+| Equal sample | 9.0886 | 0.6707 | 0.2504 |
+| Frozen intrinsic-area proxy | 9.0886 | 0.6938 | 0.2600 |
+| Geodesic proposal importance | 7.4454 | 0.6272 | 0.2139 |
+| Historical-measure matched | 9.0886 | **0.5721** | **0.4462** |
+
+The selected Q4 estimator transports the equal mass of each of 4,096 frozen historical push-forward samples to its 16 nearest persistent geodesic samples with normalized inverse-distance weights. This is a finite empirical match to the intended algorithmic measure. `SOURCE_MEASURE_MATCHED=true`, but its finite sample estimator is not yet resolution invariant.
+
+### Fixed-total K/M ablation
+
+Holding $K_{chart}M=8192$ gives:
+
+| K | M | Whole MSE | Thin response | Nearest p95 |
+|---:|---:|---:|---:|---:|
+| 64 | 128 | 0.7415 | 0.4528 | 0.03976 |
+| 128 | 64 | 0.6333 | 0.4565 | 0.03099 |
+| 256 | 32 | 0.6129 | 0.4462 | 0.03009 |
+| 512 | 16 | 0.6113 | 0.4348 | 0.03021 |
+
+Increasing K improves geometric coverage and whole-image error, but does not improve thin-feature response at fixed total count: the 64-to-512 change is $-0.0180$. Therefore `IS_BANDWIDTH_K_LIMITED=false` and `FIXED_TOTAL_SAMPLE_K_ABLATION_SUPPORTS_K_LIMIT=false`.
+
+### Total-emitter scaling
+
+The 256-square historical-measure MSE falls from 1.7647 at $64\times32$ to 0.5926 at $128\times64$, 0.2409 at $256\times128$, 0.1453 at $512\times128$, and 0.1392 at $1024\times64$. The corresponding nearest-sample p95 falls from 0.07656 to 0.01070. The two equal 65,536-emitter candidates favor more centers slightly: $1024\times64$ has whole MSE 0.1744 and thin response 0.5349 versus 0.1804/0.5134 for $512\times128$. These gains do not survive the Full-HD fidelity gate.
+
+### K/M expectation invariance
+
+All historical-matched rows have exactly the calibrated raw mass 9.088634, so source mass is invariant by construction. Detector estimates are not converged: at fixed $M=32$, K scaling changes foreground brightness by at most 11.93% and image energy by 72.77%; at fixed $K=256$, M scaling changes them by 10.83% and 45.55%. Consequently `CHART_DENSITY_EXPECTATION_INVARIANT=false` and `EMITTER_COUNT_EXPECTATION_INVARIANT=false`. The distinction matters: exact mass normalization alone does not imply stable image-space quadrature.
+
+### Multi-seed variance and K/M diagnosis
+
+Eight fixed seeds give:
+
+| K | M | Response-norm CV | Median response cosine | Mean image self-MSE |
+|---:|---:|---:|---:|---:|
+| 64 | 32 | 0.3025 | 0.5362 | 0.04021 |
+| 64 | 128 | **0.1206** | 0.7046 | 0.004909 |
+| 512 | 16 | 0.1783 | 0.7895 | 0.003312 |
+| 1024 | 64 | 0.1705 | **0.9032** | **0.0001359** |
+
+Increasing M at fixed K reduces response-norm CV by 0.1818 and passes the isolated 0.15 variance threshold. The selected forward configuration has excellent directional stability but CV 0.1705, just above the gate. Thus `M_INCREASE_REDUCES_VARIANCE=true`, `CROSS_SEED_GEOMETRY_RESPONSE_STABLE=true`, `SOURCE_MC_VARIANCE_ACCEPTABLE=false`, `IS_VARIANCE_M_LIMITED=true`, and `PRIMARY_LIMITATION=M_LIMITED`.
+
+### Strict full-rerender finite differences
+
+The full four-step geodesic JVP at $512\times16$ exceeds the 16 GiB device budget, so strict FD uses a declared fixed-total 2,048-emitter K control: $64\times32$, $256\times8$, and $512\times4$. It rerenders chart centers, frames, sample motion, appearance, finite transport, and continuous detector without rebuilding sign-changing cells. Maximum best-category error falls from 0.1327 through 0.03364 to 0.00973; the last occlusion-boundary error is 0.00973 and minimum cosine 0.999956. `FULL_RERENDER_FD_ACCEPTABLE=true` for the high-K fixed-budget diagnostic.
+
+### Sparsity scaling
+
+At $M=16$, chart/sample nnz grows 10,021, 17,374, 31,720, and 57,629 for $K=64,128,256,512$, while density falls 0.1529, 0.06628, 0.03025, and 0.01374. Mean active geometry influences per emitter remain 4.43, 3.98, 3.88, and 3.79. The source-position Jacobian density remains near 6%, and no dense matrix is materialized. `SOURCE_OPERATOR_REMAINS_SPARSE=true`.
+
+### Full-HD result
+
+Only the selected $1024\times64$ and fixed-budget $512\times16$ candidates are streamed at 1920×1080. The selected candidate processes 65,536 emitters, retains 173,184 view-emitter packets, performs 31.46 million transport interactions, and takes 3.031 s. It peaks at 1,030.87 MiB allocated / 1,152 MiB reserved. Its whole/foreground/silhouette MSE values are 18.85/1214.58/108.21, edge ratio is 0.7715, and thin response is only 0.13925. The historical source measure reaches 0.9938 thin response in the same test. Therefore `THIN_FEATURE_FIDELITY_RECOVERED=false` and `FULLHD_SOURCE_DENSITY_ADEQUATE=false` despite the far larger source population.
+
+### Multiview scene-state reuse
+
+For $64\times32$, $C_{source}=0.2671$ s, 20-direction $C_{transport}=0.2320$ s, and $C_{measure}=0.687$ ms/view. For $1024\times64$, they are 3.619 s, 4.532 s, and 0.939 ms/view. Cached and independently measured detector images agree within $2.22\times10^{-15}$. Transport and source construction scale with emitters, while detector-only marginal cost stays below one millisecond; `SCENE_TRANSPORT_REUSED_ACROSS_VIEWS=true`.
+
+### Scientific decision and birth readiness
+
+The experiment supports geodesic charts as a persistent sparse sampling infrastructure and validates decoupling source energy from $\lambda$. It rejects the hypothesis that v0.8.7 primarily failed because it had only 64 chart centers: more K improves coverage but not fixed-budget thin bandwidth. More M clearly improves variance, yet final response CV, K/M image invariance, and Full-HD thin fidelity still fail. No geometry optimization, simulated activation, or birth is run.
+
+```text
+PRIMARY_LIMITATION=M_LIMITED
+BEST_K=1024
+BEST_M=64
+BEST_TOTAL_EMITTERS=65536
+BEST_QUADRATURE_FORMULATION=HISTORICAL_MEASURE_MATCHED
+SMALL_GEOMETRY_OPTIMIZATION_READY=false
+HIGH_RES_BIRTH_READY_TO_RETEST=false
+```
+
+The formal Quadro RTX 5000 run takes 343.61 s and peaks at 1,216.97 MiB allocated / 1,270 MiB reserved with 2,666.11 MiB CPU RSS. Complete measurements, exact center-prefix/latent digests, all seeds, chart radii, view frames, quadrature equations, 18 verdicts, and reproduction commands are in the [JSON report](artifacts/v088_geodesic_emitter_scaling.json) and [CSV record](artifacts/v088_geodesic_emitter_scaling.csv). Thirteen figures use `figures/v088_*.png`; the dedicated [Full-HD four-view comparison](render_res/v088_fullhd_geodesic_emitter_comparison.png) shows the unresolved high-resolution bias directly.
 
 ## Limitations
 
