@@ -189,6 +189,7 @@ def sample_meshfree_zero_set(
     sobol_scramble_seed: int | None = None,
     sobol_start_index: int = 0,
     sampling_cells: Tensor | None = None,
+    unit_sequence: Tensor | None = None,
 ) -> MeshFreeSurfaceState:
     """Sample sign-changing cells and project without any mesh scaffold."""
     if count < 1 or newton_steps < 1 or sobol_start_index < 0:
@@ -209,14 +210,23 @@ def sample_meshfree_zero_set(
     )
     if cells.numel() == 0:
         raise RuntimeError("implicit grid contains no sign-changing cells")
-    engine = torch.quasirandom.SobolEngine(
-        4,
-        scramble=sobol_scramble_seed is not None,
-        seed=sobol_scramble_seed,
-    )
-    if sobol_start_index:
-        engine.fast_forward(sobol_start_index)
-    sequence = engine.draw(count)
+    if unit_sequence is None:
+        engine = torch.quasirandom.SobolEngine(
+            4,
+            scramble=sobol_scramble_seed is not None,
+            seed=sobol_scramble_seed,
+        )
+        if sobol_start_index:
+            engine.fast_forward(sobol_start_index)
+        sequence = engine.draw(count)
+    else:
+        if unit_sequence.shape != (count, 4):
+            raise ValueError("unit_sequence must have shape (count, 4)")
+        if not bool(
+            ((unit_sequence >= 0.0) & (unit_sequence < 1.0)).all()
+        ):
+            raise ValueError("unit_sequence values must lie in [0, 1)")
+        sequence = unit_sequence
     sequence = sequence.to(dtype=dtype, device=device)
     choice = torch.floor(sequence[:, 0] * cells.shape[0]).to(torch.long)
     choice.clamp_max_(cells.shape[0] - 1)

@@ -713,6 +713,74 @@ The K=32→64 birth comparison and five-seed follow-up were not executed because
 
 This run establishes that millions of real emitter samples can make fixed-footprint Full-HD transport quantitatively comparable to the 256² reference: all contribution-density gates pass, and streaming keeps peak allocation/reservation to 1,306.29/1,374 MiB. It also shows that matching aggregate writes and count distributions is not yet sufficient for a clean geometry-bandwidth claim: matched RGB narrowly misses its stability gate and independent-sample image error varies strongly because the hard support threshold amplifies rare sample-dependent support changes. The v0.8 sample-starvation confound is removed, but whether higher detector resolution improves geometry reconstruction or child selection remains unresolved. The next prerequisite is a threshold-robust detector estimator plus a streaming/factored Jacobian, followed by the same low/high K=32→64 and five-seed protocol. Exact metrics, seeds, gates, timings, and evidence are in the [JSON](artifacts/v082_high_sample_resolution_control.json) and [CSV](artifacts/v082_high_sample_resolution_control.csv); [runtime scaling](figures/v082_runtime_scaling.png) reports the practical cost.
 
+## v0.8.3: Pixel accumulation, support switching, and gradient stability
+
+### 1. Exact pixel estimator
+
+v0.8.3 audits the unchanged legacy 4x4 detector operator before proposing any repair. For an in-frame event $i$, the integer anchor is `floor` of its continuous detector coordinate, the candidate offsets are −1, 0, 1, 2, and strictly positive separable cubic weights are accumulated. The exact sufficient statistics and output are
+
+\[
+N_p=\sum_i \mathbf 1[w_{ip}>0],\quad W_p=\sum_iw_{ip},\quad Q_p=\sum_iw_{ip}^2,
+\]
+\[
+A_p=\sum_iw_{ip}C_i\left(0.35+0.65\max(0,n_i\!\cdot\!\omega_v)\right),\qquad
+I_p=\mathbf 1[W_p\geq0.05]\operatorname{clamp}\!\left(1.5A_p/\max(W_p,10^{-30}),0,1\right).
+\]
+
+Thus $W_p$, but not $N_p$, is a random per-pixel denominator. Emitter count, packets/emitter, view count, retained-event count, pixel/detector area, and RGB-channel count are not separate denominators. Each view is formed independently.
+
+### 2. Accumulation statistics
+
+The primary pair uses scrambled Sobol seeds 101 and 211 and exactly the v0.8.2 matched-density prefixes. Writes/pixel remain 6.8876, 6.8884, 6.8881, and 6.8885 at 256², 512², 960×540, and 1080p; target-foreground writes/pixel are 23.84, 24.50, 24.66, and 24.94. Pixels with at least 64 contributions have self-MSE $5.56,4.50,3.66,14.97\times10^{-5}$, far below the corresponding 4–7 contribution bins $8.09,11.10,4.58,33.29\times10^{-3}$. Therefore many-emitter accumulation is not itself the failure: `MULTIPLE_EMITTER_ACCUMULATION_UNSTABLE=false` and `HIGH_COUNT_PIXELS_MORE_STABLE=true`.
+
+### 3. Normalization audit
+
+Nested 256² prefixes N/2N/4N = 65,536/131,072/262,144 produce foreground mean intensities 0.58419/0.58550/0.58634. Their relative range is 0.003669, below the declared 0.05 gate, while foreground mean $W_p$ scales 1.4970/2.9944/5.9888 as expected. The current ratio estimator therefore preserves brightness under sample scaling (`PIXEL_ESTIMATOR_NORMALIZATION_CORRECT=true`). On common support, median absolute Spearman correlations of pixel self-error with |ΔN| and |ΔW| are only 0.0585 and 0.0559, so neither ordinary count fluctuation nor random-denominator variation is the primary driver.
+
+### 4. Support switching
+
+The A/B support-XOR fractions are only 0.000777/0.000622/0.000263/0.000690, yet these pixels explain 81.36%/95.45%/91.22%/99.23% of total MC self-SSE. Their per-scalar MSE is 0.145/0.321/0.204/0.493, whereas common-support MSE falls from $9.14\times10^{-5}$ to $9.74\times10^{-6}$. The cubic value and first derivative remain mathematically continuous at an integer anchor: numerical total weight stays one in float32 and float64. Stencil membership nevertheless changes discretely (14 entries in the two-dimensional near-boundary test), and the final $W_p\geq0.05$ decision turns rare sampling differences into an on/off RGB jump. `COMPACT_SUPPORT_SWITCHING_DETECTED=true` and `SUPPORT_SWITCHING_DOMINATES_MC_SSE=true`.
+
+### 5. Visibility switching
+
+The exact hard decisions are outward $n\cdot\omega>10^{-8}$, intersection epsilon $2\times10^{-4}$, in-frame clipping, cubic `weight > 0`, and final support $W_p\geq0.05$. A same-identity, 65,536-emitter controlled direction perturbation finds visible↔occluded switches by $10^{-4}$ in some views and up to 0.000244 at $10^{-3}$; most state changes occur at grazing events. This establishes `VISIBILITY_SWITCHING_DETECTED=true`, although the detector support threshold is the more direct source of the measured image spikes.
+
+### 6. Foreground/interior/silhouette decomposition
+
+All coverage, zero/count<2/count<4, median, p90, p95, count, weight, intensity, and error statistics are reported separately for target, predicted, union, intersection, and >8 px interior foreground. The aggregate background is not called sparse foreground. The 0–8 px silhouette bands explain 82.65%/71.11%/53.78%/62.67% of primary self-SSE. The finest 0–1 px band alone explains 48.11% at 256². `SILHOUETTE_REGION_DOMINATES_MC_SSE=true`, while multiseed foreground and interior error both worsen substantially at Full HD.
+
+### 7. Multi-seed MC result
+
+Eight deterministic scrambled Sobol sets are recorded: seed 101 is the reference and seeds 211/307/401/503/601/701/809 are seven independent comparisons. Mean whole-image MSE (95% CI) is $1.286\times10^{-4}$ ([1.220,1.351]×10⁻⁴), $2.270\times10^{-4}$ ([2.165,2.374]×10⁻⁴), $6.891\times10^{-5}$ ([6.365,7.418]×10⁻⁵), and $3.288\times10^{-4}$ ([2.985,3.592]×10⁻⁴). Full HD exceeds 256² by 2.558× in every paired comparison; paired $t=12.73$, $p=1.44\times10^{-5}$. The unusual 960×540 low and 1080p high values are therefore stable effects of this raster/configuration, not one unlucky scramble. Support switches explain 80.22%/95.68%/92.07%/99.21% of mean SSE.
+
+### 8. Sobol/grid test
+
+Against the scrambled distribution at 1080p, the unscrambled Sobol result is 2.10 standard deviations away and pseudorandom uniform is 19.43 standard deviations away; pseudorandom self-MSE is $1.124\times10^{-3}$. The tested sequence family therefore materially affects the raster result (`SOBOL_GRID_RESONANCE_DETECTED=true`), but no checkerboard-only explanation is supported: measured checkerboard correlations remain below 0.008. Sobol structure modulates the instability; it does not replace the support-switch root cause.
+
+### 9. Gradient stability
+
+A controlled 256², four-view, 16,384-emitter Bunny case evaluates five basis coefficients selected as deep interior, smooth visible surface, silhouette, occlusion boundary, and high curvature over six epsilons from $10^{-2}$ to $3\times10^{-5}$. Best analytic-vs-frozen relative errors are 0.00590, 0.09719, 0.02049, 0.11651, and 0.04119; three of five pass the 0.08 all-pixel gate, so the strict all-category verdict is false. Independent-realization gradient cosines range from 0.424 to 0.796, confirming substantial sample-realization variance.
+
+### 10. Frozen-support vs full-rerender finite differences
+
+The same five best-epsilon analytic-vs-full relative errors are 1.00029/0.99986/0.99977/0.99755/0.99983, even though only $3.8\times10^{-6}$ to $3.4\times10^{-5}$ of RGB scalars change final support. Full rerender derivatives are dominated by discrete root/visibility/support changes that the local analytic Jacobian intentionally freezes. Hence both strict match booleans are false; the much closer frozen results isolate missing topology derivatives rather than a generic failure of the continuous spline derivative.
+
+### 11. Root cause
+
+Cases 1–3 are rejected: high-count pixels are more stable, and stable common-support |ΔN|/|ΔW| correlations are weak. Case 4 is the primary cause: rare compact/final-support changes carry most SSE. Case 5 is also supported by visibility switching plus silhouette concentration. Case 6 is a secondary sequence/raster interaction. The measured high-resolution effect is a combination of hard support/visibility topology and sampling phase, not overlap of many emitters.
+
+### 12. Fix, if justified
+
+No production estimator, footprint, visibility rule, optimizer, or birth score is changed in v0.8.3. A repair now requires a radiometrically justified treatment of the hard $W_p=0.05$ transition and detector integration, with before/after/control evidence; simply blurring, enlarging support, or dividing by counts would confound the diagnosis.
+
+### 13. Remaining unknowns
+
+The multiseed design is reference-versus-seven rather than all 28 pairs. Exact emitter-ID Jaccard overlap is undefined between independent point samples, so presence/count/weight/occupancy proxies are used. Full-resolution geometry Jacobians remain infeasible with the explicit sparse construction; the finite-difference study is the declared smaller controlled case.
+
+### 14. Birth prerequisite verdict
+
+`MC_SELF_NOISE_STATISTICALLY_CHARACTERIZED` and `NORMALIZATION_VALIDATED` pass, and the support root cause is numerically isolated. `INTERIOR_MC_STABLE` and `GRADIENT_STABILITY_ACCEPTABLE` fail: Full-HD/256² multiseed interior MSE is 6.714× and analytic Jacobians do not match full rerenders. Therefore `HIGH_RES_BIRTH_READY_TO_TEST=false`; no K=32→64 birth experiment was run, and this is a failed prerequisite rather than a negative birth result. The complete 14-part report, exact seeds and nested `[0,N)` four-dimensional Sobol ranges, thresholds, per-pixel cases, commands, 1,520.05 s runtime, 1,382.41/1,742 MiB recorded CUDA peak allocation/reservation, and all boolean evidence are in the [JSON](artifacts/v083_pixel_support_gradient_diagnostic.json) and [CSV](artifacts/v083_pixel_support_gradient_diagnostic.csv). The twelve required plots and four resolution-specific spatial maps are retained as [`figures/v083_*.png`](figures/).
+
 ## Limitations
 
 v0.8 is one controlled Bunny run, not a general benchmark or a real-photo reconstruction. Its 20 direct Fibonacci packet directions are also its detector directions; it preserves a shared scene-centric transport state but does not validate arbitrary off-atlas cameras. The 8,192-element candidate dictionary is only a safety envelope. Visibility, ownership, and footprint topology remain frozen within each Jacobian cell. The 2×2 ablation changes the deterministic sampled target support with photon density, has no repeated stochastic trials, and uses a simplified one-shot K=1024 comparison; its signed effects are descriptive, not confidence intervals. In particular, a million attempted packets aggregated over 20 Full-HD views does not imply dense observations per pixel. The strict negative high-bandwidth verdict applies to this optimizer, dictionary, renderer approximation, and controlled target—not to every possible observation-driven birth method.

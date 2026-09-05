@@ -131,6 +131,7 @@ def _prepare_surface(
     scramble_seed: int | None,
     sampling_cells: Tensor,
     maximum_offset: float = 0.05,
+    unit_sequence: Tensor | None = None,
 ) -> SurfaceState:
     device = base.grid.device
     point_parts: list[Tensor] = []
@@ -157,6 +158,11 @@ def _prepare_surface(
             sobol_scramble_seed=scramble_seed,
             sobol_start_index=start,
             sampling_cells=sampling_cells,
+            unit_sequence=(
+                unit_sequence[start:stop]
+                if unit_sequence is not None
+                else None
+            ),
         )
         if surface.valid_count != stop - start:
             raise RuntimeError(
@@ -261,6 +267,11 @@ def _prepare_surface(
             "sobol_seed": scramble_seed,
             "sobol_start_index": 0,
             "sobol_stop_index_exclusive": count,
+            "sampling_method": (
+                "provided_unit_sequence"
+                if unit_sequence is not None
+                else "sobol"
+            ),
             "emitter_index_range": [0, count],
             "chunk_size": chunk_size,
             "chunks": math.ceil(count / chunk_size),

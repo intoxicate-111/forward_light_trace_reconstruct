@@ -23,6 +23,7 @@ runs/
 !figures/v08_*.png
 !figures/v081_*.png
 !figures/v082_*.png
+!figures/v083_*.png
 !render_res/
 !render_res/v04_*.png
 !render_res/v05_*.png
