@@ -1,6 +1,6 @@
 # Zero-Set Forward Light Tracing
 
-This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4–v0.7 establish camera-independent mesh-free RGB transport, and v0.8–v0.8.4 diagnose high-resolution sampling and adopt continuous detector integration. v0.8.5 tests finite-support, root-free zero-set attenuation; v0.8.6 replaces its geometry-dependent source population with fixed latent anchors and finds that source-resampling topology is removed, while source MC variance and thin-feature fidelity remain unresolved. This project makes no claim of novelty.
+This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4–v0.7 establish camera-independent mesh-free RGB transport, and v0.8–v0.8.4 diagnose high-resolution sampling and adopt continuous detector integration. v0.8.5 tests finite-support, root-free zero-set attenuation; v0.8.6 removes geometry-dependent source resampling with fixed 3D latent anchors; v0.8.7 replaces the volume proposal with persistent parameter-attached 2D geodesic charts and compares overlap-energy semantics. Source topology and energy invariance improve, while source MC variance and thin-feature fidelity remain unresolved. This project makes no claim of novelty.
 
 ## Model
 
@@ -81,6 +81,7 @@ python demo.py --appearance-ablation --bunny-artifacts artifacts --render-output
 python demo.py --corrected-birth --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 python demo.py --high-bandwidth-birth --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 python demo.py --continuous-source-field --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
+python demo.py --geodesic-source-charts --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 ```
 
 The reference fields are an analytic sphere and analytic torus; the optional Bunny path adds a fixed mesh-derived trilinear level-set evaluator. With the default seed, the sphere is the convex normal/camera sanity check. The side-view torus activates non-convex self-occlusion: some rays emitted from its inner wall cross the hole and re-intersect the opposite tube before reaching the detector. Every run reports zero-set and normal errors, hit and absorption fractions, sparse shape/nnz/density, operator fan-in/fan-out, direct-versus-sparse error, and measured pipeline runtime. `--verify` additionally runs deterministic hand checks for all acceptance gates through production code.
@@ -1201,6 +1202,119 @@ The mathematically fixed latent emitters do not appear or disappear; their smoot
 ### 20. Birth readiness
 
 `SMALL_GEOMETRY_OPTIMIZATION_READY=false` and `HIGH_RES_BIRTH_READY_TO_RETEST=false`; no birth experiment was run. The next useful step is to improve variance and thin-feature coverage without reintroducing geometry-dependent identities—for example, a frozen nonuniform proposal with correct $1/q(a)$ weighting—then repeat the same multiseed and hard-reference gates. The formal run took 51.33 s. Its main 32,768-anchor render had 810 nonzero anchors (2.472%), took 0.1701 s, processed 192,594 source evaluations/s and 770,376 packets/s, and peaked at 433.13 MiB allocated / 618 MiB reserved with 1,941.03 MiB CPU RSS. Complete numbers and all 23 verdicts are in the [JSON report](artifacts/v086_continuous_source_field.json) and [CSV record](artifacts/v086_continuous_source_field.csv); the 14 new figures use the `figures/v086_*.png` namespace and the render sheet is [here](render_res/v086_historical_vs_continuous_source_rgb.png).
+
+## v0.8.7: parameter-attached geodesic source charts
+
+### 1. v0.8.6 variance/bandwidth failure
+
+v0.8.6 proved that fixed 3D latent anchors remove source-resampling topology, but its eight-seed median geometry-response cosine was $-0.00824$, normalized image self-MSE was 1.5631, and its Bunny thin-feature response was 0.4060 at 256 square and 0.1480 at 512 square. v0.8.7 asks whether moving the fixed quadrature onto persistent local two-dimensional manifold charts reduces that variance without sacrificing identity, sparsity, energy semantics, or multiview reuse.
+
+### 2. Parameter-attached chart formulation
+
+The geometry remains
+
+$$F(x;\lambda)=F_0(x)+\sum_k\lambda_kB_k(x).$$
+
+The local geometry basis associated with $\lambda_k$ defines a persistent surface-chart center used to parameterize a local source basis; $\lambda_k$ is not itself emitted energy. A nested master dictionary of 128 fixed world-space Wendland centers has support radii $0.45\sqrt{32/K_{level}}$. The main experiment uses $K=64$, and the centers have maximum reference zero-set residual $3.96\times10^{-10}$. A scale-aware one-step projection updates each chart center under deformation.
+
+### 3. Fixed chart identities
+
+Each latent sample has immutable identity $(k,m,\rho_m,\theta_m)$. Per-chart scrambled Sobol points use seed $101+104729k$ and proper disk-area coordinates $\rho=\sqrt{u_0}$, $\theta=2\pi u_1$. The main configuration uses $M=32$ samples per chart and 2,048 total samples. The identity digest stays fixed through perturbations, with no duplicates, root birth/death, cut-locus selection, or chart-crossing reassignment. Scaling $F$ by 0.5, 2, and 10 changes final outputs by at most $3.77\times10^{-14}$.
+
+### 4. Tangent-frame construction
+
+The selected frame projects a frozen reference direction into the current tangent plane, with a minimal-rotation fallback. The reference least-aligned-axis choice occurs only once at $F_0$; it is not reevaluated during deformation. Its maximum angular change is 0.00313 rad, below the 0.05 gate, whereas the deliberately naive axis-switch control jumps by 1.740 rad. Thus `TANGENT_FRAME_CONTINUOUS=true` for the selected construction.
+
+### 5. Projected geodesic walk
+
+A fixed four-step walk repeatedly advances in the transported tangent direction and applies
+
+$$x\leftarrow y-\frac{F(y)\nabla F(y)}{\|\nabla F(y)\|^2+\eta^2}.$$
+
+There is no root search, shortest-path solver, branch selection, or cut-locus owner. The radius sweep tests $R_{chart}/R_{basis}=0.25,0.5,1.0,1.5$; the smallest configuration satisfying coverage, residual, and sparsity gates is 1.0, giving radii 0.3182–0.45. Adjacent perturbations preserve every latent identity and have maximum Bunny sample-position jump 0.00187.
+
+### 6. Sparse source matrix
+
+The frozen 8%-margin support envelope builds a COO chart/source matrix of shape $2048\times64$ with 11,764 nonzeros, density 0.08975, and 282,336 bytes. Each emitter depends on 5.744 chart centers on average and at most 12; each $\lambda$ column has 183.8 entries on average and at most 348. Values are recomputed continuously while the envelope stays fixed, and no dense source matrix is materialized.
+
+### 7. Source-energy kernel
+
+The chart kernel is the nonnegative compact $C^2$ unit-disk density
+
+$$K_E(r)=\frac{4}{\pi}(1-r^2)^3,\qquad 0\le r<1,$$
+
+and zero outside support. It integrates to one on the unit disk. These charts are algorithmic source quadrature, not physical radiance primitives.
+
+### 8. Raw additive semantics
+
+Raw addition literally superposes independent chart energies and is exactly linear: its overlap mass changes by only $1.15\times10^{-10}$ between coincident and separated kernels, and numerical superposition error is zero. It fails DoF-density invariance, however: the $K=32,64,128$ sweep gives maximum mass deviation 0.9988 and brightness deviation 0.9267. `RAW_ADDITIVE_ENERGY_LINEAR=true`, but `RAW_ADDITIVE_DOF_DENSITY_INVARIANT=false`.
+
+### 9. Area/mass-corrected additive semantics
+
+This variant multiplies each normalized chart kernel by its frozen reference Voronoi area. It retains literal additive energy under overlap: coincident/separated masses are 1.00000000024/1.00000000012. Across $K$, maximum source-mass and brightness deviations are 0.00101 and 0.04716. It therefore meets both density and overlap-energy gates and is the selected formulation.
+
+### 10. Partition-of-unity semantics
+
+Exact POU uses sparse responsibilities $\alpha_{mk}=K_{mk}/\sum_lK_{ml}$; soft POU uses denominator $\sum_lK_{ml}+10^{-3}$. Their maximum $K$-sweep brightness deviations are 0.03568 and 0.03520, and POU remains local. But moving two kernels from coincidence to separation changes integrated mass by 0.4998 for exact POU and 0.4872 for soft POU. POU is useful as normalized responsibility, but does not preserve literal source-energy superposition in this experiment.
+
+### 11. Overlap controls
+
+The controlled two-kernel sweep compares raw addition, area-corrected addition, exact/soft POU, max responsibility, and a geometry-coupled amplitude diagnostic. Raw and area-corrected addition preserve integrated mass; exact/soft POU and max responsibility do not. Since the intended source semantics require local DoF-density invariance and literal energy bookkeeping together, `OVERLAP_ENERGY_SEMANTICS_RESOLVED=true` and `BEST_OVERLAP_FORMULATION=AREA_CORRECTED_ADDITIVE`. This is an experimental selection, not a claim that overlap must always be normalized or additive.
+
+### 12. DoF-density invariance
+
+Using nested $K=32,64,128$ chart sets at fixed $M=32$, area correction keeps source mass within 0.101% and detector brightness within 4.716% of the $K=64$ reference. Raw addition nearly doubles mass at $K=128$. Exact and soft POU also pass the declared density gates, but fail the separate additive-overlap mass test. DoF density therefore need not change brightness when chart area is accounted for.
+
+### 13. DoF-birth simulation
+
+Appending a 65th zero-coefficient chart without changing geometry causes area-corrected source-mass, brightness, and image-norm jumps of 0.0113%, 0.256%, and 3.631%. The raw image-norm jump is 5.828%; exact and soft POU reduce it to about 1.804% but alter overlap-energy semantics. For the selected formulation `DOF_BIRTH_ENERGY_STABLE=true`; this is a source-basis birth simulation, not an executed geometry optimization.
+
+### 14. Surface coverage
+
+At the selected radius ratio, 4,096 reference-surface probes have zero unsupported fraction, cover-count percentiles 5/12/23, 95th-percentile nearest-source distance 0.07199, maximum distance 0.13023, and spatial source-mass CV 0.5395. `SOURCE_COVERAGE_ACCEPTABLE=true`. The 0.25 and 0.5 radius ratios leave 33.2% and 10.1% unsupported, which is why they are rejected.
+
+### 15. Thin-feature fidelity
+
+The analytic thin-cylinder toy still leaves 23.0% unsupported and has response proxy 0.0702; the narrow-concavity control has zero unsupported fraction and proxy 0.3468. On Bunny, selected area correction gives thin-feature ratios 0.4279 at 256 square and 0.1318 at 512 square, far below the 0.75 gate and the historical dynamic-source values 0.9116/0.9637. `THIN_FEATURE_FIDELITY_RECOVERED=false` and `GEOMETRY_BANDWIDTH_PRESERVED=false`.
+
+### 16. Curvature/geodesic study
+
+At radius ratio 1.0, projected geodesic samples have surface-residual p95 $7.16\times10^{-4}$ versus $1.06\times10^{-2}$ for one-shot tangent projection. They also reduce zero-support probability from 0.00391 to zero and nearest-distance p95 from 0.07993 to 0.07199. Geodesic/tangent discrepancy grows by a factor 4.85 from the lowest to highest curvature bin, supporting an adaptive rule based on $R_{chart}\kappa$ and `GEODESIC_BETTER_THAN_TANGENT_PROJECT=true`.
+
+### 17. Multi-seed variance
+
+Eight exact seeds (101, 211, 307, 401, 503, 601, 701, 809) give source-mass CV 0.00153, response-norm CV 0.1880, mean image self-MSE 0.07299, and median response/Jacobian cosine 0.5238. Directional stability is much better than v0.8.6's $-0.00824$, so `CROSS_SEED_GEOMETRY_RESPONSE_STABLE=true`, but the response-norm CV exceeds the 0.15 gate; therefore `SOURCE_MC_VARIANCE_ACCEPTABLE=false`. Geodesic sampling improves variance materially but does not fully solve it.
+
+### 18. Full-rerender FD
+
+The strict $K=32$, $M=8$, one-micro-sample rerender recomputes chart centers, frames, geodesic samples, source weights, finite transport, and detector measurements while preserving identities. Best relative errors are 0.000315 (deep interior), 0.00592 (high curvature), 0.04878 (occlusion boundary), 0.00198 (silhouette), and 0.00182 (smooth visible); median error is 0.00198 and median cosine 0.999998. The median source-gradient test passes, but the 0.04878 occlusion result exceeds the all-category 0.02 threshold: `SOURCE_GRADIENT_FD_ACCEPTABLE=true` and `FULL_RERENDER_FD_ACCEPTABLE=false`.
+
+### 19. Jacobian sparsity
+
+The source-position Jacobian has shape $1536\times64$, 8,496 nonzeros, and density 0.08643; per-$\lambda$ image-support nnz ranges from 39 to 276 with median 108. A full dense geometry-to-image Jacobian is never built. Frozen identities match before and after every FD perturbation, so `SOURCE_TOPOLOGY_REMAINS_REMOVED=true` while the measured response remains nonzero (`GEOMETRY_SIGNAL_PRESERVED=true`).
+
+### 20. Forward multiview reuse
+
+One scene-side state stores source positions, direction identities, transmitted RGB, and source identities. Twenty global packet directions cost 0.2231 s once; detector-only marginal cost is 0.000701 s per extra camera. Cached and independently measured views agree to $1.78\times10^{-15}$, with no geometry retrace by the detector. Thus `SCENE_TRANSPORT_REUSED_ACROSS_VIEWS=true` and `MULTIVIEW_MEASUREMENT_EQUIVALENT=true`.
+
+### 21. Hybrid reserve-source study
+
+Parameter-attached charts cannot represent a disconnected component outside all existing basis supports: their maximum detected remote mass is exactly zero. Adding a fixed 5% global reserve population, with persistent identities, supports the component from $\lambda=0$ and reaches detected mass 0.08756; the historical dynamic extractor reaches 272 geometry-dependent samples. `HYBRID_RESERVE_NEEDED=true` and `NEW_REGION_COVERAGE_SUPPORTED=true`: a small reserve is necessary for topology-changing geometry coverage in this finite dictionary.
+
+### 22. Small optimization if allowed
+
+No small geometry optimization or high-resolution birth was run. Required prerequisites fail for source MC variance, geometry bandwidth, and all-category full-rerender FD. Running an optimizer now would mix those unresolved source-estimator errors with geometry convergence. Accordingly `SMALL_GEOMETRY_OPTIMIZATION_READY=false` and `HIGH_RES_BIRTH_READY_TO_RETEST=false`.
+
+### 23. Scientific decision
+
+The experiment establishes fixed parameter-attached 2D chart identity, continuous frames and mapping, sparse coupling, level-set scale invariance, stable area-corrected energy under DoF density and birth, reusable multiview transport, and valid source/transmission/absorption bookkeeping (1.00053 = 0.37794 + 0.62259 within $2.22\times10^{-16}$). It does not simultaneously achieve the required MC norm stability, thin-feature bandwidth, and all-category FD accuracy. The ten main questions are therefore answered as follows: charts materially improve but do not solve v0.8.6 variance; geodesic walking beats tangent projection; sparse coupling is efficient; area-corrected addition best matches the tested joint energy/density semantics; DoF density and chart birth are stable only with correction; thin fidelity does not recover; identities remain fixed and locally differentiable; scene transport is reusable; and disconnected births require a reserve source.
+
+```text
+BEST_OVERLAP_FORMULATION=AREA_CORRECTED_ADDITIVE
+PRIMARY_SOURCE=UNRESOLVED
+```
+
+The formal Quadro RTX 5000 run took 62.55 s. Main chart construction took 0.6985 s, the main render 0.2016 s, and measured throughput was 40,632 packets/s, 31.84 million interaction evaluations/s, and 1,420 detector measurements/s. It peaked at 423.86 MiB allocated / 538 MiB reserved and 2,039.39 MiB CPU RSS. Full results and all 31 evidence-backed verdicts are in the [JSON report](artifacts/v087_geodesic_source_charts.json) and [CSV record](artifacts/v087_geodesic_source_charts.csv); 19 figures use `figures/v087_*.png`, and the [RGB comparison](render_res/v087_geodesic_source_rgb_comparison.png) is copied into the dedicated render directory.
 
 ## Limitations
 

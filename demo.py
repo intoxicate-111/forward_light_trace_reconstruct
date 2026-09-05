@@ -836,6 +836,23 @@ def run_continuous_source_field_analysis(
     )
 
 
+def run_geodesic_source_chart_analysis(
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    from zlt.geodesic_source import run_geodesic_source_experiment
+    from zlt.mesh_field import obtain_stanford_bunny
+
+    mesh_path = args.bunny_mesh
+    if mesh_path is None:
+        mesh_path = obtain_stanford_bunny(args.bunny_cache)
+    return run_geodesic_source_experiment(
+        mesh_path,
+        args.bunny_artifacts,
+        args.bunny_figures,
+        args.render_output,
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -1213,6 +1230,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--direct-photon-comparison", action="store_true")
     parser.add_argument("--finite-packet-transport", action="store_true")
     parser.add_argument("--continuous-source-field", action="store_true")
+    parser.add_argument("--geodesic-source-charts", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -1238,6 +1256,13 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.geodesic_source_charts:
+        report = run_geodesic_source_chart_analysis(args)
+        print("parameter_attached_geodesic_source_charts:")
+        print(json.dumps(report["verdicts"], indent=2, sort_keys=True))
+        print(f"BEST_OVERLAP_FORMULATION={report['BEST_OVERLAP_FORMULATION']}")
+        print(f"PRIMARY_SOURCE={report['PRIMARY_SOURCE']}")
+        return
     if args.continuous_source_field:
         report = run_continuous_source_field_analysis(args)
         print("fixed_latent_continuous_source_field:")
