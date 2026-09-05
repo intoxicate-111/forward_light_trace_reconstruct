@@ -1,6 +1,6 @@
 # Zero-Set Forward Light Tracing
 
-This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4–v0.7 establish camera-independent mesh-free RGB transport, and v0.8–v0.8.4 diagnose high-resolution sampling and adopt continuous detector integration. v0.8.5 tests finite-support, root-free zero-set attenuation and shows that removing visibility-root topology does not remove source-sampling topology. This project makes no claim of novelty.
+This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4–v0.7 establish camera-independent mesh-free RGB transport, and v0.8–v0.8.4 diagnose high-resolution sampling and adopt continuous detector integration. v0.8.5 tests finite-support, root-free zero-set attenuation; v0.8.6 replaces its geometry-dependent source population with fixed latent anchors and finds that source-resampling topology is removed, while source MC variance and thin-feature fidelity remain unresolved. This project makes no claim of novelty.
 
 ## Model
 
@@ -80,6 +80,7 @@ python demo.py --meshfree-rgb --bunny-artifacts artifacts --bunny-figures figure
 python demo.py --appearance-ablation --bunny-artifacts artifacts --render-output render_res
 python demo.py --corrected-birth --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 python demo.py --high-bandwidth-birth --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
+python demo.py --continuous-source-field --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 ```
 
 The reference fields are an analytic sphere and analytic torus; the optional Bunny path adds a fixed mesh-derived trilinear level-set evaluator. With the default seed, the sphere is the convex normal/camera sanity check. The side-view torus activates non-convex self-occlusion: some rays emitted from its inner wall cross the hole and re-intersect the opposite tube before reaching the detector. Every run reports zero-set and normal errors, hit and absorption fractions, sparse shape/nnz/density, operator fan-in/fan-out, direct-versus-sparse error, and measured pipeline runtime. `--verify` additionally runs deterministic hand checks for all acceptance gates through production code.
@@ -1080,6 +1081,126 @@ The finite packet plus continuous zero-set interaction defines a continuous tran
 ### 18. Remaining unresolved topology sources
 
 Sign-changing-cell count/order, cell-to-Sobol assignment, source projection/root identity, and degenerate-gradient behavior remain. The eight-seed test passes its declared variance gate with median geometry-response cosine 0.426 and response-norm CV 0.0479, but source resampling still dominates strict full FD. The formal run took 66.50 s; its main finite render processed 16,384 attempted packets and 12.687M micro/path interactions in 0.345 s, peaking at 398.57 MiB allocated and 446 MiB reserved. Exact configurations, thresholds, 22 boolean verdicts, FD rows, performance counters, and limitations are in the [JSON report](artifacts/v085_finite_packet_zero_set_transport.json) and [CSV record](artifacts/v085_finite_packet_zero_set_transport.csv); the [multi-seed](figures/v085_mc_multiseed.png) and [runtime](figures/v085_runtime_scaling.png) plots remain separate because continuity and variance are different questions.
+
+## v0.8.6: fixed latent continuous zero-set sources
+
+### 1. Remaining v0.8.5 source-topology problem
+
+v0.8.5 reduced the visibility/owner component of full finite differences to numerical zero, but rebuilding sign-changing cells and source roots still contributed 0.999995913 of the full-FD norm. Thus the remaining discontinuity was upstream of the finite-packet transport and continuous detector: a geometry perturbation could replace the mathematical emitter population. v0.8.6 keeps the v0.8.5 transport and v0.8.4 detector, and changes only this source operator.
+
+### 2. Fixed latent anchor formulation
+
+The main run creates 32,768 scrambled three-dimensional Sobol anchors, seed 101, once in the geometry-independent box $[-1.2,1.2]^3$. The proposal is uniform, $q(a)=1/13.824=0.072337963$, every sample has volume quadrature weight $1/[N_s q(a)]=0.000421875$, and
+
+$$h_s=(13.824/N_s)^{1/3}=0.075.$$
+
+Anchor indices and coordinates define identity; the SHA-256 identity digest is `7c2e81a844e02bccdb0717307eb3597e460c028a5bba84ffc3ba464e9a249a4f` before and after every perturbation. Compact-support culling skips only terms for which the kernel is exactly zero. Full evaluation and culled evaluation differ by $4.34\times10^{-19}$; chunk sizes 128 and 512 differ by $6.51\times10^{-19}$. Therefore the latent identities remain fixed even when their weights are zero.
+
+### 3. Continuous source measure
+
+The declared source quantity is an **algorithmic normalized volume-shell measure**, not calibrated physical surface radiometry:
+
+$$S_\epsilon(F)=\frac{1}{A_{ref}}\int_\Omega G(\tilde x(a),F)\,\delta_\epsilon(d_F(a))\,da,$$
+
+$$\widehat S_\epsilon(F)=\sum_{j=1}^{N_s}\frac{\delta_\epsilon(d_F(a_j))}{N_sq(a_j)A_{ref}}G(\tilde x_j,F).$$
+
+$A_{ref}=9.088634203$ is the initial-field, 32,768-anchor, $\epsilon_s/h_s=1$ global estimate and is computed once then frozen; it is not a random local denominator. The compact normalized kernel is
+
+$$\psi(s)=\frac{35}{32}(1-s^2)^3\quad (|s|<1),\qquad \psi(s)=0\quad (|s|\geq1),$$
+
+with $\int\psi(s)ds=1$. It is nonnegative and $C^2$, with value and first two derivatives zero at the support boundary, and $\delta_\epsilon(d)=\psi(d/\epsilon)/\epsilon$.
+
+### 4. Non-SDF normalization
+
+No signed-distance assumption is introduced. Source activation uses
+
+$$d_F(x)=\frac{F(x)}{\sqrt{\|\nabla F(x)\|^2+\eta^2}},\qquad \eta=10^{-6}\operatorname{median}_{a_j}\|\nabla F(a_j)\|.$$
+
+Recomputing the scaled $\eta$ for $F$, $0.5F$, $2F$, and $10F$ gives a maximum error of $6.20\times10^{-14}$ across source weight, mass, projected position, normal, and image. `SOURCE_LEVELSET_SCALE_INVARIANT=true`.
+
+### 5. Continuous projection
+
+The primary source position is exactly one regularized Newton correction,
+
+$$\tilde x_j=a_j-\frac{F(a_j)\nabla F(a_j)}{\|\nabla F(a_j)\|^2+\eta^2},\qquad n_j=\frac{\nabla F(\tilde x_j)}{\|\nabla F(\tilde x_j)\|}.$$
+
+There is no root search, owner selection, convergence test, or variable iteration count. A 16-step solve is used only as a diagnostic: over the 810 selected active anchors, p95 position error is $3.91\times10^{-4}$, or 0.02083 of $\epsilon_s$, p95 residual is $3.55\times10^{-4}$, and p95 normal error is 0.001013. Raw and projected source images remain separate controls.
+
+### 6. Source-shell width
+
+At 32,768 anchors, the sweep covers $\epsilon_s/h_s=1,0.5,0.25,0.125,0.0625,0.03125$. Their active counts are 3241, 1613, 810, 405, 214, and 104; zero-support probabilities are 0, 0, 0, 0.0315, 0.1687, and 0.4475; mass drift from the wide shell is 0, 0.00436, 0.01898, 0.06206, 0.06033, and 0.07869. The narrowest row is plainly under-sampled rather than intrinsically superior. The selected width is $\epsilon_s/h_s=0.25$, $\epsilon_s=0.01875$, and $\epsilon_s/r=0.76352$.
+
+### 7. Anchor-density tradeoff
+
+The density study uses $N_s=4096,8192,16384,32768$, corresponding to $h_s=0.15,0.119055,0.094494,0.075$, at ratios 1, 0.25, and 0.0625. At ratio 0.25 the zero-support probabilities are 0, 0.000244, 0, and 0, whereas ratio 0.0625 remains sparse even at the largest density (0.1687 zero support and local mass CV 0.8174). Increasing density helps, but the experiment does not support an extremely narrow 0.0625 shell at the tested budget.
+
+### 8. Plane analytic/control
+
+For a plane crossing $[-1,1]^3$, the expected raw source mass is its area, 4. The selected continuous estimator averages 3.999999959, relative bias $1.02\times10^{-8}$, and its translation CV is $2.46\times10^{-7}$. Its maximum adjacent translation jump is $3.69\times10^{-6}$ versus 0.015625 for the hard shell; historical cell-source count changes by as many as 1024. Positive field scaling changes the plane result by zero at recorded precision.
+
+### 9. Sphere control
+
+For radius 0.6 the reference area is $4\pi R^2=4.523893421$. At 32,768 anchors and ratio 0.25, the estimate is 4.207835049 (6.99% relative error); the ratio-1 estimate is 4.522982703 (0.0201% error). Analytic-sphere one-step projection and normal errors are at machine precision. The width dependence confirms that narrow-shell variance, not projection error, is the limiting term on this toy.
+
+### 10. Source birth/death transition
+
+The source-birth toy holds all 32,768 identities fixed while a scalar geometry parameter moves the zero set. Historical sign-changing-cell counts range from 0 to 1472 and jump by as many as 96. The continuous source response has maximum adjacent value jump 0.05553 and derivative jump 27.12, compared with 0.1200 and 62.5 for a fixed-anchor hard shell; its 1x/2x/4x FD spread is 0.4812. This is evidence for continuous value and gradient evolution, not a claim that an arbitrarily narrow quadrature is variance-free.
+
+### 11. Coverage statistics
+
+An independent 4096-point zero-set sample is used only for diagnostics. At the selected width, nearby active-count p10/median/p90 is 4/6/9, local $N_{eff}$ minimum/median is 1.0/4.015, zero-support probability is zero, and local source-mass CV is 0.4558. At ratios 0.125 and below the minimum $N_{eff}$ becomes zero. With gates of zero support $\leq1\%$, mass drift $\leq2\%$, local CV $\leq0.75$, wide-shell edge/thin retention $\geq95\%$, and full-FD error $\leq0.15$, the minimum usable tested ratio is
+
+```text
+MIN_USABLE_EPSILON_OVER_H = 0.25
+SELECTED_EPSILON_OVER_H = 0.25
+```
+
+### 12. Sample convergence
+
+Nested Sobol prefixes use 4096/8192/16384/32768 anchors at fixed world width $\epsilon_s=0.01875$. The 16,384-anchor mass differs from the 32,768 reference by 2.901%, passing the 5% brightness gate; image MSE is 0.5300 and geometry-response cosine is 0.7067. The fitted image-MSE rate is $N_s^{-1.408}$. Thus the mean source mass converges without a systematic brightness rescaling, but geometry-response convergence is slower than the mass statistic alone suggests.
+
+### 13. Multi-seed variance
+
+The selected-width test uses seeds 101, 211, 307, 401, 503, 601, 701, and 809 with 16,384 anchors. Source-mass CV is 0.04084 and response-norm CV is 0.04574, but mean normalized image self-MSE is 1.5631 and the median pairwise geometry-response cosine is $-0.00824$. Consequently `SOURCE_MC_VARIANCE_ACCEPTABLE=false`; for the still narrower 0.03125 row, 44.75% zero support and 7.87% mass drift also make `VERY_NARROW_SOURCE_VARIANCE_ACCEPTABLE=false`.
+
+### 14. Gradient derivation
+
+For $w_j=[N_s q(a_j)A_{ref}]^{-1}\delta_\epsilon(d_F(a_j))$,
+
+$$\frac{\partial w_j}{\partial\lambda_k}=\frac{\psi'(d_F/\epsilon_s)}{N_s q(a_j)A_{ref}\epsilon_s^2}\frac{\partial d_F(a_j)}{\partial\lambda_k}.$$
+
+Autodiff also differentiates the explicit one-step $\tilde x_j(F)$, the normal at $\tilde x_j$, color, smooth outward energy factor, v0.8.5 finite-packet attenuation, detector projection, and v0.8.4 cubic detector kernel. The emission multiplier is $1-\exp[-(\max(0,n^T\omega)/0.05)^2]$; identities are never deleted by an outward test. For fixed geometry, the full energy chain remains linear, with maximum scale/superposition error $8.88\times10^{-16}$.
+
+### 15. Full-rerender FD
+
+The strict rerender reuses only fixed anchor identities and coordinates; it recomputes source weights, projected positions, normals, finite-packet transmission, and continuous detector measurements. It never rebuilds sign-changing cells. At the best common $10^{-4}$ FD step, analytic/full relative errors are $9.75\times10^{-5}$ (deep interior), $4.19\times10^{-6}$ (high curvature), $1.86\times10^{-5}$ (occlusion boundary), $3.22\times10^{-5}$ (silhouette), and $3.29\times10^{-5}$ (smooth visible), with median $3.22\times10^{-5}$ and all cosines above 0.999999998. The FD diagnostic uses 8192 anchors, 512 surface samples, 64-square output, and two fixed packet micro-samples; the main render retains eight.
+
+### 16. Topology before/after
+
+The v0.8.5 source-resampling/full-FD fraction is 0.999995913. In v0.8.6 it is exactly zero by construction and verified by identical anchor digests: absolute reduction 0.999995913, relative reduction 1.0. The reported decomposition keeps detector, transport, source-weight, source-position/normal, source-identity, and unexplained residual terms separate. Detector, finite transport, source weight, and source motion are continuous response components, not topology; visibility topology and source identity/resampling are both zero in the new rerender. `SOURCE_RESAMPLING_TOPOLOGY_REMOVED=true` and `FULL_RERENDER_TOPOLOGY_FRACTION_REDUCED=true`.
+
+### 17. Image fidelity
+
+At 256 square, the historical dynamic v0.8.5 source has whole/foreground/silhouette MSE 0.0534/0.2370/0.1422 to the hard high-sample reference, edge ratio 0.8729, and thin-feature ratio 0.9060. The selected fixed projected source has 4.2764/14.2160/11.3863, edge ratio 1.1760, and thin-feature ratio 0.4060. At 512 square its whole/silhouette MSE is 17.6524/55.0538 and thin-feature ratio is 0.1480. These are source/detector measurement biases, not geometry errors. Although selected-versus-wide geometry response is 4.365 and the signal is not erased, `GEOMETRY_BANDWIDTH_PRESERVED=false` because the hard-reference thin-feature gate fails. Halving packet radius while holding $\epsilon_s$ fixed changes image MSE by only $5.81\times10^{-4}$, confirming that source bandwidth and packet radius are distinct controls.
+
+### 18. Small optimization, if allowed
+
+No optimization was run. The mandatory continuity, identity, sample-count, coverage, gradient-FD, source-resampling, and full-rerender mismatch gates pass, but source MC variance and geometry bandwidth do not. Running a fixed-K optimizer would therefore confound an unresolved source estimator with geometry optimization.
+
+### 19. Scientific verdict
+
+Eighteen of 23 declared verdicts pass, including fixed identity, scale invariance, source-measure derivation, energy linearity, projection, plane continuity, selected-width coverage/mass, full-rerender FD, and removal of source-resampling topology. Five fail: `VERY_NARROW_SOURCE_VARIANCE_ACCEPTABLE`, `SOURCE_MC_VARIANCE_ACCEPTABLE`, `GEOMETRY_BANDWIDTH_PRESERVED`, `SMALL_GEOMETRY_OPTIMIZATION_READY`, and `HIGH_RES_BIRTH_READY_TO_RETEST`. The experiment answers the topology question positively but not the complete source-formulation decision:
+
+```text
+PRIMARY_SOURCE =
+UNRESOLVED
+```
+
+The mathematically fixed latent emitters do not appear or disappear; their smooth compact-kernel weights may be exactly zero. $\epsilon_s$ is source-representation bandwidth, not physical surface thickness. The selected source operator is continuous and differentiable, but is not yet a sufficiently stable and faithful replacement for the historical dynamic source in this configuration.
+
+### 20. Birth readiness
+
+`SMALL_GEOMETRY_OPTIMIZATION_READY=false` and `HIGH_RES_BIRTH_READY_TO_RETEST=false`; no birth experiment was run. The next useful step is to improve variance and thin-feature coverage without reintroducing geometry-dependent identities—for example, a frozen nonuniform proposal with correct $1/q(a)$ weighting—then repeat the same multiseed and hard-reference gates. The formal run took 51.33 s. Its main 32,768-anchor render had 810 nonzero anchors (2.472%), took 0.1701 s, processed 192,594 source evaluations/s and 770,376 packets/s, and peaked at 433.13 MiB allocated / 618 MiB reserved with 1,941.03 MiB CPU RSS. Complete numbers and all 23 verdicts are in the [JSON report](artifacts/v086_continuous_source_field.json) and [CSV record](artifacts/v086_continuous_source_field.csv); the 14 new figures use the `figures/v086_*.png` namespace and the render sheet is [here](render_res/v086_historical_vs_continuous_source_rgb.png).
 
 ## Limitations
 
