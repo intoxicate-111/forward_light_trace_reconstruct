@@ -870,6 +870,23 @@ def run_emitter_scaling_analysis(
     )
 
 
+def run_million_emitter_analysis(
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    from zlt.mesh_field import obtain_stanford_bunny
+    from zlt.million_emitter import run_million_emitter_experiment
+
+    mesh_path = args.bunny_mesh
+    if mesh_path is None:
+        mesh_path = obtain_stanford_bunny(args.bunny_cache)
+    return run_million_emitter_experiment(
+        mesh_path,
+        args.bunny_artifacts,
+        args.bunny_figures,
+        args.render_output,
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -1249,6 +1266,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--continuous-source-field", action="store_true")
     parser.add_argument("--geodesic-source-charts", action="store_true")
     parser.add_argument("--emitter-scaling", action="store_true")
+    parser.add_argument("--million-emitter-streaming", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -1274,6 +1292,18 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.million_emitter_streaming:
+        report = run_million_emitter_analysis(args)
+        print("sparse_geodesic_million_emitter_streaming:")
+        print(json.dumps(report["verdicts"], indent=2, sort_keys=True))
+        for key in (
+            "BEST_QUADRATURE_FORMULATION",
+            "BEST_EMITTER_CHUNK_SIZE",
+            "BEST_CAMERA_BLOCK_SIZE",
+            "BEST_GEODESIC_GRAPH_STORAGE",
+        ):
+            print(f"{key}={report[key]}")
+        return
     if args.emitter_scaling:
         report = run_emitter_scaling_analysis(args)
         print("decoupled_geodesic_emitter_scaling:")

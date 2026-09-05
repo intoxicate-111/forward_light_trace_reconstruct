@@ -1,6 +1,6 @@
 # Zero-Set Forward Light Tracing
 
-This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4–v0.7 establish camera-independent mesh-free RGB transport, and v0.8–v0.8.4 diagnose high-resolution sampling and adopt continuous detector integration. v0.8.5 tests finite-support, root-free zero-set attenuation; v0.8.6 removes geometry-dependent source resampling with fixed 3D latent anchors; v0.8.7 introduces persistent parameter-attached 2D geodesic charts; v0.8.8 separates chart sampling density from source energy and diagnoses the remaining failure as primarily per-chart quadrature limited rather than chart-center limited. This project makes no claim of novelty.
+This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4–v0.7 establish camera-independent mesh-free RGB transport, and v0.8–v0.8.4 diagnose high-resolution sampling and adopt continuous detector integration. v0.8.5 tests finite-support, root-free zero-set attenuation; v0.8.6 removes geometry-dependent source resampling with fixed 3D latent anchors; v0.8.7 introduces persistent parameter-attached 2D geodesic charts; v0.8.8 separates chart sampling density from source energy; and v0.8.9 replaces the dense geodesic field/Jacobian path with compact-support queries, a sparse local geodesic graph, mass-conserving hierarchical quadrature, and Full-HD transport streamed through as many as 2,097,152 emitters. This project makes no claim of novelty.
 
 ## Model
 
@@ -83,6 +83,7 @@ python demo.py --high-bandwidth-birth --bunny-artifacts artifacts --bunny-figure
 python demo.py --continuous-source-field --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 python demo.py --geodesic-source-charts --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 python demo.py --emitter-scaling --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
+python demo.py --million-emitter-streaming --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 ```
 
 The reference fields are an analytic sphere and analytic torus; the optional Bunny path adds a fixed mesh-derived trilinear level-set evaluator. With the default seed, the sphere is the convex normal/camera sanity check. The side-view torus activates non-convex self-occlusion: some rays emitted from its inner wall cross the hole and re-intersect the opposite tube before reaching the detector. Every run reports zero-set and normal errors, hit and absorption fractions, sparse shape/nnz/density, operator fan-in/fan-out, direct-versus-sparse error, and measured pipeline runtime. `--verify` additionally runs deterministic hand checks for all acceptance gates through production code.
@@ -1422,6 +1423,70 @@ HIGH_RES_BIRTH_READY_TO_RETEST=false
 ```
 
 The formal Quadro RTX 5000 run takes 343.61 s and peaks at 1,216.97 MiB allocated / 1,270 MiB reserved with 2,666.11 MiB CPU RSS. Complete measurements, exact center-prefix/latent digests, all seeds, chart radii, view frames, quadrature equations, 18 verdicts, and reproduction commands are in the [JSON report](artifacts/v088_geodesic_emitter_scaling.json) and [CSV record](artifacts/v088_geodesic_emitter_scaling.csv). Thirteen figures use `figures/v088_*.png`; the dedicated [Full-HD four-view comparison](render_res/v088_fullhd_geodesic_emitter_comparison.png) shows the unresolved high-resolution bias directly.
+
+## v0.8.9: measure-correct sparse geodesic graph and million-emitter streaming
+
+### Dense `LocalField` is excluded from production geodesic mapping
+
+The remaining v0.8.8 memory failure was not an emitter-count limit in the forward renderer. It came from using the diagnostic `finite_packet.LocalField` in differentiable geodesic mapping: every query broadcasts points against every geometry basis and forms dense `[N,K]` values and `[N,K,3]` gradients. v0.8.9 keeps that implementation only for a 128-emitter numerical control. The production path queries a `cKDTree` once for the conservative compact-support envelope of each chart, represents those chart/basis pairs in CSR, and evaluates Wendland values and gradients only on the resulting edges. A chart-local exact forward-mode AD pass differentiates only with respect to that chart's basis union; no total-$K$ tensor is created and no dense Jacobian is sparsified afterward.
+
+For emitter $i$, the stored dependency set is the union of compact supports touched by its four-step projected geodesic walk,
+
+$$\mathcal N_{geo}(i)=\bigcup_{\ell=0}^{4}\{k:B_k(x_i^\ell)\ne0\}.$$
+
+The final `SparseGeodesicGraph` stores one int32 CSR column and two float32 three-vectors, $\partial x_i/\partial\lambda_k$ and $\partial n_i/\partial\lambda_k$, per retained edge. Quadrature weights are frozen, so $\partial w_i/\partial\lambda_k=0$. At 2,097,152 emitters the graph has 8,755,850 block edges, 4.175 edges/emitter on average (p95 8), density 0.06524, 28.96 bytes/edge including amortized row pointers, and occupies 241.81 MiB. It is retained in CPU pinned memory while geodesic workspaces are released before streamed transport.
+
+### Required 32K-by-2K memory forensic
+
+The exact problematic scale, 32,768 geodesic samples and 2,048 bases, now completes without OOM. The old float64 value and gradient broadcasts have shapes `[32768,2048]` and `[32768,2048,3]`, requiring 512 and 1,536 MiB respectively before any multi-step autograd state. The sparse run has candidate-neighbor p50/p90/p95/max 66/86/94/134, 2,214,304 candidate pairs, and 699,023 retained Jacobian edges. Its graph is 18.79 MiB, or 601.31 bytes/point and 28.19 bytes/retained edge. The complete exact local-AD control took 552.89 s and peaked at 2,011.92 MiB CUDA allocated / 2,232 MiB reserved. Thus geodesic storage scales with $N_{points}$ times local fanout rather than $N_{points}K_{total}$.
+
+### Numerical and gradient equivalence
+
+The small dense-versus-sparse comparison gives maximum absolute errors $3.11\times10^{-20}$ for $F$, $2.22\times10^{-16}$ for $\nabla F$, $3.96\times10^{-16}$ for projected positions, $7.05\times10^{-15}$ for normals, and $2.22\times10^{-16}$ for final RGB. Against a monolithic float64 autograd mapping, the float32 sparse graph has combined position/normal JVP error $1.96\times10^{-8}$ and VJP error $2.94\times10^{-8}$. Sampling plus unchanged transport recovers the full geometry gradient with relative error $1.10\times10^{-7}$ and cosine $0.999999999999995$; the analytic sampling/transport path decomposition sums to the full gradient within $5.64\times10^{-16}$ relative error.
+
+```text
+NO_DENSE_POINT_BY_LAMBDA_TENSOR=true
+SPARSE_FIELD_NUMERICALLY_EQUIVALENT=true
+SPARSE_GEODESIC_NUMERICALLY_EQUIVALENT=true
+SPARSE_END_TO_END_GRADIENT_EQUIVALENT=true
+```
+
+### Explicit source measure and hierarchical quadrature
+
+The successful historical renderer samples an algorithmic sign-changing-cell push-forward measure,
+
+$$\mu_{hist,N}=\frac1{N_{ref}}\sum_j\delta_{\Phi_F(C_{\lfloor u_{j0}N_{cell}\rfloor},u_{j,1:3})},$$
+
+not calibrated physical area. v0.8.9 assigns each of the 4,096 frozen historical samples to one of 1,024 persistent charts, defines $A_k=A_{ref}n_k/N_{ref}$, and subdivides it exactly as $w_{km}=A_k/M$. Total source mass is exactly 9.088634 for every $M=64\ldots2048$, with $d w/d\lambda=0$. This hierarchical formulation is selected over equal chart mass and the separately labelled physical-area proxy; exact projected proposal-density/Jacobian ratios are unavailable, so the geodesic importance candidate is explicitly not run rather than approximated silently.
+
+At 256-square resolution the foreground brightness stays within 0.113% from 65,536 through 524,288 emitters, while total image energy settles from 170,136 to 157,658. The declared count-invariance gate passes. This does not mean the estimator matches the historical finite measure best: the frozen v0.8.8 historical-matched control still has 0.1744 whole-image MSE and 0.5349 thin response at 65,536 emitters, versus 0.5090 and 0.0925 for the hierarchical estimator. The new result establishes mass/expectation control and scalable execution, not recovered bandwidth.
+
+### Streaming transport and 32x scaling
+
+Production execution is
+
+```text
+sparse point/basis query -> chart-local geodesic AD -> sparse J_geo
+    -> release geodesic workspace -> streamed finite transport
+    -> 16-write continuous detector accumulation
+```
+
+The finite-support v0.8.5 attenuation and continuous v0.8.4 detector are unchanged. Source ownership is one sparse chart edge per emitter, the detector emits exactly 16 local cubic writes per packet, camera blocks reuse the same scene state, and no dense emitter/lambda or packet/pixel matrix is materialized. With 8,192-emitter chunks and four Full-HD views, the 32x progression is:
+
+| M | Emitters | Sparse $J_{geo}$ MiB | Peak CUDA MiB | Full-HD runtime s | Whole MSE | Thin response |
+|---:|---:|---:|---:|---:|---:|---:|
+| 64 | 65,536 | 7.56 | 838.38 | 2.04 | 18.448 | 0.01578 |
+| 128 | 131,072 | 15.12 | 933.31 | 3.59 | 17.862 | 0.01388 |
+| 256 | 262,144 | 30.23 | 933.31 | 6.57 | 17.570 | 0.01124 |
+| 512 | 524,288 | 60.45 | 933.31 | 12.29 | 17.424 | 0.00850 |
+| 1,024 | 1,048,576 | 120.91 | 933.31 | 23.11 | 17.354 | 0.00589 |
+| 2,048 | 2,097,152 | 241.81 | 933.31 | 42.78 | 17.323 | 0.00364 |
+
+Emitter count grows 32x while transient Full-HD CUDA allocation grows only 1.113x; runtime grows 20.97x and sparse CPU graph storage grows 31.99x as expected. All six rows complete, so both one-million- and two-million-emitter Full-HD execution gates pass. Chunk outputs agree within $1.51\times10^{-7}$ relative error; the fastest tested chunk is 16,384, while 8,192 is the conservative production selection. Twenty-view camera-block outputs agree within $8.31\times10^{-8}$, and block 20 is fastest in this diagnostic.
+
+Eight-seed response-norm CV falls from 0.01029 at 65K to 0.000957 at 1M and image self-MSE falls from $5.59\times10^{-5}$ to $4.91\times10^{-8}$. However, median cross-seed response cosine remains about 0.612, below the 0.90 gate. Full-HD thin response also decreases from 0.0158 to 0.00364, far below the 0.75 target. Consequently variance reduction is supported, but `CROSS_SEED_GEOMETRY_RESPONSE_STABLE`, `FULLHD_SOURCE_DENSITY_ADEQUATE`, `THIN_FEATURE_FIDELITY_RECOVERED`, `SMALL_GEOMETRY_OPTIMIZATION_READY`, and `HIGH_RES_BIRTH_READY_TO_RETEST` remain false. No optimization or birth experiment is run.
+
+The formal Quadro RTX 5000 experiment takes 1,309.33 s. Exact settings, all seeds, graph hashes, dtypes, scale rows, storage modes, evidence for 33 verdicts, and reproduction commands are in the [JSON report](artifacts/v089_sparse_geodesic_million_emitter.json) and [CSV record](artifacts/v089_sparse_geodesic_million_emitter.csv). The 20 diagnostic figures use `figures/v089_*.png`; the [Full-HD four-view 65K/262K/1M/2M montage](render_res/v089_fullhd_million_emitter_comparison.png) is the direct visual result.
 
 ## Limitations
 
