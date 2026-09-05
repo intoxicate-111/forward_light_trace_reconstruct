@@ -109,6 +109,7 @@ class PixelView:
     mass: np.ndarray
     squared_mass: np.ndarray
     numerator: np.ndarray | None
+    hard_bin_numerator: np.ndarray | None = None
 
     @property
     def support(self) -> np.ndarray:
@@ -160,6 +161,7 @@ def _diagnostic_splat(
     numerator: Tensor,
     counts: Tensor,
     ambient: float,
+    hard_bin_numerator: Tensor | None = None,
 ) -> dict[str, object]:
     rows, columns = resolution
     device = points.device
@@ -211,6 +213,19 @@ def _diagnostic_splat(
         pixels[valid],
         torch.ones(int(valid.sum()), dtype=torch.int32, device=device),
     )
+    hard_bin_writes = 0
+    if hard_bin_numerator is not None:
+        hard_rows = torch.floor(row + 0.5).to(torch.long)
+        hard_columns = torch.floor(column + 0.5).to(torch.long)
+        hard_valid = (
+            (hard_rows >= 0)
+            & (hard_rows < rows)
+            & (hard_columns >= 0)
+            & (hard_columns < columns)
+        )
+        hard_pixels = hard_rows[hard_valid] * columns + hard_columns[hard_valid]
+        hard_bin_numerator.index_add_(0, hard_pixels, radiance[hard_valid])
+        hard_bin_writes = int(hard_valid.sum())
     row_gap = (2.0 - row_distance.abs()).abs()[:, :, None].expand(-1, 4, 4)
     column_gap = (
         (2.0 - column_distance.abs()).abs()[:, None, :].expand(-1, 4, 4)
@@ -223,7 +238,7 @@ def _diagnostic_splat(
         torch.minimum(fractional_column, 1.0 - fractional_column),
     )
     thresholds = (1e-6, 1e-5, 1e-4, 1e-3)
-    return {
+    report = {
         "projected_events": int(in_frame.any(1).sum()),
         "footprint_writes": int(valid.sum()),
         "candidate_pairs": int(in_frame.sum()),
@@ -237,6 +252,9 @@ def _diagnostic_splat(
         "event_kernel_weight_sum": float(effective_weights.sum()),
         "event_kernel_weight_squared_sum": float(effective_weights.square().sum()),
     }
+    if hard_bin_numerator is not None:
+        report["hard_bin_writes"] = hard_bin_writes
+    return report
 
 
 def _merge_event_report(total: dict[str, object], row: dict[str, object]) -> None:
@@ -246,6 +264,10 @@ def _merge_event_report(total: dict[str, object], row: dict[str, object]) -> Non
         "candidate_pairs",
     ):
         total[key] = int(total.get(key, 0)) + int(row[key])
+    if "hard_bin_writes" in row:
+        total["hard_bin_writes"] = int(total.get("hard_bin_writes", 0)) + int(
+            row["hard_bin_writes"]
+        )
     for key in ("event_kernel_weight_sum", "event_kernel_weight_squared_sum"):
         total[key] = float(total.get(key, 0.0)) + float(row[key])
     for key in ("near_kernel_boundary_pairs", "near_integer_anchor_events"):
@@ -268,6 +290,7 @@ def _render_diagnostics(
     *,
     geometry: str = "base",
     keep_numerator: bool = False,
+    keep_hard_bin: bool = False,
 ) -> tuple[list[PixelView], dict[str, object]]:
     device = surface.reference_points.device
     rows, columns = resolution
@@ -294,6 +317,9 @@ def _render_diagnostics(
         mass = torch.zeros(pixels, dtype=torch.float64, device=device)
         squared_mass = torch.zeros_like(mass)
         numerator = torch.zeros((pixels, 3), dtype=torch.float64, device=device)
+        hard_bin_numerator = (
+            torch.zeros_like(numerator) if keep_hard_bin else None
+        )
         counts = torch.zeros(pixels, dtype=torch.int32, device=device)
         direction = atlas.directions[view_id]
         for start in range(0, emitter_count, config.emitter_chunk_size):
@@ -329,6 +355,7 @@ def _render_diagnostics(
                 numerator,
                 counts,
                 config.ambient,
+                hard_bin_numerator,
             )
             _sync(device)
             splat_seconds += time.perf_counter() - splat_started
@@ -345,9 +372,12 @@ def _render_diagnostics(
                 numerator.detach().cpu().to(torch.float32).numpy()
                 if keep_numerator
                 else None,
+                hard_bin_numerator.detach().cpu().to(torch.float32).numpy()
+                if hard_bin_numerator is not None
+                else None,
             )
         )
-        del mass, squared_mass, numerator, counts, image
+        del mass, squared_mass, numerator, counts, image, hard_bin_numerator
         _progress(
             "v083_render_view",
             geometry=geometry,

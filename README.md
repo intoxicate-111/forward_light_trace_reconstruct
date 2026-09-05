@@ -781,6 +781,174 @@ The multiseed design is reference-versus-seven rather than all 28 pairs. Exact e
 
 `MC_SELF_NOISE_STATISTICALLY_CHARACTERIZED` and `NORMALIZATION_VALIDATED` pass, and the support root cause is numerically isolated. `INTERIOR_MC_STABLE` and `GRADIENT_STABILITY_ACCEPTABLE` fail: Full-HD/256² multiseed interior MSE is 6.714× and analytic Jacobians do not match full rerenders. Therefore `HIGH_RES_BIRTH_READY_TO_TEST=false`; no K=32→64 birth experiment was run, and this is a failed prerequisite rather than a negative birth result. The complete 14-part report, exact seeds and nested `[0,N)` four-dimensional Sobol ranges, thresholds, per-pixel cases, commands, 1,520.05 s runtime, 1,382.41/1,742 MiB recorded CUDA peak allocation/reservation, and all boolean evidence are in the [JSON](artifacts/v083_pixel_support_gradient_diagnostic.json) and [CSV](artifacts/v083_pixel_support_gradient_diagnostic.csv). The twelve required plots and four resolution-specific spatial maps are retained as [`figures/v083_*.png`](figures/).
 
+## v0.8.4: Monte Carlo continuous detector integration
+
+### 1. Motivation
+
+v0.8.4 asks whether the artificial detector-side discontinuity identified in v0.8.3 can be removed by defining a genuine forward detector integral. It does not smooth the $W_p\geq0.05$ decision, enlarge the footprint, optimize geometry, or run birth. The treatment is `CONTINUOUS_KERNEL_MONTE_CARLO`; the legacy, ungated-ratio, and hard-bin paths remain explicit controls. The formal experiment uses 20 views, the matched-density emitter counts from v0.8.2, and eight scrambled four-dimensional Sobol realizations 101/211/307/401/503/601/701/809.
+
+### 2. Existing estimator
+
+The historical output remains
+
+\[
+N_p=\sum_i\mathbf 1[w_{ip}>0],\qquad W_p=\sum_iw_{ip},
+\]
+\[
+A_p=\sum_iw_{ip}C_i\left(0.35+0.65\max(0,n_i\cdot\omega_v)\right),
+\]
+\[
+I_p=\mathbf 1[W_p\geq0.05]\operatorname{clamp}\!\left(1.5A_p/\max(W_p,10^{-30}),0,1\right).
+\]
+
+This is a normalized reconstruction of a transported attribute. Its random local denominator is meaningful for that operator, but it is not the normalization of a forward Monte Carlo detector integral.
+
+### 3. Why W>=0.05 is problematic
+
+The $W=0.05$ decision converts a continuous cubic weight into an on/off pixel value. A one-sample sweep crosses the threshold at pixel displacement 1.33057 and produces a value jump of 0.8. In the mandatory Full-HD threshold ablation, reducing the threshold from 0.10/0.05/0.02/0.01/0.005 to zero changes self-MSE from $1.191\times10^{-3}$/$3.430\times10^{-4}$/$8.404\times10^{-5}$/$3.843\times10^{-5}$/$2.284\times10^{-5}$ to $1.876\times10^{-5}$. The corresponding support-XOR SSE fractions are 0.99781/0.99229/0.96815/0.92987/0.88136/0.84557.
+
+Removing the 0.05 gate reduces absolute support-switch SSE by −13.76%, 72.66%, 32.72%, and 95.34% across the four resolutions; the median reduction is 52.69%, above the declared 50% gate. It does not solve the operator: at $W>0$, the ratio still jumps when the last compact-support contribution disappears, and rare XOR pixels still explain most ungated self-SSE.
+
+### 4. Forward detector integral
+
+Let $z\in[0,1)^4$, $x=T_F(z)$ be the existing zero-set projection, $u(x)$ the normalized detector coordinate, $V$ the hard outward/first-hit visibility indicator, and
+
+\[
+f(x,\omega_v)=V\,C(x)\left[0.35+0.65\max(0,n(x)\cdot\omega_v)\right].
+\]
+
+The new declared measurement is
+
+\[
+I_p=g\int_{[0,1)^4} f(T_F(z),\omega_v)K_p(u(T_F(z)))\,dz,
+\qquad g=1.5.
+\]
+
+For detector coordinates $s=(s_y,s_x)$, $r=s_yH-\tfrac12$, and $c=s_xW-\tfrac12$, the continuous response is
+
+\[
+K_p(s)=HW\,B(r_p-r)B(c_p-c),
+\]
+
+where $B$ is the cardinal cubic B-spline with support radius two pixels. For an interior pixel, $\int K_p(s)\,ds=1$; $HW$ is the reciprocal normalized pixel area. Detector-edge truncation is explicit. The fixed 4x4 pixel footprint is a shrinking normalized-coordinate reconstruction/detector response as resolution rises, not a calibrated optical PSF and not the enlarged v0.8.1 footprint.
+
+### 5. Sampling PDF / transport weight derivation
+
+The scrambled Sobol variable has $q_z(z)=1$ on the unit four-cube. `floor(z0*M)` selects one of $M$ sign-changing cells with probability $1/M$; `z1:z3` are uniform voxel coordinates before Newton/fallback zero-set projection. The induced physical surface-area density after projection is not tractable and is not invented or approximated. Each view direction $\omega_v$ is a deterministic Fibonacci-atlas direction, so there is no outgoing-direction PDF in this per-view estimator. Visibility is hard; normal dependence enters outward acceptance and the cosine lobe. There is no $1/r^2$ factor or other attenuation, intentionally.
+
+Consequently the valid estimator of the declared *algorithmic latent-measure* integral is
+
+\[
+\widehat I_p=\frac{g}{N}\sum_{i=1}^N f_iK_p(u_i),
+\]
+
+not an unverified surface-area radiometric estimator. For iid latent samples,
+
+\[
+\mathbb E[\widehat I_p]=I_p,\qquad
+\operatorname{Var}(\widehat I_p)=\frac{g^2}{N}\operatorname{Var}[fK_p].
+\]
+
+Thus $N\mapsto aN$ multiplies the expected sum by $a$ and the global factor by $1/a$, preserving expected brightness. Scrambled Sobol is randomized QMC, so $1/N$ variance is a reference rather than an asserted exact rate. A $2^{20}$-sample constant-response toy test gives interior values 0.9999996803 and 0.9999999192 for expectation 1; the maximum interior error is $3.20\times10^{-7}$. The same test explicitly represents unit constant color and a front-facing constant-normal flat patch; the edge value 0.6391674044 agrees with numerical integration 0.6391669379.
+
+### 6. Four estimator definitions
+
+| Estimator | Exact implemented output | Role |
+|---|---|---|
+| `LEGACY_GATED_NORMALIZED_SPLAT` | $\mathbf1[W\geq0.05]\,\mathrm{clamp}(gA/W,0,1)$ | historical production control |
+| `UNGATED_NORMALIZED_SPLAT` | $\mathbf1[W>0]\,\mathrm{clamp}(gA/W,0,1)$ | isolates the 0.05 threshold |
+| `HARD_BIN_MONTE_CARLO` | $gHW/N\sum_i f_i\mathbf1[u_i\in p]$ | forward-MC box-response control |
+| `CONTINUOUS_KERNEL_MONTE_CARLO` | $gHW/N\sum_i f_iB(r_p-r_i)B(c_p-c_i)$ | primary continuous-response measurement |
+
+The MC outputs are scientifically evaluated without a clamp and without a random per-pixel denominator. Raw SSE is never used to rank different operators: cross-operator noise below is divided by the matching operator target mean-square.
+
+### 7. Continuity test
+
+Dense sweeps cover pixel centers, integer boundaries, the legacy activation boundary, cubic-support boundaries, and the image edge with visibility fixed. Legacy, ungated ratio, and hard-bin controls each exhibit a measured 0.8 value jump and a finite-grid derivative spike of approximately 1600 at their respective hard boundary. For the continuous cubic response, the analytic left/right test at support radius two with $\epsilon=10^{-7}$ gives value and first-derivative differences $1.67\times10^{-22}$ and $5.00\times10^{-15}$. Therefore the continuous detector response is $C^1$ across stencil transitions. This statement does not apply to visibility, root ownership, or path topology.
+
+### 8. Sample convergence
+
+Nested 256² prefixes use N/2N/4N/8N = 32,768/65,536/131,072/262,144 emitters. The continuous-MC foreground brightness means are 0.791125/0.791079/0.791041/0.791009, a relative range of 0.000147 versus the 0.05 gate. Its empirical log-MSE slope is −1.9958, implying RMSE slope −0.9979; this is better than the iid $N^{-1/2}$ reference for this scrambled-Sobol case, not a universal QMC guarantee. The legacy/ungated/hard-bin RMSE slopes are −1.0494/−0.6315/−0.8424. Exact energy, RMSE, independent-scramble MSE, standard deviation, and confidence intervals at every N are archived.
+
+### 9. Multi-seed MC test
+
+Seed 101 is the reference and the remaining seven scrambles form independent comparisons. The table reports raw mean self-MSE ± standard deviation, followed by the dimensionless self-MSE divided by that estimator's matching target mean-square:
+
+| Resolution | Legacy | Ungated | Hard-bin MC | Continuous MC |
+|---:|---:|---:|---:|---:|
+| 256² | 1.286e−4 ± 8.81e−6 / 0.001130 | 1.673e−4 ± 2.89e−6 / 0.001452 | 0.16766 ± 0.00376 / 0.49880 | 0.02050 ± 0.00120 / 0.08719 |
+| 512² | 2.270e−4 ± 1.41e−5 / 0.002000 | 6.835e−5 ± 1.19e−6 / 0.000598 | 0.18051 ± 0.00421 / 0.40891 | 0.02682 ± 0.00115 / 0.10094 |
+| 960x540 | 6.891e−5 ± 7.11e−6 / 0.000607 | 4.234e−5 ± 6.05e−7 / 0.000371 | 0.17246 ± 0.00182 / 0.31095 | 0.02204 ± 0.00050 / 0.07501 |
+| 1920x1080 | 3.288e−4 ± 4.09e−5 / 0.002910 | 1.887e−5 ± 1.40e−7 / 0.000166 | 0.18358 ± 0.00113 / 0.14660 | 0.02667 ± 0.00069 / 0.05697 |
+
+On the scale-normalized statistic, the continuous kernel reduces mean variance by 76.55% versus the hard-bin MC control. It does not beat either normalized reconstruction control at the present matched density; those controls estimate different quantities and their much smaller values must not be relabeled as MC-detector superiority.
+
+### 10. Resolution test
+
+The matched settings are 256²/65,536, 512²/262,144, 960x540/518,400, and 1920x1080/2,073,600 emitters, each with 20 views and a 65,536-emitter streaming chunk. Continuous-MC raw mean self-MSE is 0.02050/0.02682/0.02204/0.02667. After matching each operator's target scale, it is 0.08719/0.10094/0.07501/0.05697; the max/min ratio is 1.7719, failing the declared 1.50 stability gate. The high-resolution value is not worse monotonically, but the four-level range is too large to claim resolution stability.
+
+### 11. Support-XOR decomposition
+
+For continuous MC, support means nonzero accumulated continuous-kernel mass; it is not $W\geq0.05$. Across eight seeds, mean support-XOR pixel fractions are 0.001074/0.000514/0.000337/0.000158, while their mean fractions of total self-SSE are $3.37\times10^{-9}$/$2.43\times10^{-10}$/$2.15\times10^{-10}$/$1.49\times10^{-6}$. In the primary seed-101/211 pairs, the median fraction is $3.70\times10^{-10}$, far below the 0.50 pathology gate. The old situation in which roughly 0.1% of pixels explained nearly all SSE is removed: continuous weights vanish smoothly, so a binary bookkeeping support change carries negligible energy.
+
+At Full HD, continuous-MC self-SSE is instead 95.68% in the >8 px interior and only 4.32% in the combined 0–8 px silhouette bands. The corresponding legacy split is 27.14% interior and 72.86% in the silhouette bands. Each region retains its RGB-scalar count, MSE, and SSE fraction; the enclosing estimator row retains aggregate contribution count and detector weight, while the Jacobian report gives applicable regional norms. This is a redistribution of sampling variance, not proof that geometric visibility has become smooth.
+
+### 12. Visibility residual
+
+A same-emitter controlled direction perturbation retains 65,536 identities. For perturbations no larger than $10^{-3}$, the maximum visible↔occluded switch fraction is 0.000244; the maximum any-state switch fraction is 0.000671, and most switched events are grazing. In the coefficient-gradient experiment, the largest visibility-switch fraction is $4.58\times10^{-5}$. At each category's best frozen-FD epsilon, topology-component/full-FD norm fractions are 0.9940/0.9950/0.7422/0.9924/0.0669. The median is 0.9924: detector membership is repaired, but real root/visibility ownership changes remain.
+
+### 13. Jacobian result
+
+For
+
+\[
+I_p=\frac{g}{N}\sum_i a_i(F)K_p(u_i(F)),
+\]
+
+the implemented sparse column is
+
+\[
+\frac{\partial I_p}{\partial\lambda}=\frac{g}{N}\sum_i\left[
+\frac{\partial a_i}{\partial\lambda}K_p(u_i)+
+a_i\nabla K_p(u_i)\cdot\frac{\partial u_i}{\partial\lambda}
+\right].
+\]
+
+Color, cosine-lobe, projected-coordinate, and cubic-weight derivatives are included. Surface identity, visible owner set, root/path topology, and footprint candidate topology are frozen; no visibility derivative is invented.
+
+| Category | Best epsilon | Frozen relative error / cosine / norm ratio / sign | Full relative error / cosine / norm ratio | Topology/full norm |
+|---|---:|---:|---:|---:|
+| deep interior | 3e−5 | 0.00758 / 0.99997 / 0.99964 / 0.6796 | 0.99400 / 0.10939 / 0.10670 | 0.99400 |
+| silhouette | 3e−5 | 0.07427 / 0.99733 / 0.98363 / 0.4264 | 0.99423 / 0.12331 / 0.18417 | 0.99497 |
+| smooth visible | 3e−4 | 0.04865 / 0.99882 / 0.99569 / 0.9696 | 0.74346 / 0.66891 / 0.68211 | 0.74221 |
+| occlusion boundary | 3e−5 | 0.09249 / 0.99571 / 0.99606 / 0.3877 | 0.99211 / 0.12813 / 0.15439 | 0.99237 |
+| high curvature | 3e−5 | 0.03027 / 0.99954 / 1.00157 / 0.5049 | 0.06756 / 0.99776 / 1.00751 | 0.06686 |
+
+Four categories pass the 0.08 frozen-FD relative-error gate, but occlusion boundary does not; the strict all-category verdict is false. The median full-rerender mismatch improves by only 0.773% from v0.8.3, below the 20% requirement, because tiny visibility/root changes can dominate a finite-difference norm.
+
+The legacy clamp affects up to 1.073% of RGB scalars and 2.985% of pixels. Continuous MC is evaluated unclamped; counterfactually imposing the old clamp would affect up to 44.22% of nonzero analytic Jacobian entries, 53.79% of frozen-FD changes, and 53.31% of full-FD changes. `CLAMP_GRADIENT_EFFECT_SIGNIFICANT=true`, while the preferred scientific MC measurement avoids this extra nonsmooth operation.
+
+### 14. Geometry result, if allowed
+
+Before optimization, exact and fixed imperfect geometry are rendered with the same operator and common random numbers; seed 211 repeats the test independently. At 256²:
+
+| Estimator | Common MSE / RMSE / MAE | Held-out MSE / RMSE / MAE | Common silhouette / interior MSE |
+|---|---:|---:|---:|
+| legacy | 0.001040 / 0.03225 / 0.00569 | 0.001061 / 0.03258 / 0.00574 | 0.006029 / 0.000339 |
+| ungated | 0.001076 / 0.03280 / 0.00610 | 0.001085 / 0.03294 / 0.00613 | 0.006231 / 0.000346 |
+| hard-bin MC | 0.05082 / 0.22543 / 0.05843 | 0.05231 / 0.22872 / 0.05890 | 0.14143 / 0 |
+| continuous MC | 0.004713 / 0.06865 / 0.01707 | 0.004841 / 0.06957 / 0.01737 | 0.01710 / 0.00898 |
+
+The images show a smooth but threshold-sensitive legacy reconstruction and a visibly grainier forward-MC density estimate at this sampling budget. Each row compares current and target geometry under the same measurement operator; cross-row raw errors are not interpreted as geometry rankings. Small optimization is not allowed because scale-normalized resolution stability is 1.7719 > 1.50 and the maximum best frozen-FD error is 0.09249 > 0.08. No optimization and no birth were run.
+
+### 15. Scientific verdict
+
+The main result is precise: Monte Carlo transport combined with a continuous finite-area detector response removes the current artificial detector-side support discontinuity. It does not make visibility differentiable, and it does not make hard-bin MC continuous. The normalized splats and detector MC are useful but non-equivalent operators: the former reconstruct local transported attributes; the latter estimate the declared latent-measure detector integral. For forward-measurement semantics, continuous MC is preferred; for low-noise historical reconstruction at the current sample budget, normalized splat remains an important control.
+
+The explicit verdicts are: `LEGACY_HARD_GATE_DISCONTINUITY_CONFIRMED=true`, `HARD_GATE_DOMINATES_SUPPORT_SWITCH_SSE=true`, `UNGATED_NORMALIZED_SPLAT_CONTINUOUS_ENOUGH=false`, `MC_ESTIMATOR_DERIVED=true`, `MC_SAMPLING_PDF_ACCOUNTED_FOR=true`, `MC_SAMPLE_COUNT_INVARIANT=true`, `MC_EXPECTATION_CONSISTENT=true`, `HARD_BIN_MC_PIXEL_BOUNDARY_DISCONTINUITY_CONFIRMED=true`, `CONTINUOUS_MC_DETECTOR_VALUE_CONTINUOUS=true`, `CONTINUOUS_MC_DETECTOR_GRADIENT_CONTINUOUS=true`, `CONTINUOUS_MC_MULTISEED_VARIANCE_REDUCED=true` relative to the scale-normalized hard-bin control, `CONTINUOUS_MC_RESOLUTION_STABLE=false`, `CONTINUOUS_MC_SUPPORT_XOR_PATHOLOGY_REMOVED=true`, `CLAMP_GRADIENT_EFFECT_SIGNIFICANT=true`, `VISIBILITY_DISCONTINUITY_REMAINS=true`, `ANALYTIC_MC_JACOBIAN_MATCHES_FROZEN_FD=false`, `FULL_RERENDER_MISMATCH_REDUCED=false`, `FULL_RERENDER_MISMATCH_DOMINATED_BY_VISIBILITY=true`, `MC_DETECTOR_MEASUREMENT_PREFERRED=true` semantically, `NORMALIZED_SPLAT_STILL_USEFUL_AS_CONTROL=true`, `SMALL_GEOMETRY_OPTIMIZATION_READY=false`, and `HIGH_RES_BIRTH_READY_TO_RETEST=false`.
+
+The formal local-CUDA run took 1,857.93 s and peaked at 1,229.97 MiB allocated / 1,420 MiB reserved; process peak RSS was 17,556.76 MiB. The four matched renders take 2.75/10.41/20.27/82.86 s and sustain approximately 0.48–0.51 million attempted packets/s. Full HD streams 41.472M packets into 17.855M retained events and 285.681M continuous detector writes with 1,420 MiB peak reserved VRAM. Nested Sobol prefix and 1,024-vs-2,048 chunk tests both have exactly zero error. Exact equations, PDFs, seeds, all mean/std/median/95% CI/min/max rows, performance counters, direct numerical evidence for every verdict, and the formal/verification commands are in the [JSON](artifacts/v084_mc_continuous_detector.json) and [CSV](artifacts/v084_mc_continuous_detector.csv). Fourteen plots, including representative RGB and spatial-error maps, are under [`figures/v084_*.png`](figures/).
+
 ## Limitations
 
 v0.8 is one controlled Bunny run, not a general benchmark or a real-photo reconstruction. Its 20 direct Fibonacci packet directions are also its detector directions; it preserves a shared scene-centric transport state but does not validate arbitrary off-atlas cameras. The 8,192-element candidate dictionary is only a safety envelope. Visibility, ownership, and footprint topology remain frozen within each Jacobian cell. The 2×2 ablation changes the deterministic sampled target support with photon density, has no repeated stochastic trials, and uses a simplified one-shot K=1024 comparison; its signed effects are descriptive, not confidence intervals. In particular, a million attempted packets aggregated over 20 Full-HD views does not imply dense observations per pixel. The strict negative high-bandwidth verdict applies to this optimizer, dictionary, renderer approximation, and controlled target—not to every possible observation-driven birth method.
