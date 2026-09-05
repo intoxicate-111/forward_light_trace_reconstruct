@@ -1393,8 +1393,8 @@ def _figures(
         _save_figure(path, figure)
         paths.append(path)
 
-    figure, axis = plt.subplots(figsize=(11, 4)); axis.axis("off")
-    labels = ["sparse support query", "chart-local geodesic AD", "CSR J_geo", "release graph", "stream transport", "16-write detector"]
+    figure, axis = plt.subplots(figsize=(16, 4)); axis.axis("off")
+    labels = ["sparse support query", "chart-local geodesic AD", "CSR J_geo", "release workspace", "stream transport", "16-write detector"]
     for index, label in enumerate(labels):
         x = 0.08 + 0.17 * index
         axis.text(x, 0.55, label, ha="center", va="center", bbox={"boxstyle": "round", "fc": "#d9ead3" if index < 4 else "#d9eaf7"})
