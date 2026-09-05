@@ -1533,6 +1533,48 @@ At Full HD the stratified sampler raises thin response from 0.005889 to 0.006712
 
 The corrected formal Quadro RTX 5000 run takes 7,077.42 s. Full settings, all eight seeds, four jitter values, both radial schemes, exact digests, local-measure regions, resolution rows, sparse graphs, and verdict evidence are in the [JSON report](artifacts/v0810_stratified_geodesic_polar.json) and [CSV record](artifacts/v0810_stratified_geodesic_polar.csv). Twelve required figures use `figures/v0810_*.png`, including the [Full-HD four-view comparison](figures/v0810_fullhd_comparison.png).
 
+## v0.8.11: finite-packet transverse integration and support bandwidth
+
+The million-emitter and stratified-polar production paths pass `micro_samples=1`, and `_micro_offsets(1)` is exactly `[[0, 0, 0]]`. Thus their nonzero packet radius does **not** create off-center field queries: it only affects the existing launch exclusion. This is not true of every historical experiment: the main v0.8.7 chart render defaults to four micro samples. The v0.8.11 report records call sites, per-path configuration, offset tensors, and field-query positions captured from the original transmission function.
+
+`src/zlt/transverse_packet.py` retains the original interaction law, including the world-space **3D ball** offsets (not a ray-perpendicular disk), normalized level-set shell, normal-direction barrier, fixed `kappa=-log(0.01)`, and mean over micro samples. `M=1` remains the separate zero-offset control. All larger counts use prefixes of one deterministic 128-point Sobol ball sequence; the report records its digest and angular/radial occupancy. The effective transverse radius is measured by projecting those actual offsets perpendicular to each view direction.
+
+The live quadrature workspace is bounded by emitter, path, and micro chunks. Each offset's scalar optical depth is accumulated once, then prefix means yield `M=4,8,16,32,64,128`; there is no full-emitter path-by-micro array or geometry-parameter axis. A fused float64 trilinear lookup interpolates the **existing independent gradient grid**, rather than replacing it with the derivative of the scalar interpolant. Original-versus-streamed value, gradient, transmission and optical-depth checks guard this optimization. The geodesic sampler, sparse Jacobians, geometry, source weights and detector operator are unchanged.
+
+The primary screen uses all 1,048,576 emitters (`1024` charts, `32×32` AREA_STRATIFIED samples, zero jitter), four fixed views, and all 42 combinations of `r/h=0,0.25,0.5,1,1.5,2` and the seven micro counts. Shell width stays `epsilon=h`, path step stays `0.5h`, and launch start stays **`2.1h`**, equal to the original production value at `r=h`. Otherwise changing `r` would also change the integration domain through the historical `1.05*(r+epsilon)` rule. The original variable-start matrix is retained as auxiliary evidence; it is not used to attribute support-radius gains. Full-HD readout reuses exact scene optical depths; detector time and joint-prefix transport time are reported separately, not presented as three independent transport benchmarks.
+
+Convergence requires RGB relative L2 ≤ 0.01, transmission RMS ≤ 0.01, and optical-depth relative L2 ≤ 0.05 against `M=128`, for the selected count and every larger tested count below 128. The reference is not automatically declared converged. Path-step and epsilon controls use 4,096 distributed emitters over all four views, with their reduced scope explicitly recorded. The shell control measures sensitivity, not an image-optimal epsilon. The historical thin-feature and edge-sharpness ratios remain image-gradient proxies, not isolated geometry-frequency transfer measurements.
+
+### Production-radius result
+
+At the original `r=h`, the minimum count meeting the stated criteria is **64**. Relative to the 128-point reference, the centerline has RGB relative L2 error **0.18108** and transmission RMS error **0.10642**; at 64 samples these fall to **0.006744** and **0.003977**. Thus the centerline approximation is genuinely biased, but removing that bias does **not** restore the missing image bandwidth:
+
+| Full-HD four-view, r/h=1 | Whole MSE | Foreground MSE | Silhouette MSE | Thin response | Edge response |
+|---|---:|---:|---:|---:|---:|
+| Historical centerline, micro=1 | 17.411538 | 1243.997805 | 99.570552 | 0.006712 | 0.193800 |
+| Finite support, micro=64 | 17.416539 | 1247.598354 | 99.651110 | 0.006600 | 0.174279 |
+
+With the launch start fixed, the radius screen gives:
+
+| r/h | Minimum micro count passing against 128 | 256-square MSE at micro=128 | Thin response | Edge response |
+|---:|---:|---:|---:|---:|
+| 0 | 1 (degenerate) | 0.494373 | 0.039726 | 0.127062 |
+| 0.25 | 8 | 0.495359 | 0.039317 | 0.125523 |
+| 0.5 | 16 | 0.498351 | 0.038243 | 0.121641 |
+| 1 | 64 | 0.509437 | 0.035097 | 0.110568 |
+| 1.5 | not established | 0.524584 | 0.031367 | 0.097341 |
+| 2 | not established | 0.541083 | 0.027244 | 0.083072 |
+
+The declared rank selects `BEST_PACKET_RADIUS_OVER_H=0`, a **degenerate centerline control**, not a successful finite-width packet setting. Its Full-HD result matches the historical centerline. The best *nonzero* screened support is `r/h=0.25`, micro=8, with the primary `epsilon=h` held fixed; that is a low-resolution selection, not a separate Full-HD winner. Enlarging support increases attenuation while reducing the detail proxies. The larger-radius results remain 128-reference-limited, rather than being labelled converged.
+
+`PRIMARY_FAILURE=TRANSVERSE_PACKET_SUPPORT_NOT_PRIMARY`: the centerline collapse is real, but the tested correction does not explain or cure the severe detail loss. Detector bandwidth, transport formulation, and the reference/readout bandwidth relationship remain unisolated possibilities. The longitudinal control accepts `path_step/epsilon=0.5` (best-radius transmission RMS error `0.002729` to 0.125). The epsilon sensitivity control is run at `r=h`, because epsilon/r is undefined at the winning zero radius; it does not establish an image-optimal epsilon, so `BEST_EPSILON_OVER_RADIUS=null`. No geometry optimization, birth, or detector redesign is performed.
+
+In view 0, 37.25% of all packets and 54.42% of the declared thin-region packets change transmission by more than 0.01. The filament toy at `d/r=0.5` changes from transmission 1.0 on the centerline to 0.34892 at micro=128. These establish a real off-center interaction, not recovery of Full-HD detail. Crossing calibration retains the same mean and fixed kappa, with maximum absolute transmission error about `7.03e-7` from the 0.01 target.
+
+On the local Quadro RTX 5000, standalone 4,096-packet measurements with chunks `(4096,64,16)` take 0.00507 / 0.02440 / 0.09085 / 0.17733 / 0.34957 seconds at micro=1 / 8 / 32 / 64 / 128. Peak allocated CUDA memory rises from 448.03 MiB to 1,172.04 MiB, then depends mainly on the fixed inner chunks. A separate matched `(4096,32,8)` test uses exactly 593.85 MiB for both 4,096 and 32,768 packets; chunked optical depths agree within `3.56e-15`. The full million-emitter families use roughly 1.15 GiB allocated CUDA memory. These are measured allocator peaks, not total device memory including driver state.
+
+Run the full experiment with `PYTHONPATH=src python demo.py --transverse-packet-integration`; `PYTHONPATH=src python -m zlt.transverse_packet --preflight` runs the small synthetic controls, and `--profile` runs the CUDA quadrature profile. Intermediate scene transport caches live in ignored `runs/v0811_transverse/`. Evidence is written to [JSON](artifacts/v0811_transverse_packet_integration.json), [CSV](artifacts/v0811_transverse_packet_integration.csv), and fourteen `figures/v0811_*.png` plots, including the [Full-HD comparison](figures/v0811_fullhd_comparison.png). Small regression tests run with `PYTHONPATH=src python -m unittest discover -s tests -v`; `python scripts/validate_v0811.py` checks the matrix, calibration, metadata, file decoding and historical artifact bytes.
+
 ## Limitations
 
 v0.8 is one controlled Bunny run, not a general benchmark or a real-photo reconstruction. Its 20 direct Fibonacci packet directions are also its detector directions; it preserves a shared scene-centric transport state but does not validate arbitrary off-atlas cameras. The 8,192-element candidate dictionary is only a safety envelope. Visibility, ownership, and footprint topology remain frozen within each Jacobian cell. The 2×2 ablation changes the deterministic sampled target support with photon density, has no repeated stochastic trials, and uses a simplified one-shot K=1024 comparison; its signed effects are descriptive, not confidence intervals. In particular, a million attempted packets aggregated over 20 Full-HD views does not imply dense observations per pixel. The strict negative high-bandwidth verdict applies to this optimizer, dictionary, renderer approximation, and controlled target—not to every possible observation-driven birth method.

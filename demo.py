@@ -1282,6 +1282,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--emitter-scaling", action="store_true")
     parser.add_argument("--million-emitter-streaming", action="store_true")
     parser.add_argument("--stratified-geodesic-polar", action="store_true")
+    parser.add_argument("--transverse-packet-integration", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -1307,6 +1308,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.transverse_packet_integration:
+        from zlt.transverse_packet import run_experiment
+        report = run_experiment()
+        print(json.dumps(report["verdicts"], indent=2, sort_keys=True))
+        return
     if args.stratified_geodesic_polar:
         report = run_stratified_geodesic_polar_analysis(args)
         print("stratified_geodesic_polar:")
