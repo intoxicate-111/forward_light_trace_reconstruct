@@ -1285,6 +1285,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--transverse-packet-integration", action="store_true")
     parser.add_argument("--measurement-bandwidth", action="store_true")
     parser.add_argument("--polar-aliasing", action="store_true")
+    parser.add_argument("--density-matrix", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -1310,6 +1311,10 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.density_matrix:
+        from zlt.density_matrix import run_experiment
+        run_experiment()
+        return
     if args.measurement_bandwidth or args.polar_aliasing:
         if args.measurement_bandwidth:
             from zlt.measurement_bandwidth import run_experiment
