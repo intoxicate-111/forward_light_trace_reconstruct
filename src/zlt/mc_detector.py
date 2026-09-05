@@ -100,6 +100,7 @@ class EstimatorView:
     supports: dict[str, np.ndarray]
     count: np.ndarray
     mass: np.ndarray
+    direct_count: np.ndarray | None = None
 
 
 def _derive_estimators(
@@ -151,6 +152,11 @@ def _derive_estimators(
         supports,
         view.counts.reshape(rows, columns),
         mass,
+        (
+            view.hard_bin_counts.reshape(rows, columns)
+            if view.hard_bin_counts is not None
+            else None
+        ),
     )
 
 

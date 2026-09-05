@@ -94738,6 +94738,2620 @@
     }
   },
   "cpu_peak_rss_mib": 17556.7578125,
+  "direct_forward_photon_detection_comparison": {
+    "PRIMARY_FORMULATION": "CONTINUOUS_DETECTOR_PHOTON_MC",
+    "birth_experiment_run": false,
+    "commands": {
+      "formal": "PYTHONPATH=src conda run --no-capture-output -n test python demo.py --direct-photon-comparison --bunny-mesh data/stanford_bunny/cache/bun_zipper.ply",
+      "verification": "PYTHONPATH=src conda run --no-capture-output -n test python demo.py --scene sphere --verify"
+    },
+    "configuration": {
+      "capture_view": 10,
+      "convergence_counts": [
+        32768,
+        65536,
+        131072,
+        262144
+      ],
+      "emitter_chunk_size": 65536,
+      "fd_epsilons": [
+        0.01,
+        0.003,
+        0.001,
+        0.0003,
+        0.0001,
+        3e-05
+      ],
+      "fixed_emitters": 65536,
+      "geometry_parameters": 32,
+      "geometry_relative_band": 0.02,
+      "geometry_resolution": 256,
+      "geometry_samples": 16384,
+      "geometry_views": 4,
+      "heldout_seed": 211,
+      "image_energy_relative_band": 0.03,
+      "image_rmse_relative_band": 0.05,
+      "matched_emitters": [
+        65536,
+        262144,
+        518400,
+        2073600
+      ],
+      "optimization_learning_rate": 0.003,
+      "optimization_steps": 12,
+      "perturbation_deltas": [
+        0.003,
+        0.001,
+        0.0003
+      ],
+      "resolutions": [
+        [
+          256,
+          256
+        ],
+        [
+          512,
+          512
+        ],
+        [
+          540,
+          960
+        ],
+        [
+          1080,
+          1920
+        ]
+      ],
+      "seed": 101,
+      "views": 20
+    },
+    "continuous_training_direct_evaluation": {
+      "coefficients": [
+        -0.0022758540741159385,
+        -0.0006189824052828943,
+        2.1769583208858473e-05,
+        -0.0015067794585176125,
+        -0.0015420511064562288,
+        -0.0038418714065107645,
+        -0.0012277592576043289,
+        0.0005611157506586626,
+        -0.007042953976065693,
+        0.002010846143384591,
+        -0.0010393390315663346,
+        -0.0007453661514954768,
+        -0.003255625803578706,
+        -0.0013854081927892853,
+        0.00012599347313639557,
+        -0.0018161866307116557,
+        -0.0006508398634213594,
+        -0.00102475656705188,
+        -0.006791416440646828,
+        -0.0017874590708847075,
+        -0.0010903632853359758,
+        -0.0006865772357461222,
+        -0.0005129762645292111,
+        -0.00048672894602076993,
+        -0.0003474405848114654,
+        -0.0005221943731425305,
+        -0.0029253833455379543,
+        -0.0008544287918239074,
+        -0.002062680360243713,
+        -0.003954691239356762,
+        -0.0032853969247778857,
+        -0.001097934501596477
+      ],
+      "geometry_normal_error_relative_improvement": 0.02680336899605493,
+      "geometry_point_to_surface_mean_relative_improvement": 0.060114827623941706,
+      "geometry_point_to_surface_p95_relative_improvement": 0.056083612339974435,
+      "geometry_symmetric_chamfer_relative_improvement": 0.016316412375072396,
+      "heldout_continuous_relative_improvement": 0.1594004052162817,
+      "heldout_direct_relative_improvement": 0.07369423877211098,
+      "heldout_seed": 211,
+      "initial": {
+        "geometry": {
+          "normal_consistency": 0.9849095979127425,
+          "normal_error": 0.015090402087257537,
+          "point_to_surface_mean": 0.0026377529370210048,
+          "point_to_surface_p95": 0.007067494714974093,
+          "regional_ear_p2s_mean": 0.0033972607663728823,
+          "regional_head_p2s_mean": 0.0019130436843732643,
+          "regional_leg_p2s_mean": 0.00435973120918281,
+          "regional_torso_p2s_mean": 0.0017062342723128004,
+          "surface_rms": 0.005491731716530476,
+          "symmetric_chamfer": 0.0072513055418767375
+        },
+        "heldout_continuous": {
+          "energy": 257806.36478688868,
+          "mae": 0.026690176998739608,
+          "mean_brightness": 0.23966811827193724,
+          "mse": 0.00977638683085914,
+          "rmse": 0.09887561292279881
+        },
+        "heldout_direct": {
+          "energy": 595891.7154154003,
+          "mae": 0.07613500892183861,
+          "mean_brightness": 0.23966811827193726,
+          "mse": 0.18694551113909924,
+          "rmse": 0.4323719592423857
+        },
+        "train_continuous": {
+          "energy": 262082.10940526458,
+          "mae": 0.0267244539920853,
+          "mean_brightness": 0.23955151134463248,
+          "mse": 0.009374761567071257,
+          "rmse": 0.09682335238500708
+        },
+        "train_direct": {
+          "energy": 607390.9353106974,
+          "mae": 0.07538274826122793,
+          "mean_brightness": 0.2395515113446325,
+          "mse": 0.18626016101142465,
+          "rmse": 0.43157868461200055
+        }
+      },
+      "iterations": [
+        {
+          "continuous_train_loss": 0.009374761567071255,
+          "gradient_norm": 0.24295181547695324,
+          "iteration": 0,
+          "step_norm": 0.0030000000000000005
+        },
+        {
+          "continuous_train_loss": 0.008789815831805062,
+          "gradient_norm": 0.15871403843571175,
+          "iteration": 1,
+          "step_norm": 0.0021213203435596424
+        },
+        {
+          "continuous_train_loss": 0.008501648618399957,
+          "gradient_norm": 0.11483353707006078,
+          "iteration": 2,
+          "step_norm": 0.0017320508075688776
+        },
+        {
+          "continuous_train_loss": 0.00833247879517904,
+          "gradient_norm": 0.0827854921780834,
+          "iteration": 3,
+          "step_norm": 0.0015000000000000002
+        },
+        {
+          "continuous_train_loss": 0.00822638438559263,
+          "gradient_norm": 0.05960331529579437,
+          "iteration": 4,
+          "step_norm": 0.0013416407864998742
+        },
+        {
+          "continuous_train_loss": 0.008158521819582685,
+          "gradient_norm": 0.04234555601492808,
+          "iteration": 5,
+          "step_norm": 0.0012247448713915896
+        },
+        {
+          "continuous_train_loss": 0.00811510562964366,
+          "gradient_norm": 0.02947268651307589,
+          "iteration": 6,
+          "step_norm": 0.0011338934190276819
+        },
+        {
+          "continuous_train_loss": 0.008087302760519091,
+          "gradient_norm": 0.020344016972066028,
+          "iteration": 7,
+          "step_norm": 0.0010606601717798212
+        },
+        {
+          "continuous_train_loss": 0.008069212318858035,
+          "gradient_norm": 0.01433849579820588,
+          "iteration": 8,
+          "step_norm": 0.0009999999999999996
+        },
+        {
+          "continuous_train_loss": 0.008057090167177143,
+          "gradient_norm": 0.010380833714094118,
+          "iteration": 9,
+          "step_norm": 0.0009486832980505137
+        },
+        {
+          "continuous_train_loss": 0.008048405944188744,
+          "gradient_norm": 0.0082940758482167,
+          "iteration": 10,
+          "step_norm": 0.0009045340337332908
+        },
+        {
+          "continuous_train_loss": 0.008041451265138187,
+          "gradient_norm": 0.007252617330393894,
+          "iteration": 11,
+          "step_norm": 0.0008660254037844388
+        }
+      ],
+      "optimized": {
+        "geometry": {
+          "normal_consistency": 0.9853140715281861,
+          "normal_error": 0.014685928471813936,
+          "point_to_surface_mean": 0.002479184873897441,
+          "point_to_surface_p95": 0.0066711240811646675,
+          "regional_ear_p2s_mean": 0.0029489041849170496,
+          "regional_head_p2s_mean": 0.0018145042843708407,
+          "regional_leg_p2s_mean": 0.004222984144057559,
+          "regional_torso_p2s_mean": 0.0016139694412349585,
+          "surface_rms": 0.005372655858844266,
+          "symmetric_chamfer": 0.007132990250397829
+        },
+        "heldout_continuous": {
+          "energy": 256989.04560221708,
+          "mae": 0.024786581791533775,
+          "mean_brightness": 0.23963946336211578,
+          "mse": 0.008218026808469073,
+          "rmse": 0.09065333313491056
+        },
+        "heldout_direct": {
+          "energy": 594360.2711520647,
+          "mae": 0.07181361868989276,
+          "mean_brightness": 0.23963946336211583,
+          "mse": 0.17316870400384013,
+          "rmse": 0.41613543949517223
+        },
+        "train_continuous": {
+          "energy": 261245.9341603364,
+          "mae": 0.024876046670939046,
+          "mean_brightness": 0.2395233928579279,
+          "mse": 0.008035538667621191,
+          "rmse": 0.08964116614380466
+        },
+        "train_direct": {
+          "energy": 608033.8114742159,
+          "mae": 0.07104003495688273,
+          "mean_brightness": 0.23952339285792795,
+          "mse": 0.17311982397135275,
+          "rmse": 0.4160767044324313
+        }
+      },
+      "train_continuous_relative_improvement": 0.14285407579367895,
+      "train_direct_relative_improvement": 0.07054829636524314,
+      "train_seed": 101,
+      "transport_cells_during_training": "fixed forward visibility owner cells"
+    },
+    "cpu_peak_rss_mib": 10733.76171875,
+    "direct_density_statistics": {
+      "fixed_sample_historical_control": [
+        {
+          "all_pixels": {
+            "count_lt2_fraction": 0.8877067565917969,
+            "count_lt4_fraction": 0.976373291015625,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 3.058866262435913,
+              "mean": 1.7672684953367543,
+              "median": 1.7698060274124146,
+              "p90": 2.366671085357666,
+              "p95": 2.5097455501556403,
+              "p99": 2.7154604101181032,
+              "samples": 279487
+            },
+            "photon_hit_count": {
+              "maximum": 34.0,
+              "mean": 0.430474853515625,
+              "median": 0.0,
+              "p90": 2.0,
+              "p95": 3.0,
+              "p99": 5.0,
+              "samples": 1310720
+            },
+            "pixels": 1310720,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 34.21135711669922,
+              "mean": 0.6973710819880126,
+              "median": 0.0,
+              "p90": 2.815854382514955,
+              "p95": 4.317989253997804,
+              "p99": 6.905204281806955,
+              "samples": 1310720
+            },
+            "zero_hit_fraction": 0.7867683410644531
+          },
+          "emitters": 65536,
+          "foreground": {
+            "count_lt2_fraction": 0.6167037328319418,
+            "count_lt4_fraction": 0.9193537466340971,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 3.058866262435913,
+              "mean": 1.7672684953367543,
+              "median": 1.7698060274124146,
+              "p90": 2.366671085357666,
+              "p95": 2.5097455501556403,
+              "p99": 2.7154604101181032,
+              "samples": 279487
+            },
+            "photon_hit_count": {
+              "maximum": 34.0,
+              "mean": 1.4693618195928104,
+              "median": 1.0,
+              "p90": 3.0,
+              "p95": 4.0,
+              "p99": 7.0,
+              "samples": 383998
+            },
+            "pixels": 383998,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 34.21135711669922,
+              "mean": 2.380372357625112,
+              "median": 2.0644967555999756,
+              "p90": 5.147123861312866,
+              "p95": 6.306560015678397,
+              "p99": 8.788391361236556,
+              "samples": 383998
+            },
+            "zero_hit_fraction": 0.2721654800285418
+          },
+          "resolution": [
+            256,
+            256
+          ],
+          "sample_regime": "DIRECT_PHOTON_FIXED_SAMPLE",
+          "views": 20
+        },
+        {
+          "all_pixels": {
+            "count_lt2_fraction": 0.9836297988891601,
+            "count_lt4_fraction": 0.9987831115722656,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 12.259486198425293,
+              "mean": 6.743544748535936,
+              "median": 6.704538345336914,
+              "p90": 9.272324371337893,
+              "p95": 9.884479904174805,
+              "p99": 10.786044387817384,
+              "samples": 447225
+            },
+            "photon_hit_count": {
+              "maximum": 15.0,
+              "mean": 0.10761871337890624,
+              "median": 0.0,
+              "p90": 0.0,
+              "p95": 1.0,
+              "p99": 2.0,
+              "samples": 5242880
+            },
+            "pixels": 5242880,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 59.87965393066406,
+              "mean": 0.6973710819102052,
+              "median": 0.0,
+              "p90": 0.0,
+              "p95": 6.961405444145196,
+              "p99": 11.299635105133055,
+              "samples": 5242880
+            },
+            "zero_hit_fraction": 0.914698600769043
+          },
+          "emitters": 65536,
+          "foreground": {
+            "count_lt2_fraction": 0.941464442651495,
+            "count_lt4_fraction": 0.9956487252742906,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 12.259486198425293,
+              "mean": 6.743544748535936,
+              "median": 6.704538345336914,
+              "p90": 9.272324371337893,
+              "p95": 9.884479904174805,
+              "p99": 10.786044387817384,
+              "samples": 447225
+            },
+            "photon_hit_count": {
+              "maximum": 15.0,
+              "mean": 0.38481637006841324,
+              "median": 0.0,
+              "p90": 1.0,
+              "p95": 2.0,
+              "p99": 3.0,
+              "samples": 1466237
+            },
+            "pixels": 1466237,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 59.87965393066406,
+              "mean": 2.4936165830799366,
+              "median": 0.0,
+              "p90": 8.553670310974123,
+              "p95": 10.218469238281248,
+              "p99": 17.258754196166958,
+              "samples": 1466237
+            },
+            "zero_hit_fraction": 0.6949845079615369
+          },
+          "resolution": [
+            512,
+            512
+          ],
+          "sample_regime": "DIRECT_PHOTON_FIXED_SAMPLE",
+          "views": 20
+        },
+        {
+          "all_pixels": {
+            "count_lt2_fraction": 0.9942332175925926,
+            "count_lt4_fraction": 0.9997437307098765,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 24.24361228942871,
+              "mean": 13.12320750644972,
+              "median": 13.015727996826172,
+              "p90": 18.22952880859375,
+              "p95": 19.4626630783081,
+              "p99": 21.287176437377937,
+              "samples": 489143
+            },
+            "photon_hit_count": {
+              "maximum": 10.0,
+              "mean": 0.054420524691358024,
+              "median": 0.0,
+              "p90": 0.0,
+              "p95": 0.0,
+              "p99": 1.0,
+              "samples": 10368000
+            },
+            "pixels": 10368000,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 118.41435241699219,
+              "mean": 0.6973710819338391,
+              "median": 0.0,
+              "p90": 0.0,
+              "p95": 0.0,
+              "p99": 17.65482402801512,
+              "samples": 10368000
+            },
+            "zero_hit_fraction": 0.9528218557098765
+          },
+          "emitters": 65536,
+          "foreground": {
+            "count_lt2_fraction": 0.9781095496403215,
+            "count_lt4_fraction": 0.9990272131358812,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 24.24361228942871,
+              "mean": 13.12320750644972,
+              "median": 13.015727996826172,
+              "p90": 18.22952880859375,
+              "p95": 19.4626630783081,
+              "p99": 21.287176437377937,
+              "samples": 489143
+            },
+            "photon_hit_count": {
+              "maximum": 10.0,
+              "mean": 0.2065778991025611,
+              "median": 0.0,
+              "p90": 1.0,
+              "p95": 1.0,
+              "p99": 2.0,
+              "samples": 2731328
+            },
+            "pixels": 2731328,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 118.41435241699219,
+              "mean": 2.647189710459543,
+              "median": 0.0,
+              "p90": 13.273974418640144,
+              "p95": 16.59486618041992,
+              "p99": 23.869906253814698,
+              "samples": 2731328
+            },
+            "zero_hit_fraction": 0.8209138558239801
+          },
+          "resolution": [
+            540,
+            960
+          ],
+          "sample_regime": "DIRECT_PHOTON_FIXED_SAMPLE",
+          "views": 20
+        },
+        {
+          "all_pixels": {
+            "count_lt2_fraction": 0.9992401861496913,
+            "count_lt4_fraction": 0.9999841338734567,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 96.97444915771484,
+              "mean": 51.62581222885645,
+              "median": 51.08331298828125,
+              "p90": 72.47626037597658,
+              "p95": 77.51157836914062,
+              "p99": 84.9643179321289,
+              "samples": 527165
+            },
+            "photon_hit_count": {
+              "maximum": 7.0,
+              "mean": 0.013605131172839506,
+              "median": 0.0,
+              "p90": 0.0,
+              "p95": 0.0,
+              "p99": 1.0,
+              "samples": 41472000
+            },
+            "pixels": 41472000,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 473.65740966796875,
+              "mean": 0.6973710819415656,
+              "median": 0.0,
+              "p90": 0.0,
+              "p95": 0.0,
+              "p99": 39.20374534606884,
+              "samples": 41472000
+            },
+            "zero_hit_fraction": 0.9872886525848765
+          },
+          "emitters": 65536,
+          "foreground": {
+            "count_lt2_fraction": 0.9947435944699231,
+            "count_lt4_fraction": 0.999890237858564,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 96.97444915771484,
+              "mean": 51.62581222885645,
+              "median": 51.08331298828125,
+              "p90": 72.47626037597658,
+              "p95": 77.51157836914062,
+              "p99": 84.9643179321289,
+              "samples": 527165
+            },
+            "photon_hit_count": {
+              "maximum": 7.0,
+              "mean": 0.0941205358460968,
+              "median": 0.0,
+              "p90": 0.0,
+              "p95": 1.0,
+              "p99": 1.0,
+              "samples": 5994781
+            },
+            "pixels": 5994781,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 473.65740966796875,
+              "mean": 4.824425364376215,
+              "median": 0.0,
+              "p90": 0.0,
+              "p95": 49.54228210449219,
+              "p99": 74.62323760986341,
+              "samples": 5994781
+            },
+            "zero_hit_fraction": 0.9120626758508776
+          },
+          "resolution": [
+            1080,
+            1920
+          ],
+          "sample_regime": "DIRECT_PHOTON_FIXED_SAMPLE",
+          "views": 20
+        }
+      ],
+      "matched_density": [
+        {
+          "all_pixels": {
+            "count_lt2_fraction": 0.8877067565917969,
+            "count_lt4_fraction": 0.976373291015625,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 3.058866262435913,
+              "mean": 1.7672684953367543,
+              "median": 1.7698060274124146,
+              "p90": 2.366671085357666,
+              "p95": 2.5097455501556403,
+              "p99": 2.7154604101181032,
+              "samples": 279487
+            },
+            "photon_hit_count": {
+              "maximum": 34.0,
+              "mean": 0.430474853515625,
+              "median": 0.0,
+              "p90": 2.0,
+              "p95": 3.0,
+              "p99": 5.0,
+              "samples": 1310720
+            },
+            "pixels": 1310720,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 34.21135711669922,
+              "mean": 0.6973710819880126,
+              "median": 0.0,
+              "p90": 2.815854382514955,
+              "p95": 4.317989253997804,
+              "p99": 6.905204281806955,
+              "samples": 1310720
+            },
+            "zero_hit_fraction": 0.7867683410644531
+          },
+          "emitters": 65536,
+          "foreground": {
+            "count_lt2_fraction": 0.6167037328319418,
+            "count_lt4_fraction": 0.9193537466340971,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 3.058866262435913,
+              "mean": 1.7672684953367543,
+              "median": 1.7698060274124146,
+              "p90": 2.366671085357666,
+              "p95": 2.5097455501556403,
+              "p99": 2.7154604101181032,
+              "samples": 279487
+            },
+            "photon_hit_count": {
+              "maximum": 34.0,
+              "mean": 1.4693618195928104,
+              "median": 1.0,
+              "p90": 3.0,
+              "p95": 4.0,
+              "p99": 7.0,
+              "samples": 383998
+            },
+            "pixels": 383998,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 34.21135711669922,
+              "mean": 2.380372357625112,
+              "median": 2.0644967555999756,
+              "p90": 5.147123861312866,
+              "p95": 6.306560015678397,
+              "p99": 8.788391361236556,
+              "samples": 383998
+            },
+            "zero_hit_fraction": 0.2721654800285418
+          },
+          "resolution": [
+            256,
+            256
+          ],
+          "sample_regime": "DIRECT_PHOTON_MATCHED_DENSITY",
+          "views": 20
+        },
+        {
+          "all_pixels": {
+            "count_lt2_fraction": 0.9005739212036132,
+            "count_lt4_fraction": 0.9714132308959961,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 3.0648715496063232,
+              "mean": 1.766812779113759,
+              "median": 1.7657063007354736,
+              "p90": 2.3618953943252565,
+              "p95": 2.5048745632171627,
+              "p99": 2.713028526306152,
+              "samples": 1023220
+            },
+            "photon_hit_count": {
+              "maximum": 44.0,
+              "mean": 0.4305271148681641,
+              "median": 0.0,
+              "p90": 1.0,
+              "p95": 2.0,
+              "p99": 6.0,
+              "samples": 5242880
+            },
+            "pixels": 5242880,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 47.51912307739258,
+              "mean": 0.6973512992786141,
+              "median": 0.0,
+              "p90": 2.5071078062057524,
+              "p95": 4.250169944763183,
+              "p99": 8.902288303375242,
+              "samples": 5242880
+            },
+            "zero_hit_fraction": 0.8048362731933594
+          },
+          "emitters": 262144,
+          "foreground": {
+            "count_lt2_fraction": 0.6462837945581287,
+            "count_lt4_fraction": 0.898300288860646,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 3.0648715496063232,
+              "mean": 1.766812779113759,
+              "median": 1.7657063007354736,
+              "p90": 2.3618953943252565,
+              "p95": 2.5048745632171627,
+              "p99": 2.713028526306152,
+              "samples": 1023220
+            },
+            "photon_hit_count": {
+              "maximum": 44.0,
+              "mean": 1.531634549551781,
+              "median": 1.0,
+              "p90": 4.0,
+              "p95": 5.0,
+              "p99": 9.0,
+              "samples": 1473721
+            },
+            "pixels": 1473721,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 47.51912307739258,
+              "mean": 2.4808828672196843,
+              "median": 1.9533601999282837,
+              "p90": 5.530195236206055,
+              "p95": 7.726132869720459,
+              "p99": 13.262205505371096,
+              "samples": 1473721
+            },
+            "zero_hit_fraction": 0.30568947582344286
+          },
+          "resolution": [
+            512,
+            512
+          ],
+          "sample_regime": "DIRECT_PHOTON_MATCHED_DENSITY",
+          "views": 20
+        },
+        {
+          "all_pixels": {
+            "count_lt2_fraction": 0.9064805169753086,
+            "count_lt4_fraction": 0.9755829475308642,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 3.0648715496063232,
+              "mean": 1.7665217148042978,
+              "median": 1.7636983394622803,
+              "p90": 2.3611474990844727,
+              "p95": 2.5047279119491574,
+              "p99": 2.712941589355469,
+              "samples": 1990099
+            },
+            "photon_hit_count": {
+              "maximum": 66.0,
+              "mean": 0.4305081983024691,
+              "median": 0.0,
+              "p90": 1.0,
+              "p95": 2.0,
+              "p99": 7.0,
+              "samples": 10368000
+            },
+            "pixels": 10368000,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 66.79003143310547,
+              "mean": 0.6972935782584742,
+              "median": 0.0,
+              "p90": 2.398759770393369,
+              "p95": 4.010182213783257,
+              "p99": 9.086064414978004,
+              "samples": 10368000
+            },
+            "zero_hit_fraction": 0.8080537229938272
+          },
+          "emitters": 518400,
+          "foreground": {
+            "count_lt2_fraction": 0.6636709781502858,
+            "count_lt4_fraction": 0.9121876735436039,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 3.0648715496063232,
+              "mean": 1.7665217148042978,
+              "median": 1.7636983394622803,
+              "p90": 2.3611474990844727,
+              "p95": 2.5047279119491574,
+              "p99": 2.712941589355469,
+              "samples": 1990099
+            },
+            "photon_hit_count": {
+              "maximum": 66.0,
+              "mean": 1.5482592134852118,
+              "median": 1.0,
+              "p90": 3.0,
+              "p95": 5.0,
+              "p99": 12.0,
+              "samples": 2882921
+            },
+            "pixels": 2882921,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 66.79003143310547,
+              "mean": 2.507713468174764,
+              "median": 1.9152389764785767,
+              "p90": 5.147421836853027,
+              "p95": 7.3586859703063965,
+              "p99": 17.955524444580057,
+              "samples": 2882921
+            },
+            "zero_hit_fraction": 0.3096935365207718
+          },
+          "resolution": [
+            540,
+            960
+          ],
+          "sample_regime": "DIRECT_PHOTON_MATCHED_DENSITY",
+          "views": 20
+        },
+        {
+          "all_pixels": {
+            "count_lt2_fraction": 0.913388599537037,
+            "count_lt4_fraction": 0.9796565393518518,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 3.0648715496063232,
+              "mean": 1.7634991079931783,
+              "median": 1.7584589719772339,
+              "p90": 2.3572603702545165,
+              "p95": 2.500996625423431,
+              "p99": 2.710633592605591,
+              "samples": 7454518
+            },
+            "photon_hit_count": {
+              "maximum": 146.0,
+              "mean": 0.4305323109567901,
+              "median": 0.0,
+              "p90": 1.0,
+              "p95": 2.0,
+              "p99": 5.0,
+              "samples": 41472000
+            },
+            "pixels": 41472000,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 243.5026092529297,
+              "mean": 0.6973179905807648,
+              "median": 0.0,
+              "p90": 2.2774968624114997,
+              "p95": 3.8433509111404405,
+              "p99": 7.472151856422403,
+              "samples": 41472000
+            },
+            "zero_hit_fraction": 0.8202517843364198
+          },
+          "emitters": 2073600,
+          "foreground": {
+            "count_lt2_fraction": 0.6834518070871689,
+            "count_lt4_fraction": 0.9256485211953321,
+            "mean_rgb_contribution_per_hit": {
+              "maximum": 3.0648715496063232,
+              "mean": 1.7634991079931783,
+              "median": 1.7584589719772339,
+              "p90": 2.3572603702545165,
+              "p95": 2.500996625423431,
+              "p99": 2.710633592605591,
+              "samples": 7454518
+            },
+            "photon_hit_count": {
+              "maximum": 146.0,
+              "mean": 1.573513697913651,
+              "median": 1.0,
+              "p90": 3.0,
+              "p95": 4.0,
+              "p99": 15.0,
+              "samples": 11347239
+            },
+            "pixels": 11347239,
+            "total_accumulated_rgb_contribution": {
+              "maximum": 243.5026092529297,
+              "mean": 2.5485646072463513,
+              "median": 1.826517105102539,
+              "p90": 4.9403661727905295,
+              "p95": 6.580739307403563,
+              "p99": 19.983182563781565,
+              "samples": 11347239
+            },
+            "zero_hit_fraction": 0.34305446461469613
+          },
+          "resolution": [
+            1080,
+            1920
+          ],
+          "sample_regime": "DIRECT_PHOTON_MATCHED_DENSITY",
+          "views": 20
+        }
+      ]
+    },
+    "direct_detector_equation": "I_box[p]=g H W/N sum_i f_i 1[u_i in P_p]",
+    "direct_photon_finite_difference": {
+      "epsilon_norm_ratio_by_category": {
+        "deep_interior": 22.979073352155737,
+        "high_curvature": 22.372562820200113,
+        "occlusion_boundary": 22.48922082210072,
+        "silhouette": 28.78126840659579,
+        "smooth_visible_surface": 31.150370768880414
+      },
+      "rows": [
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "deep_interior",
+          "changed_image_pixel_fraction": 0.00885009765625,
+          "crossing_fraction": 0.013207094096257418,
+          "epsilon": 0.01,
+          "gradient_fd_snr": 0.6880497629564868,
+          "heldout_fd_norm": 4494.318560944468,
+          "parameter": 17,
+          "photons_crossing_pixel_boundaries": 385,
+          "same_sample_fd_norm": 4450.421726634687,
+          "same_vs_heldout_cosine": -0.04579754232015039
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "deep_interior",
+          "changed_image_pixel_fraction": 0.00820159912109375,
+          "crossing_fraction": 0.00439092998524922,
+          "epsilon": 0.003,
+          "gradient_fd_snr": 0.6983069811179378,
+          "heldout_fd_norm": 9189.056589934171,
+          "parameter": 17,
+          "photons_crossing_pixel_boundaries": 128,
+          "same_sample_fd_norm": 8916.333984114675,
+          "same_vs_heldout_cosine": 0.00552363782919015
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "deep_interior",
+          "changed_image_pixel_fraction": 0.0079193115234375,
+          "crossing_fraction": 0.0009948200747830263,
+          "epsilon": 0.001,
+          "gradient_fd_snr": 0.6256333109594504,
+          "heldout_fd_norm": 15186.994948887716,
+          "parameter": 17,
+          "photons_crossing_pixel_boundaries": 29,
+          "same_sample_fd_norm": 13386.125497567273,
+          "same_vs_heldout_cosine": -0.11795858655219793
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "deep_interior",
+          "changed_image_pixel_fraction": 0.007862091064453125,
+          "crossing_fraction": 0.00034304140509759526,
+          "epsilon": 0.0003,
+          "gradient_fd_snr": 0.6043213280144987,
+          "heldout_fd_norm": 30017.862907858056,
+          "parameter": 17,
+          "photons_crossing_pixel_boundaries": 10,
+          "same_sample_fd_norm": 23881.743268172293,
+          "same_vs_heldout_cosine": -0.06297102548022919
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "deep_interior",
+          "changed_image_pixel_fraction": 0.00785064697265625,
+          "crossing_fraction": 0.00013721656203903812,
+          "epsilon": 0.0001,
+          "gradient_fd_snr": 0.5945708044881013,
+          "heldout_fd_norm": 56882.270158434876,
+          "parameter": 17,
+          "photons_crossing_pixel_boundaries": 4,
+          "same_sample_fd_norm": 47051.60292135477,
+          "same_vs_heldout_cosine": -0.151876798261086
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "deep_interior",
+          "changed_image_pixel_fraction": 0.007843017578125,
+          "crossing_fraction": 6.860828101951906e-05,
+          "epsilon": 3e-05,
+          "gradient_fd_snr": 0.6462078024015897,
+          "heldout_fd_norm": 120773.63968279159,
+          "parameter": 17,
+          "photons_crossing_pixel_boundaries": 2,
+          "same_sample_fd_norm": 102266.56730436605,
+          "same_vs_heldout_cosine": -1.5717415301888567e-05
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "high_curvature",
+          "changed_image_pixel_fraction": 0.00568389892578125,
+          "crossing_fraction": 0.018832973139857982,
+          "epsilon": 0.01,
+          "gradient_fd_snr": 0.7687573589062232,
+          "heldout_fd_norm": 6967.687550886476,
+          "parameter": 5,
+          "photons_crossing_pixel_boundaries": 549,
+          "same_sample_fd_norm": 7236.9772592274685,
+          "same_vs_heldout_cosine": 0.12197991389155305
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "high_curvature",
+          "changed_image_pixel_fraction": 0.005008697509765625,
+          "crossing_fraction": 0.007135261226029982,
+          "epsilon": 0.003,
+          "gradient_fd_snr": 0.733173312685387,
+          "heldout_fd_norm": 14354.150166878815,
+          "parameter": 5,
+          "photons_crossing_pixel_boundaries": 208,
+          "same_sample_fd_norm": 14151.909575144993,
+          "same_vs_heldout_cosine": 0.08304802952174481
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "high_curvature",
+          "changed_image_pixel_fraction": 0.004688262939453125,
+          "crossing_fraction": 0.0025385063977222053,
+          "epsilon": 0.001,
+          "gradient_fd_snr": 0.7389815594697993,
+          "heldout_fd_norm": 25194.047889331203,
+          "parameter": 5,
+          "photons_crossing_pixel_boundaries": 74,
+          "same_sample_fd_norm": 26257.919695945875,
+          "same_vs_heldout_cosine": 0.046598852725160345
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "high_curvature",
+          "changed_image_pixel_fraction": 0.004558563232421875,
+          "crossing_fraction": 0.000651778669685431,
+          "epsilon": 0.0003,
+          "gradient_fd_snr": 0.7405542767756969,
+          "heldout_fd_norm": 40459.60894483546,
+          "parameter": 5,
+          "photons_crossing_pixel_boundaries": 19,
+          "same_sample_fd_norm": 44554.88572233461,
+          "same_vs_heldout_cosine": 0.0006606701192061614
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "high_curvature",
+          "changed_image_pixel_fraction": 0.004520416259765625,
+          "crossing_fraction": 0.00020582484305855717,
+          "epsilon": 0.0001,
+          "gradient_fd_snr": 0.7274260467542936,
+          "heldout_fd_norm": 63323.04160209647,
+          "parameter": 5,
+          "photons_crossing_pixel_boundaries": 6,
+          "same_sample_fd_norm": 67096.06116087694,
+          "same_vs_heldout_cosine": 0.0004597797813998246
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "high_curvature",
+          "changed_image_pixel_fraction": 0.004512786865234375,
+          "crossing_fraction": 0.00013721656203903812,
+          "epsilon": 3e-05,
+          "gradient_fd_snr": 0.7557017461829936,
+          "heldout_fd_norm": 140324.5717184781,
+          "parameter": 5,
+          "photons_crossing_pixel_boundaries": 4,
+          "same_sample_fd_norm": 161909.72836042618,
+          "same_vs_heldout_cosine": 5.1194546025024645e-05
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "occlusion_boundary",
+          "changed_image_pixel_fraction": 0.003570556640625,
+          "crossing_fraction": 0.011286062227710884,
+          "epsilon": 0.01,
+          "gradient_fd_snr": 0.762205690552703,
+          "heldout_fd_norm": 6326.4400312838225,
+          "parameter": 8,
+          "photons_crossing_pixel_boundaries": 329,
+          "same_sample_fd_norm": 6458.299067582872,
+          "same_vs_heldout_cosine": 0.12162655131909264
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "occlusion_boundary",
+          "changed_image_pixel_fraction": 0.003170013427734375,
+          "crossing_fraction": 0.004871187952385853,
+          "epsilon": 0.003,
+          "gradient_fd_snr": 0.77479135409052,
+          "heldout_fd_norm": 12470.025660618901,
+          "parameter": 8,
+          "photons_crossing_pixel_boundaries": 142,
+          "same_sample_fd_norm": 13832.014424245044,
+          "same_vs_heldout_cosine": 0.08149093280183091
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "occlusion_boundary",
+          "changed_image_pixel_fraction": 0.002941131591796875,
+          "crossing_fraction": 0.0016122946039586977,
+          "epsilon": 0.001,
+          "gradient_fd_snr": 0.8064541366983756,
+          "heldout_fd_norm": 20514.129520633793,
+          "parameter": 8,
+          "photons_crossing_pixel_boundaries": 47,
+          "same_sample_fd_norm": 24921.09957203479,
+          "same_vs_heldout_cosine": 0.08504214386458088
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "occlusion_boundary",
+          "changed_image_pixel_fraction": 0.002849578857421875,
+          "crossing_fraction": 0.00044595382662687385,
+          "epsilon": 0.0003,
+          "gradient_fd_snr": 0.7353170766216329,
+          "heldout_fd_norm": 38293.246427987964,
+          "parameter": 8,
+          "photons_crossing_pixel_boundaries": 13,
+          "same_sample_fd_norm": 42989.92399088464,
+          "same_vs_heldout_cosine": -0.03146233812612941
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "occlusion_boundary",
+          "changed_image_pixel_fraction": 0.00281524658203125,
+          "crossing_fraction": 0.00010291242152927858,
+          "epsilon": 0.0001,
+          "gradient_fd_snr": 0.6506660177601307,
+          "heldout_fd_norm": 79034.51223825714,
+          "parameter": 8,
+          "photons_crossing_pixel_boundaries": 3,
+          "same_sample_fd_norm": 67730.72327497335,
+          "same_vs_heldout_cosine": -0.00016347344520622768
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "occlusion_boundary",
+          "changed_image_pixel_fraction": 0.00281524658203125,
+          "crossing_fraction": 3.430414050975953e-05,
+          "epsilon": 3e-05,
+          "gradient_fd_snr": 0.6892181905603474,
+          "heldout_fd_norm": 152692.8766435087,
+          "parameter": 8,
+          "photons_crossing_pixel_boundaries": 1,
+          "same_sample_fd_norm": 145242.1138660384,
+          "same_vs_heldout_cosine": 2.9718237635169747e-05
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "silhouette",
+          "changed_image_pixel_fraction": 0.00403594970703125,
+          "crossing_fraction": 0.013378614798806216,
+          "epsilon": 0.01,
+          "gradient_fd_snr": 0.7593623648053539,
+          "heldout_fd_norm": 6609.36341755961,
+          "parameter": 18,
+          "photons_crossing_pixel_boundaries": 390,
+          "same_sample_fd_norm": 6376.231560402617,
+          "same_vs_heldout_cosine": 0.1641248637686231
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "silhouette",
+          "changed_image_pixel_fraction": 0.00354766845703125,
+          "crossing_fraction": 0.005488662481561524,
+          "epsilon": 0.003,
+          "gradient_fd_snr": 0.7418040880984333,
+          "heldout_fd_norm": 14318.297955219288,
+          "parameter": 18,
+          "photons_crossing_pixel_boundaries": 160,
+          "same_sample_fd_norm": 13526.196921992758,
+          "same_vs_heldout_cosine": 0.14324716319068642
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "silhouette",
+          "changed_image_pixel_fraction": 0.003314971923828125,
+          "crossing_fraction": 0.0022640732736441288,
+          "epsilon": 0.001,
+          "gradient_fd_snr": 0.6770927928284228,
+          "heldout_fd_norm": 28301.89121831744,
+          "parameter": 18,
+          "photons_crossing_pixel_boundaries": 66,
+          "same_sample_fd_norm": 25968.91926523281,
+          "same_vs_heldout_cosine": 0.0029839508406095862
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "silhouette",
+          "changed_image_pixel_fraction": 0.003200531005859375,
+          "crossing_fraction": 0.0005488662481561525,
+          "epsilon": 0.0003,
+          "gradient_fd_snr": 0.6493807860107401,
+          "heldout_fd_norm": 50528.82344597451,
+          "parameter": 18,
+          "photons_crossing_pixel_boundaries": 16,
+          "same_sample_fd_norm": 42110.36881313526,
+          "same_vs_heldout_cosine": 0.028507817041771508
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "silhouette",
+          "changed_image_pixel_fraction": 0.003177642822265625,
+          "crossing_fraction": 0.00027443312407807624,
+          "epsilon": 0.0001,
+          "gradient_fd_snr": 0.8034449170445632,
+          "heldout_fd_norm": 68727.05512425829,
+          "parameter": 18,
+          "photons_crossing_pixel_boundaries": 8,
+          "same_sample_fd_norm": 92727.7581914714,
+          "same_vs_heldout_cosine": 0.000137359609657602
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "silhouette",
+          "changed_image_pixel_fraction": 0.003162384033203125,
+          "crossing_fraction": 0.00010291242152927858,
+          "epsilon": 3e-05,
+          "gradient_fd_snr": 0.8140028194182883,
+          "heldout_fd_norm": 130943.30222162543,
+          "parameter": 18,
+          "photons_crossing_pixel_boundaries": 3,
+          "same_sample_fd_norm": 183516.0319625548,
+          "same_vs_heldout_cosine": -6.074742644202048e-05
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "smooth_visible_surface",
+          "changed_image_pixel_fraction": 0.005146026611328125,
+          "crossing_fraction": 0.016843332990291927,
+          "epsilon": 0.01,
+          "gradient_fd_snr": 0.7623558565760835,
+          "heldout_fd_norm": 7025.5964519886365,
+          "parameter": 31,
+          "photons_crossing_pixel_boundaries": 491,
+          "same_sample_fd_norm": 7246.015703385228,
+          "same_vs_heldout_cosine": 0.11317695738548601
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "smooth_visible_surface",
+          "changed_image_pixel_fraction": 0.004497528076171875,
+          "crossing_fraction": 0.006483482556344551,
+          "epsilon": 0.003,
+          "gradient_fd_snr": 0.7186931671267613,
+          "heldout_fd_norm": 14675.630439877443,
+          "parameter": 31,
+          "photons_crossing_pixel_boundaries": 189,
+          "same_sample_fd_norm": 15226.354870468473,
+          "same_vs_heldout_cosine": -0.0036645720269405826
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "smooth_visible_surface",
+          "changed_image_pixel_fraction": 0.004241943359375,
+          "crossing_fraction": 0.002332681554663648,
+          "epsilon": 0.001,
+          "gradient_fd_snr": 0.7505556344696147,
+          "heldout_fd_norm": 27392.052363038158,
+          "parameter": 31,
+          "photons_crossing_pixel_boundaries": 68,
+          "same_sample_fd_norm": 28521.175541767767,
+          "same_vs_heldout_cosine": 0.07665614377882217
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "smooth_visible_surface",
+          "changed_image_pixel_fraction": 0.004116058349609375,
+          "crossing_fraction": 0.0007889952317244692,
+          "epsilon": 0.0003,
+          "gradient_fd_snr": 0.7287744160062981,
+          "heldout_fd_norm": 49237.135391138836,
+          "parameter": 31,
+          "photons_crossing_pixel_boundaries": 23,
+          "same_sample_fd_norm": 51155.74789567488,
+          "same_vs_heldout_cosine": 0.022625843842039018
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "smooth_visible_surface",
+          "changed_image_pixel_fraction": 0.004093170166015625,
+          "crossing_fraction": 0.00034304140509759526,
+          "epsilon": 0.0001,
+          "gradient_fd_snr": 0.793939078739437,
+          "heldout_fd_norm": 72797.45494219604,
+          "parameter": 31,
+          "photons_crossing_pixel_boundaries": 10,
+          "same_sample_fd_norm": 95061.29944953388,
+          "same_vs_heldout_cosine": -3.5886210135650554e-06
+        },
+        {
+          "boundary_term_characterization": "finite-difference crossing term; no smooth pathwise derivative asserted",
+          "category": "smooth_visible_surface",
+          "changed_image_pixel_fraction": 0.004070281982421875,
+          "crossing_fraction": 0.00013721656203903812,
+          "epsilon": 3e-05,
+          "gradient_fd_snr": 0.82828294812993,
+          "heldout_fd_norm": 152692.30957308252,
+          "parameter": 31,
+          "photons_crossing_pixel_boundaries": 4,
+          "same_sample_fd_norm": 225716.07575757967,
+          "same_vs_heldout_cosine": 7.75301544281087e-06
+        }
+      ],
+      "smooth_indicator_derivative_claimed": false
+    },
+    "environment": {
+      "available": true,
+      "gpu": "Quadro RTX 5000",
+      "pytorch": "2.5.1+cu124",
+      "pytorch_cuda": "12.4",
+      "vram_mib": 15904.875
+    },
+    "equivalence_bands_predeclared": {
+      "continuous_training_must_improve_heldout_direct": true,
+      "foreground_rmse_relative": 0.05,
+      "geometry_metrics_relative": 0.02,
+      "same_variant_ranking_required": true,
+      "total_energy_relative": 0.03
+    },
+    "geometry_perturbation_response": [
+      {
+        "category": "deep_interior",
+        "continuous": {
+          "response_l2_norm": 4.344726606661989,
+          "responsive_pixel_fraction": 0.02999114990234375,
+          "responsive_pixels": 7862,
+          "snr_to_independent_scramble": 0.7523196040131551
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 1.0,
+        "delta": 0.003,
+        "direct": {
+          "response_l2_norm": 38.33481018148947,
+          "responsive_pixel_fraction": 0.008045196533203125,
+          "responsive_pixels": 2109,
+          "snr_to_independent_scramble": 0.670391894889921
+        },
+        "direct_over_continuous_response_norm": 8.823296297334053,
+        "direct_sign_consistency_cosine_to_previous_delta": 1.0,
+        "parameter": 17,
+        "photon_pixel_crossing_fraction": 0.00219546499262461,
+        "photon_pixel_crossings": 64
+      },
+      {
+        "category": "deep_interior",
+        "continuous": {
+          "response_l2_norm": 1.4372814450363094,
+          "responsive_pixel_fraction": 0.029880523681640625,
+          "responsive_pixels": 7833,
+          "snr_to_independent_scramble": 0.7469123136965204
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 0.992389131346409,
+        "delta": 0.001,
+        "direct": {
+          "response_l2_norm": 18.898378586407212,
+          "responsive_pixel_fraction": 0.0078887939453125,
+          "responsive_pixels": 2068,
+          "snr_to_independent_scramble": 0.6186072099718113
+        },
+        "direct_over_continuous_response_norm": 13.148697251796632,
+        "direct_sign_consistency_cosine_to_previous_delta": 0.5276947380283354,
+        "parameter": 17,
+        "photon_pixel_crossing_fraction": 0.0005145621076463929,
+        "photon_pixel_crossings": 15
+      },
+      {
+        "category": "deep_interior",
+        "continuous": {
+          "response_l2_norm": 0.4297036207122805,
+          "responsive_pixel_fraction": 0.0298004150390625,
+          "responsive_pixels": 7812,
+          "snr_to_independent_scramble": 0.744987934024339
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 0.9990258289706376,
+        "delta": 0.0003,
+        "direct": {
+          "response_l2_norm": 11.239539697406888,
+          "responsive_pixel_fraction": 0.007854461669921875,
+          "responsive_pixels": 2059,
+          "snr_to_independent_scramble": 0.5995727134808696
+        },
+        "direct_over_continuous_response_norm": 26.156492884039768,
+        "direct_sign_consistency_cosine_to_previous_delta": 0.5949286903360275,
+        "parameter": 17,
+        "photon_pixel_crossing_fraction": 0.0002401289835683167,
+        "photon_pixel_crossings": 7
+      },
+      {
+        "category": "high_curvature",
+        "continuous": {
+          "response_l2_norm": 8.51927398692184,
+          "responsive_pixel_fraction": 0.015621185302734375,
+          "responsive_pixels": 4095,
+          "snr_to_independent_scramble": 0.9324231736224807
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 1.0,
+        "delta": 0.003,
+        "direct": {
+          "response_l2_norm": 62.11384582374339,
+          "responsive_pixel_fraction": 0.004772186279296875,
+          "responsive_pixels": 1251,
+          "snr_to_independent_scramble": 0.7131539371161685
+        },
+        "direct_over_continuous_response_norm": 7.290978775784882,
+        "direct_sign_consistency_cosine_to_previous_delta": 1.0,
+        "parameter": 5,
+        "photon_pixel_crossing_fraction": 0.0036019347535247506,
+        "photon_pixel_crossings": 105
+      },
+      {
+        "category": "high_curvature",
+        "continuous": {
+          "response_l2_norm": 2.8293854997110874,
+          "responsive_pixel_fraction": 0.015621185302734375,
+          "responsive_pixels": 4095,
+          "snr_to_independent_scramble": 0.9295933821037373
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 0.9890863162569458,
+        "delta": 0.001,
+        "direct": {
+          "response_l2_norm": 40.00921344497901,
+          "responsive_pixel_fraction": 0.00461578369140625,
+          "responsive_pixels": 1210,
+          "snr_to_independent_scramble": 0.7423441971656909
+        },
+        "direct_over_continuous_response_norm": 14.140601713362994,
+        "direct_sign_consistency_cosine_to_previous_delta": 0.6146757481458086,
+        "parameter": 5,
+        "photon_pixel_crossing_fraction": 0.0014750780419196597,
+        "photon_pixel_crossings": 43
+      },
+      {
+        "category": "high_curvature",
+        "continuous": {
+          "response_l2_norm": 0.8469572001036734,
+          "responsive_pixel_fraction": 0.01560211181640625,
+          "responsive_pixels": 4090,
+          "snr_to_independent_scramble": 0.9282801563180406
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 0.9986329976956435,
+        "delta": 0.0003,
+        "direct": {
+          "response_l2_norm": 17.265308929373596,
+          "responsive_pixel_fraction": 0.00452423095703125,
+          "responsive_pixels": 1186,
+          "snr_to_independent_scramble": 0.6850750519279809
+        },
+        "direct_over_continuous_response_norm": 20.38510201844934,
+        "direct_sign_consistency_cosine_to_previous_delta": 0.4314504261508395,
+        "parameter": 5,
+        "photon_pixel_crossing_fraction": 0.00027443312407807624,
+        "photon_pixel_crossings": 8
+      },
+      {
+        "category": "occlusion_boundary",
+        "continuous": {
+          "response_l2_norm": 10.564962519651743,
+          "responsive_pixel_fraction": 0.00991058349609375,
+          "responsive_pixels": 2598,
+          "snr_to_independent_scramble": 0.9591871540953073
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 1.0,
+        "delta": 0.003,
+        "direct": {
+          "response_l2_norm": 59.669659050125716,
+          "responsive_pixel_fraction": 0.00299835205078125,
+          "responsive_pixels": 786,
+          "snr_to_independent_scramble": 0.7652937258054839
+        },
+        "direct_over_continuous_response_norm": 5.64788175434934,
+        "direct_sign_consistency_cosine_to_previous_delta": 1.0,
+        "parameter": 8,
+        "photon_pixel_crossing_fraction": 0.002778635381290522,
+        "photon_pixel_crossings": 81
+      },
+      {
+        "category": "occlusion_boundary",
+        "continuous": {
+          "response_l2_norm": 3.436512542002861,
+          "responsive_pixel_fraction": 0.0099029541015625,
+          "responsive_pixels": 2596,
+          "snr_to_independent_scramble": 0.9659091326778744
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 0.9658135920053947,
+        "delta": 0.001,
+        "direct": {
+          "response_l2_norm": 31.409948175431268,
+          "responsive_pixel_fraction": 0.00286865234375,
+          "responsive_pixels": 752,
+          "snr_to_independent_scramble": 0.8089127520250313
+        },
+        "direct_over_continuous_response_norm": 9.140065048947847,
+        "direct_sign_consistency_cosine_to_previous_delta": 0.4656999497768793,
+        "parameter": 8,
+        "photon_pixel_crossing_fraction": 0.0007546910912147097,
+        "photon_pixel_crossings": 22
+      },
+      {
+        "category": "occlusion_boundary",
+        "continuous": {
+          "response_l2_norm": 0.9964765752520447,
+          "responsive_pixel_fraction": 0.0098876953125,
+          "responsive_pixels": 2592,
+          "snr_to_independent_scramble": 0.9389256171379576
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 0.9953231762966046,
+        "delta": 0.0003,
+        "direct": {
+          "response_l2_norm": 5.25721206171754,
+          "responsive_pixel_fraction": 0.00281524658203125,
+          "responsive_pixels": 738,
+          "snr_to_independent_scramble": 0.3183013323358405
+        },
+        "direct_over_continuous_response_norm": 5.275800949347758,
+        "direct_sign_consistency_cosine_to_previous_delta": 0.1652722321298567,
+        "parameter": 8,
+        "photon_pixel_crossing_fraction": 3.430414050975953e-05,
+        "photon_pixel_crossings": 1
+      },
+      {
+        "category": "silhouette",
+        "continuous": {
+          "response_l2_norm": 12.297179726321918,
+          "responsive_pixel_fraction": 0.0112762451171875,
+          "responsive_pixels": 2956,
+          "snr_to_independent_scramble": 0.981525390021258
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 1.0,
+        "delta": 0.003,
+        "direct": {
+          "response_l2_norm": 62.54264045500738,
+          "responsive_pixel_fraction": 0.003376007080078125,
+          "responsive_pixels": 885,
+          "snr_to_independent_scramble": 0.777605098396035
+        },
+        "direct_over_continuous_response_norm": 5.085933673160509,
+        "direct_sign_consistency_cosine_to_previous_delta": 1.0,
+        "parameter": 18,
+        "photon_pixel_crossing_fraction": 0.0032588933484271553,
+        "photon_pixel_crossings": 95
+      },
+      {
+        "category": "silhouette",
+        "continuous": {
+          "response_l2_norm": 4.014717990508392,
+          "responsive_pixel_fraction": 0.011241912841796875,
+          "responsive_pixels": 2947,
+          "snr_to_independent_scramble": 0.95439385221286
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 0.9653758079058665,
+        "delta": 0.001,
+        "direct": {
+          "response_l2_norm": 38.35211308340446,
+          "responsive_pixel_fraction": 0.00324249267578125,
+          "responsive_pixels": 850,
+          "snr_to_independent_scramble": 0.6828580050547474
+        },
+        "direct_over_continuous_response_norm": 9.55287847716244,
+        "direct_sign_consistency_cosine_to_previous_delta": 0.5832756943622603,
+        "parameter": 18,
+        "photon_pixel_crossing_fraction": 0.0013378614798806217,
+        "photon_pixel_crossings": 39
+      },
+      {
+        "category": "silhouette",
+        "continuous": {
+          "response_l2_norm": 1.1963821366780063,
+          "responsive_pixel_fraction": 0.01122283935546875,
+          "responsive_pixels": 2942,
+          "snr_to_independent_scramble": 0.9489269319000125
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 0.996043313765689,
+        "delta": 0.0003,
+        "direct": {
+          "response_l2_norm": 16.660626437196882,
+          "responsive_pixel_fraction": 0.003170013427734375,
+          "responsive_pixels": 831,
+          "snr_to_independent_scramble": 0.5475867721822448
+        },
+        "direct_over_continuous_response_norm": 13.925840186362558,
+        "direct_sign_consistency_cosine_to_previous_delta": 0.39722182317484755,
+        "parameter": 18,
+        "photon_pixel_crossing_fraction": 0.00027443312407807624,
+        "photon_pixel_crossings": 8
+      },
+      {
+        "category": "smooth_visible_surface",
+        "continuous": {
+          "response_l2_norm": 9.874304450381521,
+          "responsive_pixel_fraction": 0.01363372802734375,
+          "responsive_pixels": 3574,
+          "snr_to_independent_scramble": 0.8769040652891738
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 1.0,
+        "delta": 0.003,
+        "direct": {
+          "response_l2_norm": 66.00593462198883,
+          "responsive_pixel_fraction": 0.004302978515625,
+          "responsive_pixels": 1128,
+          "snr_to_independent_scramble": 0.7486615653470877
+        },
+        "direct_over_continuous_response_norm": 6.684616111815198,
+        "direct_sign_consistency_cosine_to_previous_delta": 1.0,
+        "parameter": 31,
+        "photon_pixel_crossing_fraction": 0.0036705430345442694,
+        "photon_pixel_crossings": 107
+      },
+      {
+        "category": "smooth_visible_surface",
+        "continuous": {
+          "response_l2_norm": 3.2490207889771643,
+          "responsive_pixel_fraction": 0.013614654541015625,
+          "responsive_pixels": 3569,
+          "snr_to_independent_scramble": 0.874165849755201
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 0.9843893892401389,
+        "delta": 0.001,
+        "direct": {
+          "response_l2_norm": 38.35573727388357,
+          "responsive_pixel_fraction": 0.004161834716796875,
+          "responsive_pixels": 1091,
+          "snr_to_independent_scramble": 0.7799088720111532
+        },
+        "direct_over_continuous_response_norm": 11.805322207851576,
+        "direct_sign_consistency_cosine_to_previous_delta": 0.5548402497018601,
+        "parameter": 31,
+        "photon_pixel_crossing_fraction": 0.001234949058351343,
+        "photon_pixel_crossings": 36
+      },
+      {
+        "category": "smooth_visible_surface",
+        "continuous": {
+          "response_l2_norm": 0.9630981763659829,
+          "responsive_pixel_fraction": 0.013607025146484375,
+          "responsive_pixels": 3567,
+          "snr_to_independent_scramble": 0.8733828467201681
+        },
+        "continuous_sign_consistency_cosine_to_previous_delta": 0.9979770740368289,
+        "delta": 0.0003,
+        "direct": {
+          "response_l2_norm": 19.307424788245083,
+          "responsive_pixel_fraction": 0.00408935546875,
+          "responsive_pixels": 1072,
+          "snr_to_independent_scramble": 0.7537970332016944
+        },
+        "direct_over_continuous_response_norm": 20.047203142982745,
+        "direct_sign_consistency_cosine_to_previous_delta": 0.45313313442023984,
+        "parameter": 31,
+        "photon_pixel_crossing_fraction": 0.00037734554560735483,
+        "photon_pixel_crossings": 11
+      }
+    ],
+    "multi_seed_noise": {
+      "continuous_mean_scale_normalized_self_mse": 0.08003069008954201,
+      "direct_mean_scale_normalized_self_mse": 0.3413167966091598
+    },
+    "operator_decomposition": {
+      "arrival_measure": "H_D(F)=T_forward(F)",
+      "continuous": "I_cont=M_cont H_D(F)",
+      "direct": "I_box=M_box H_D(F)",
+      "only_changed_component": "detector measurement operator M",
+      "shared_transport": true
+    },
+    "original_photon_movement_formulation": "zero set -> forward packets -> zero-set visibility/intersection -> detector arrival -> RGB",
+    "peak_allocated_mib": 1709.56787109375,
+    "peak_reserved_mib": 1786.0,
+    "performance": [
+      {
+        "attempted_packets": 1310720,
+        "emitters": 65536,
+        "hard_bin_writes": 564232,
+        "peak_allocated_mib": 517.9921875,
+        "peak_reserved_mib": 628.0,
+        "resolution": [
+          256,
+          256
+        ],
+        "retained_events": 564232,
+        "runtime_seconds": 2.645601542899385,
+        "sample_regime": "DIRECT_PHOTON_MATCHED_DENSITY"
+      },
+      {
+        "attempted_packets": 5242880,
+        "emitters": 262144,
+        "hard_bin_writes": 2257202,
+        "peak_allocated_mib": 517.9921875,
+        "peak_reserved_mib": 628.0,
+        "resolution": [
+          512,
+          512
+        ],
+        "retained_events": 2257202,
+        "runtime_seconds": 10.399514587130398,
+        "sample_regime": "DIRECT_PHOTON_MATCHED_DENSITY"
+      },
+      {
+        "attempted_packets": 1310720,
+        "emitters": 65536,
+        "hard_bin_writes": 564232,
+        "peak_allocated_mib": 517.9921875,
+        "peak_reserved_mib": 628.0,
+        "resolution": [
+          512,
+          512
+        ],
+        "retained_events": 564232,
+        "runtime_seconds": 2.897264013066888,
+        "sample_regime": "DIRECT_PHOTON_FIXED_SAMPLE"
+      },
+      {
+        "attempted_packets": 10368000,
+        "emitters": 518400,
+        "hard_bin_writes": 4463509,
+        "peak_allocated_mib": 517.9921875,
+        "peak_reserved_mib": 628.0,
+        "resolution": [
+          540,
+          960
+        ],
+        "retained_events": 4463509,
+        "runtime_seconds": 20.02220086194575,
+        "sample_regime": "DIRECT_PHOTON_MATCHED_DENSITY"
+      },
+      {
+        "attempted_packets": 1310720,
+        "emitters": 65536,
+        "hard_bin_writes": 564232,
+        "peak_allocated_mib": 517.9921875,
+        "peak_reserved_mib": 628.0,
+        "resolution": [
+          540,
+          960
+        ],
+        "retained_events": 564232,
+        "runtime_seconds": 2.978029099991545,
+        "sample_regime": "DIRECT_PHOTON_FIXED_SAMPLE"
+      },
+      {
+        "attempted_packets": 41472000,
+        "emitters": 2073600,
+        "hard_bin_writes": 17855036,
+        "peak_allocated_mib": 665.0712890625,
+        "peak_reserved_mib": 724.0,
+        "resolution": [
+          1080,
+          1920
+        ],
+        "retained_events": 17855036,
+        "runtime_seconds": 81.6030533357989,
+        "sample_regime": "DIRECT_PHOTON_MATCHED_DENSITY"
+      },
+      {
+        "attempted_packets": 1310720,
+        "emitters": 65536,
+        "hard_bin_writes": 564232,
+        "peak_allocated_mib": 665.1611328125,
+        "peak_reserved_mib": 724.0,
+        "resolution": [
+          1080,
+          1920
+        ],
+        "retained_events": 564232,
+        "runtime_seconds": 4.031704370863736,
+        "sample_regime": "DIRECT_PHOTON_FIXED_SAMPLE"
+      }
+    ],
+    "preferred_detector_formulation": "CONTINUOUS_DETECTOR_PHOTON_MC",
+    "runtime_seconds": 241.9003992609214,
+    "same_transport_detector_comparison": [
+      {
+        "continuous_energy": 974184.041015625,
+        "continuous_silhouette_edge_sharpness": 0.15874560244679428,
+        "continuous_sum": 914058.234375,
+        "direct_energy": 1381018.0859375,
+        "direct_silhouette_edge_sharpness": 0.27449433533367484,
+        "direct_sum": 914058.20703125,
+        "edge_sharpness_ratio_direct_over_continuous": 1.7291460746175649,
+        "emitters": 65536,
+        "event_reuse": "one transport pass, two detector accumulators",
+        "foreground_global_ssim": 0.6821744455423132,
+        "regions": {
+          "foreground": {
+            "mae": 0.37011086524213666,
+            "mse": 0.2482273365518831,
+            "rgb_scalars": 1151994,
+            "rmse": 0.4982241830259578
+          },
+          "interior_gt8px": {
+            "mae": 0.38436046459168377,
+            "mse": 0.254703800046442,
+            "rgb_scalars": 850254,
+            "rmse": 0.5046818800456798
+          },
+          "silhouette_0_8px": {
+            "mae": 0.16011405142985424,
+            "mse": 0.11159808819110577,
+            "rgb_scalars": 621816,
+            "rmse": 0.33406300033243097
+          },
+          "whole_image": {
+            "mae": 0.10843035330375035,
+            "mse": 0.07272247423728308,
+            "rgb_scalars": 3932160,
+            "rmse": 0.2696710481999932
+          }
+        },
+        "resolution": [
+          256,
+          256
+        ],
+        "total_contribution_relative_difference": 2.9914669516320994e-08
+      },
+      {
+        "continuous_energy": 4407858.171875,
+        "continuous_silhouette_edge_sharpness": 0.2231990463291075,
+        "continuous_sum": 3656129.125,
+        "direct_energy": 7244272.28125,
+        "direct_silhouette_edge_sharpness": 0.37362474238091437,
+        "direct_sum": 3656129.34375,
+        "edge_sharpness_ratio_direct_over_continuous": 1.673953130740549,
+        "emitters": 262144,
+        "event_reuse": "one transport pass, two detector accumulators",
+        "foreground_global_ssim": 0.6590106294989562,
+        "regions": {
+          "foreground": {
+            "mae": 0.4468158533738747,
+            "mse": 0.431719835192403,
+            "rgb_scalars": 4421163,
+            "rmse": 0.657053905849743
+          },
+          "interior_gt8px": {
+            "mae": 0.4503747313313803,
+            "mse": 0.4316628615264829,
+            "rgb_scalars": 3807432,
+            "rmse": 0.657010549022223
+          },
+          "silhouette_0_8px": {
+            "mae": 0.20924360251009397,
+            "mse": 0.21285750107110318,
+            "rgb_scalars": 1245795,
+            "rmse": 0.46136482426719877
+          },
+          "whole_image": {
+            "mae": 0.12559546331564586,
+            "mse": 0.12135211924711863,
+            "rgb_scalars": 15728640,
+            "rmse": 0.3483563107611496
+          }
+        },
+        "resolution": [
+          512,
+          512
+        ],
+        "total_contribution_relative_difference": 5.983103783294306e-08
+      },
+      {
+        "continuous_energy": 9624840.5,
+        "continuous_silhouette_edge_sharpness": 0.25851828582099395,
+        "continuous_sum": 7229539.6875,
+        "direct_energy": 17950257.4375,
+        "direct_silhouette_edge_sharpness": 0.4263052447148238,
+        "direct_sum": 7229539.8125,
+        "edge_sharpness_ratio_direct_over_continuous": 1.6490332332236286,
+        "emitters": 518400,
+        "event_reuse": "one transport pass, two detector accumulators",
+        "foreground_global_ssim": 0.6406859482309559,
+        "regions": {
+          "foreground": {
+            "mae": 0.4815324728374451,
+            "mse": 0.6432611356531565,
+            "rgb_scalars": 8648763,
+            "rmse": 0.8020356199403842
+          },
+          "interior_gt8px": {
+            "mae": 0.4815650400347534,
+            "mse": 0.6398626497808237,
+            "rgb_scalars": 7725288,
+            "rmse": 0.7999141515067875
+          },
+          "silhouette_0_8px": {
+            "mae": 0.23859924425522233,
+            "mse": 0.33301108925628264,
+            "rgb_scalars": 1862670,
+            "rmse": 0.5770711301531923
+          },
+          "whole_image": {
+            "mae": 0.13389468245643646,
+            "mse": 0.17886488624855323,
+            "rgb_scalars": 31104000,
+            "rmse": 0.42292420863383223
+          }
+        },
+        "resolution": [
+          540,
+          960
+        ],
+        "total_contribution_relative_difference": 1.7290174119401705e-08
+      },
+      {
+        "continuous_energy": 60902685.75,
+        "continuous_silhouette_edge_sharpness": 0.3836062333732691,
+        "continuous_sum": 28919169.375,
+        "direct_energy": 160737122.5,
+        "direct_silhouette_edge_sharpness": 0.5899992794076532,
+        "direct_sum": 28919172.375,
+        "edge_sharpness_ratio_direct_over_continuous": 1.538033608628963,
+        "emitters": 2073600,
+        "event_reuse": "one transport pass, two detector accumulators",
+        "foreground_global_ssim": 0.6200230063445117,
+        "regions": {
+          "foreground": {
+            "mae": 0.5400659303553931,
+            "mse": 1.9262710882062735,
+            "rgb_scalars": 34041717,
+            "rmse": 1.3879016853532073
+          },
+          "interior_gt8px": {
+            "mae": 0.5340657325840636,
+            "mse": 1.9056962518272702,
+            "rgb_scalars": 32181201,
+            "rmse": 1.3804695765670716
+          },
+          "silhouette_0_8px": {
+            "mae": 0.3208085425062507,
+            "mse": 1.1371154538661303,
+            "rgb_scalars": 3733992,
+            "rmse": 1.0663561571380034
+          },
+          "whole_image": {
+            "mae": 0.1477685602133166,
+            "mse": 0.527050925925926,
+            "rgb_scalars": 124416000,
+            "rmse": 0.7259827311485625
+          }
+        },
+        "resolution": [
+          1080,
+          1920
+        ],
+        "total_contribution_relative_difference": 1.0373741932551616e-07
+      }
+    ],
+    "sample_convergence": {
+      "continuous": {
+        "empirical_log_mse_slope": -2.0278088872692592,
+        "empirical_log_rmse_slope": -1.0139044436346296,
+        "estimator": "CONTINUOUS_KERNEL_MONTE_CARLO",
+        "reference_emitters": 262144,
+        "rows": [
+          {
+            "emitters": 32768,
+            "estimator": "CONTINUOUS_KERNEL_MONTE_CARLO",
+            "mae_vs_operator_matched_reference": 0.07765333379308383,
+            "mean_foreground_brightness": 0.7912278224183682,
+            "mse_vs_operator_matched_reference": 0.036935035263498624,
+            "reference_emitters": 262144,
+            "rmse_vs_operator_matched_reference": 0.1921848986353991,
+            "silhouette_mse_vs_operator_matched_reference": 0.047675488587305574,
+            "total_image_energy": 1088145.484375
+          },
+          {
+            "emitters": 65536,
+            "estimator": "CONTINUOUS_KERNEL_MONTE_CARLO",
+            "mae_vs_operator_matched_reference": 0.036113476877411205,
+            "mean_foreground_brightness": 0.7910965166870486,
+            "mse_vs_operator_matched_reference": 0.008134389109909535,
+            "reference_emitters": 262144,
+            "rmse_vs_operator_matched_reference": 0.09019084826028378,
+            "silhouette_mse_vs_operator_matched_reference": 0.01047669598157175,
+            "total_image_energy": 974184.041015625
+          },
+          {
+            "emitters": 131072,
+            "estimator": "CONTINUOUS_KERNEL_MONTE_CARLO",
+            "mae_vs_operator_matched_reference": 0.018929324919978778,
+            "mean_foreground_brightness": 0.7911744299156073,
+            "mse_vs_operator_matched_reference": 0.0022211399162188174,
+            "reference_emitters": 262144,
+            "rmse_vs_operator_matched_reference": 0.04712897109229967,
+            "silhouette_mse_vs_operator_matched_reference": 0.002760438415603288,
+            "total_image_energy": 951468.01171875
+          },
+          {
+            "emitters": 262144,
+            "estimator": "CONTINUOUS_KERNEL_MONTE_CARLO",
+            "mae_vs_operator_matched_reference": 0.0,
+            "mean_foreground_brightness": 0.7910753902544676,
+            "mse_vs_operator_matched_reference": 0.0,
+            "reference_emitters": 262144,
+            "rmse_vs_operator_matched_reference": 0.0,
+            "silhouette_mse_vs_operator_matched_reference": 0.0,
+            "total_image_energy": 942182.775390625
+          }
+        ]
+      },
+      "direct": {
+        "empirical_log_mse_slope": -1.7022468626309915,
+        "empirical_log_rmse_slope": -0.8511234313154957,
+        "estimator": "HARD_BIN_MONTE_CARLO",
+        "reference_emitters": 262144,
+        "rows": [
+          {
+            "emitters": 32768,
+            "estimator": "HARD_BIN_MONTE_CARLO",
+            "mae_vs_operator_matched_reference": 0.18789178133010864,
+            "mean_foreground_brightness": 0.8541926642436618,
+            "mse_vs_operator_matched_reference": 0.20944801022609075,
+            "reference_emitters": 262144,
+            "rmse_vs_operator_matched_reference": 0.45765490298487,
+            "silhouette_mse_vs_operator_matched_reference": 0.552173281142485,
+            "total_image_energy": 1948999.3828125
+          },
+          {
+            "emitters": 65536,
+            "estimator": "HARD_BIN_MONTE_CARLO",
+            "mae_vs_operator_matched_reference": 0.10188703909516335,
+            "mean_foreground_brightness": 0.8540508984307114,
+            "mse_vs_operator_matched_reference": 0.06550048391024271,
+            "reference_emitters": 262144,
+            "rmse_vs_operator_matched_reference": 0.2559306232365379,
+            "silhouette_mse_vs_operator_matched_reference": 0.173907171317074,
+            "total_image_energy": 1381018.0859375
+          },
+          {
+            "emitters": 131072,
+            "estimator": "HARD_BIN_MONTE_CARLO",
+            "mae_vs_operator_matched_reference": 0.054670001318057375,
+            "mean_foreground_brightness": 0.8541350228378659,
+            "mse_vs_operator_matched_reference": 0.019779782307644687,
+            "reference_emitters": 262144,
+            "rmse_vs_operator_matched_reference": 0.14064061400479125,
+            "silhouette_mse_vs_operator_matched_reference": 0.052390182393764764,
+            "total_image_energy": 1202232.95703125
+          },
+          {
+            "emitters": 262144,
+            "estimator": "HARD_BIN_MONTE_CARLO",
+            "mae_vs_operator_matched_reference": 0.0,
+            "mean_foreground_brightness": 0.8540280725362107,
+            "mse_vs_operator_matched_reference": 0.0,
+            "reference_emitters": 262144,
+            "rmse_vs_operator_matched_reference": 0.0,
+            "silhouette_mse_vs_operator_matched_reference": 0.0,
+            "total_image_energy": 1122679.71484375
+          }
+        ]
+      },
+      "direct_brightness_relative_range": 0.00019270739572332875,
+      "reference": "operator-matched 8N numerical reference at 256x256"
+    },
+    "title": "Direct Forward Photon Detection Comparison",
+    "trajectory_verification": {
+      "absorbed": 88695,
+      "coordinate_source": "x_boundary=x_source+t_exit*omega from forward boundary transport",
+      "emitted": 652927,
+      "event_digest": "3948901f7c0b158bc3093849c2129b6145c59c5fd683c597d935963e38b71d5f",
+      "maximum_forward_trajectory_coordinate_error": 1.1102230246251565e-16,
+      "records": [
+        {
+          "detector_coordinate_u": [
+            0.6394024801909575,
+            0.570743186956767
+          ],
+          "detector_intersection_position": [
+            0.4935605634806195,
+            -0.4821492263628324,
+            -1.5145410344877404
+          ],
+          "detector_pixel_id": [
+            163,
+            146
+          ],
+          "event_id": 283556,
+          "forward_vs_orthographic_transverse_u_max_error": 0.0,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 1.1457171408166373,
+          "source_id": 0,
+          "source_normal": [
+            0.08348429841991528,
+            -0.008598465593832615,
+            -0.9964719957463763
+          ],
+          "source_point": [
+            0.008560331270658535,
+            -0.4248633693220005,
+            -0.4781237092270943
+          ],
+          "transport_rgb_contribution": [
+            0.5395967961026121,
+            0.3895000195040983,
+            0.6843803722860875
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        },
+        {
+          "detector_coordinate_u": [
+            0.7243294674072959,
+            0.6966991988105076
+          ],
+          "detector_intersection_position": [
+            0.0988556952551437,
+            -0.7113516705610974,
+            -1.5031668713194841
+          ],
+          "detector_pixel_id": [
+            185,
+            178
+          ],
+          "event_id": 283557,
+          "forward_vs_orthographic_transverse_u_max_error": 1.1102230246251565e-16,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 1.7380834423696203,
+          "source_id": 2,
+          "source_normal": [
+            -0.3724606954476949,
+            -0.8976427673976282,
+            -0.23560664779531804
+          ],
+          "source_point": [
+            -0.6369025849681115,
+            -0.6244474984426163,
+            0.06910583740211318
+          ],
+          "transport_rgb_contribution": [
+            0.15318805427282117,
+            0.14444355497958988,
+            0.23756910747607768
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        },
+        {
+          "detector_coordinate_u": [
+            0.567928547966194,
+            0.24935121922802034
+          ],
+          "detector_intersection_position": [
+            1.2669657005250372,
+            -0.2768505716726702,
+            -1.0440919261358952
+          ],
+          "detector_pixel_id": [
+            145,
+            63
+          ],
+          "event_id": 283558,
+          "forward_vs_orthographic_transverse_u_max_error": 0.0,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 1.1596529428873656,
+          "source_id": 4,
+          "source_normal": [
+            0.9018139361720308,
+            0.26987655570455915,
+            -0.3374881763957848
+          ],
+          "source_point": [
+            0.776066222332322,
+            -0.21886792452830184,
+            0.004931745135434629
+          ],
+          "transport_rgb_contribution": [
+            0.6245897391942216,
+            0.36724729647318716,
+            0.46380295563426055
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        },
+        {
+          "detector_coordinate_u": [
+            0.6771871277444036,
+            0.49635719986245735
+          ],
+          "detector_intersection_position": [
+            0.6727365138187442,
+            -0.5869600570728817,
+            -1.40602292799978
+          ],
+          "detector_pixel_id": [
+            173,
+            127
+          ],
+          "event_id": 283559,
+          "forward_vs_orthographic_transverse_u_max_error": 1.1102230246251565e-16,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 1.0881312298625854,
+          "source_id": 7,
+          "source_normal": [
+            0.21871729566647308,
+            -0.16074695034352068,
+            -0.9624568367109261
+          ],
+          "source_point": [
+            0.21211331079840517,
+            -0.5325534955797524,
+            -0.4216978981910076
+          ],
+          "transport_rgb_contribution": [
+            0.6119853641771443,
+            0.3676735391161289,
+            0.6858834072533165
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        },
+        {
+          "detector_coordinate_u": [
+            0.21480118210903287,
+            0.5155363325979903
+          ],
+          "detector_intersection_position": [
+            0.5970212149004734,
+            0.7125400605489326,
+            -1.3709244023527536
+          ],
+          "detector_pixel_id": [
+            54,
+            131
+          ],
+          "event_id": 283560,
+          "forward_vs_orthographic_transverse_u_max_error": 1.1102230246251565e-16,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 1.209700258513601,
+          "source_id": 8,
+          "source_normal": [
+            0.9463131706024243,
+            -0.3212048286331939,
+            -0.03631585338537085
+          ],
+          "source_point": [
+            0.08493591445244288,
+            0.7730250734746127,
+            -0.27662785948866153
+          ],
+          "transport_rgb_contribution": [
+            0.37598149034289624,
+            0.48514163418928713,
+            0.4247749090116723
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        },
+        {
+          "detector_coordinate_u": [
+            0.41539295431835194,
+            0.7890281553061873
+          ],
+          "detector_intersection_position": [
+            -0.11890074683357488,
+            0.15281738313095206,
+            -1.6477750691896818
+          ],
+          "detector_pixel_id": [
+            106,
+            201
+          ],
+          "event_id": 283561,
+          "forward_vs_orthographic_transverse_u_max_error": 5.551115123125783e-17,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 1.8465774932429733,
+          "source_id": 10,
+          "source_normal": [
+            -0.8132243947289344,
+            0.23393932885881677,
+            -0.5328587751279366
+          ],
+          "source_point": [
+            -0.9005862790742605,
+            0.24514625779310079,
+            0.022641509433962263
+          ],
+          "transport_rgb_contribution": [
+            0.12518954994673992,
+            0.259818401001707,
+            0.25232404619725024
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        },
+        {
+          "detector_coordinate_u": [
+            0.819687466569127,
+            0.40646601967418106
+          ],
+          "detector_intersection_position": [
+            0.8034735021759509,
+            -0.9749761165686037,
+            -1.0915635841848612
+          ],
+          "detector_pixel_id": [
+            209,
+            104
+          ],
+          "event_id": 283562,
+          "forward_vs_orthographic_transverse_u_max_error": 0.0,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 0.9334845955230179,
+          "source_id": 12,
+          "source_normal": [
+            0.5057345375984764,
+            -0.537078360132798,
+            -0.6751143699826865
+          ],
+          "source_point": [
+            0.40831467155010925,
+            -0.9283018867924528,
+            -0.2471321157210237
+          ],
+          "transport_rgb_contribution": [
+            0.6166826262042272,
+            0.23424670095454922,
+            0.590793545678484
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        },
+        {
+          "detector_coordinate_u": [
+            0.4091194381588098,
+            0.5919264390714726
+          ],
+          "detector_intersection_position": [
+            0.4614286590289457,
+            0.16090069008959995,
+            -1.585817250778041
+          ],
+          "detector_pixel_id": [
+            104,
+            151
+          ],
+          "event_id": 283563,
+          "forward_vs_orthographic_transverse_u_max_error": 0.0,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 1.9086036335576937,
+          "source_id": 14,
+          "source_normal": [
+            0.571939047264676,
+            0.8165826535568107,
+            -0.07796471076129455
+          ],
+          "source_point": [
+            -0.34651352189405327,
+            0.2563308717674847,
+            0.14070826097669273
+          ],
+          "transport_rgb_contribution": [
+            0.24018830216577497,
+            0.31851404739075184,
+            0.2915941766343553
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        },
+        {
+          "detector_coordinate_u": [
+            0.2594978180942332,
+            0.5531800970159056
+          ],
+          "detector_intersection_position": [
+            0.5221846325233367,
+            0.5847960197641613,
+            -1.4596841955554858
+          ],
+          "detector_pixel_id": [
+            66,
+            141
+          ],
+          "event_id": 283564,
+          "forward_vs_orthographic_transverse_u_max_error": 0.0,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 1.436155076414888,
+          "source_id": 15,
+          "source_normal": [
+            0.05063021008488551,
+            -0.6280361987995037,
+            -0.7765353274798454
+          ],
+          "source_point": [
+            -0.08576258301213353,
+            0.6566037735849057,
+            -0.16053630823620876
+          ],
+          "transport_rgb_contribution": [
+            0.44928900721322207,
+            0.6067447432180421,
+            0.5310287370049189
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        },
+        {
+          "detector_coordinate_u": [
+            0.5840893314601652,
+            0.6063705804956397
+          ],
+          "detector_intersection_position": [
+            0.4127040346239689,
+            -0.328200134444061,
+            -1.5771160567207465
+          ],
+          "detector_pixel_id": [
+            149,
+            155
+          ],
+          "event_id": 283565,
+          "forward_vs_orthographic_transverse_u_max_error": 1.1102230246251565e-16,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 1.3296568119484886,
+          "source_id": 16,
+          "source_normal": [
+            -0.7373058661462465,
+            0.5437367961777376,
+            -0.40091190582059627
+          ],
+          "source_point": [
+            -0.15016077692534338,
+            -0.2617172938466365,
+            -0.37430664813322084
+          ],
+          "transport_rgb_contribution": [
+            0.18805394218235288,
+            0.16567306996540426,
+            0.25077274490654444
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        },
+        {
+          "detector_coordinate_u": [
+            0.19092053219451222,
+            0.8273128193245336
+          ],
+          "detector_intersection_position": [
+            -0.34958821108387933,
+            0.7979069320719235,
+            -1.407724474025799
+          ],
+          "detector_pixel_id": [
+            48,
+            211
+          ],
+          "event_id": 283566,
+          "forward_vs_orthographic_transverse_u_max_error": 1.1102230246251565e-16,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 0.7965783396936053,
+          "source_id": 18,
+          "source_normal": [
+            -0.6601044068462261,
+            -0.32678862341829534,
+            -0.6763662969623542
+          ],
+          "source_point": [
+            -0.6867924528301886,
+            0.8377358490566038,
+            -0.6871385957370659
+          ],
+          "transport_rgb_contribution": [
+            0.20412530622291025,
+            0.4465513095622727,
+            0.44261322107605566
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        },
+        {
+          "detector_coordinate_u": [
+            0.4209211380885598,
+            0.3982553771222866
+          ],
+          "detector_intersection_position": [
+            0.9519953700547718,
+            0.1278847000777161,
+            -1.3547052632843957
+          ],
+          "detector_pixel_id": [
+            107,
+            101
+          ],
+          "event_id": 283567,
+          "forward_vs_orthographic_transverse_u_max_error": 5.551115123125783e-17,
+          "outgoing_direction": [
+            0.4233158560098572,
+            -0.050000000000000044,
+            -0.904601396224128
+          ],
+          "path_length": 1.429246860208056,
+          "source_id": 19,
+          "source_normal": [
+            0.23984004306285037,
+            0.8027778276732869,
+            -0.5459162143953673
+          ],
+          "source_point": [
+            0.3469725119763978,
+            0.19934704308811896,
+            -0.06180655799123697
+          ],
+          "transport_rgb_contribution": [
+            0.47210067031674413,
+            0.4181088681802604,
+            0.4307797543773293
+          ],
+          "visibility_sequence": "outward -> no intervening zero-set root -> boundary arrival"
+        }
+      ],
+      "retained": 564232,
+      "reverse_camera_cast_used": false
+    },
+    "verdict_evidence": {
+      "CONTINUOUS_DETECTOR_GRADIENT_ADVANTAGE": {
+        "direct_maximum_epsilon_fd_norm_ratio": 31.150370768880414,
+        "v084_continuous_best_frozen_fd_max_relative_error": 0.09249430868264662
+      },
+      "CONTINUOUS_DETECTOR_KERNEL_ARTIFACT_DETECTED": {
+        "heldout_continuous_mse_relative_improvement": 0.1594004052162817,
+        "heldout_direct_mse_relative_improvement": 0.07369423877211098
+      },
+      "CONTINUOUS_DETECTOR_NEEDED_ONLY_FOR_DIFFERENTIATION": {
+        "direct_fd_stable": false,
+        "direct_maximum_epsilon_fd_norm_ratio": 31.150370768880414,
+        "direct_primary_quality_ready": false,
+        "direct_quality_gates_passed": 0,
+        "direct_quality_gates_total": 2,
+        "heldout_transfer": true,
+        "primary_formulation": "CONTINUOUS_DETECTOR_PHOTON_MC"
+      },
+      "CONTINUOUS_TRAINING_IMPROVES_DIRECT_HELDOUT": {
+        "heldout_direct_mse_relative_improvement": 0.07369423877211098
+      },
+      "DIRECT_FORWARD_PHOTON_FORMULATION_PREFERRED": {
+        "direct_quality_gates_passed": 0,
+        "direct_quality_gates_total": 2,
+        "heldout_direct_mse_relative_improvement": 0.07369423877211098,
+        "primary_formulation": "CONTINUOUS_DETECTOR_PHOTON_MC"
+      },
+      "DIRECT_PHOTON_DETECTOR_SUPPORTED": {
+        "brightness_relative_range": 0.00019270739572332875,
+        "empirical_log_rmse_slope": -0.8511234313154957,
+        "mathematically_derived": true,
+        "maximum_forward_trajectory_coordinate_error": 1.1102230246251565e-16,
+        "quality_equivalence_is_a_separate_verdict": false
+      },
+      "DIRECT_PHOTON_FD_STABLE_ENOUGH": {
+        "maximum_epsilon_fd_norm_ratio": 31.150370768880414,
+        "median_fd_snr": 0.737149318045716,
+        "thresholds": {
+          "ratio": 2.0,
+          "snr": 1.0
+        }
+      },
+      "DIRECT_PHOTON_GEOMETRY_SIGNAL_COMPARABLE": {
+        "accepted_ratio_band": [
+          0.5,
+          2.0
+        ],
+        "median_direct_over_continuous_response_norm": 9.55287847716244,
+        "same_variant_ranking": false
+      },
+      "DIRECT_PHOTON_IMAGE_QUALITY_COMPARABLE": {
+        "continuous_scale_normalized_self_mse_mean": 0.08003069008954201,
+        "energy_band": 0.03,
+        "foreground_rmse_relative_difference_at_matched_256": 1.8376562386678303,
+        "hard_scale_normalized_self_mse_mean": 0.3413167966091598,
+        "maximum_total_contribution_relative_difference": 1.0373741932551616e-07,
+        "rmse_band": 0.05
+      },
+      "DIRECT_PHOTON_MATCHED_DENSITY_VALID": {
+        "emitter_counts": [
+          65536,
+          262144,
+          518400,
+          2073600
+        ],
+        "matched_resolution_count": 4
+      },
+      "DIRECT_PHOTON_MC_DERIVED": {
+        "global_sample_normalization_power": -1,
+        "random_pixel_denominator_count": 0
+      },
+      "DIRECT_PHOTON_SAMPLE_COUNT_INVARIANT": {
+        "brightness_relative_range_N_2N_4N_8N": 0.00019270739572332875,
+        "threshold": 0.05
+      },
+      "FORWARD_PACKET_TRANSPORT_PRESERVED": {
+        "maximum_forward_trajectory_coordinate_error": 1.1102230246251565e-16,
+        "same_pass_detector_accumulators": 2
+      }
+    },
+    "verdicts": {
+      "CONTINUOUS_DETECTOR_GRADIENT_ADVANTAGE": true,
+      "CONTINUOUS_DETECTOR_KERNEL_ARTIFACT_DETECTED": false,
+      "CONTINUOUS_DETECTOR_NEEDED_ONLY_FOR_DIFFERENTIATION": false,
+      "CONTINUOUS_TRAINING_IMPROVES_DIRECT_HELDOUT": true,
+      "DIRECT_FORWARD_PHOTON_FORMULATION_PREFERRED": false,
+      "DIRECT_PHOTON_DETECTOR_SUPPORTED": true,
+      "DIRECT_PHOTON_FD_STABLE_ENOUGH": false,
+      "DIRECT_PHOTON_GEOMETRY_SIGNAL_COMPARABLE": false,
+      "DIRECT_PHOTON_IMAGE_QUALITY_COMPARABLE": false,
+      "DIRECT_PHOTON_MATCHED_DENSITY_VALID": true,
+      "DIRECT_PHOTON_MC_DERIVED": true,
+      "DIRECT_PHOTON_SAMPLE_COUNT_INVARIANT": true,
+      "FORWARD_PACKET_TRANSPORT_PRESERVED": true
+    }
+  },
   "environment": {
     "available": true,
     "gpu": "Quadro RTX 5000",
@@ -114747,6 +117361,7 @@
     }
   ],
   "runtime_seconds": 1857.9316645611543,
+  "runtime_seconds_with_supplement": 2099.8320638220757,
   "sample_convergence": {
     "rows": [
       {

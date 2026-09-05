@@ -110,6 +110,7 @@ class PixelView:
     squared_mass: np.ndarray
     numerator: np.ndarray | None
     hard_bin_numerator: np.ndarray | None = None
+    hard_bin_counts: np.ndarray | None = None
 
     @property
     def support(self) -> np.ndarray:
@@ -162,6 +163,7 @@ def _diagnostic_splat(
     counts: Tensor,
     ambient: float,
     hard_bin_numerator: Tensor | None = None,
+    hard_bin_counts: Tensor | None = None,
 ) -> dict[str, object]:
     rows, columns = resolution
     device = points.device
@@ -225,6 +227,14 @@ def _diagnostic_splat(
         )
         hard_pixels = hard_rows[hard_valid] * columns + hard_columns[hard_valid]
         hard_bin_numerator.index_add_(0, hard_pixels, radiance[hard_valid])
+        if hard_bin_counts is not None:
+            hard_bin_counts.scatter_add_(
+                0,
+                hard_pixels,
+                torch.ones(
+                    hard_pixels.numel(), dtype=torch.int32, device=device
+                ),
+            )
         hard_bin_writes = int(hard_valid.sum())
     row_gap = (2.0 - row_distance.abs()).abs()[:, :, None].expand(-1, 4, 4)
     column_gap = (
@@ -320,6 +330,11 @@ def _render_diagnostics(
         hard_bin_numerator = (
             torch.zeros_like(numerator) if keep_hard_bin else None
         )
+        hard_bin_counts = (
+            torch.zeros(pixels, dtype=torch.int32, device=device)
+            if keep_hard_bin
+            else None
+        )
         counts = torch.zeros(pixels, dtype=torch.int32, device=device)
         direction = atlas.directions[view_id]
         for start in range(0, emitter_count, config.emitter_chunk_size):
@@ -356,6 +371,7 @@ def _render_diagnostics(
                 counts,
                 config.ambient,
                 hard_bin_numerator,
+                hard_bin_counts,
             )
             _sync(device)
             splat_seconds += time.perf_counter() - splat_started
@@ -375,9 +391,20 @@ def _render_diagnostics(
                 hard_bin_numerator.detach().cpu().to(torch.float32).numpy()
                 if hard_bin_numerator is not None
                 else None,
+                hard_bin_counts.detach().cpu().numpy()
+                if hard_bin_counts is not None
+                else None,
             )
         )
-        del mass, squared_mass, numerator, counts, image, hard_bin_numerator
+        del (
+            mass,
+            squared_mass,
+            numerator,
+            counts,
+            image,
+            hard_bin_numerator,
+            hard_bin_counts,
+        )
         _progress(
             "v083_render_view",
             geometry=geometry,

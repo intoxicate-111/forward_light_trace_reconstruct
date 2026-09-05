@@ -786,6 +786,22 @@ def run_mc_continuous_detector_analysis(
     )
 
 
+def run_direct_photon_comparison_analysis(
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    from zlt.direct_photon import run_direct_forward_photon_comparison
+    from zlt.mesh_field import obtain_stanford_bunny
+
+    mesh_path = args.bunny_mesh
+    if mesh_path is None:
+        mesh_path = obtain_stanford_bunny(args.bunny_cache)
+    return run_direct_forward_photon_comparison(
+        mesh_path,
+        args.bunny_artifacts,
+        args.bunny_figures,
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -1160,6 +1176,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--high-sample-resolution", action="store_true")
     parser.add_argument("--pixel-support-diagnostic", action="store_true")
     parser.add_argument("--mc-continuous-detector", action="store_true")
+    parser.add_argument("--direct-photon-comparison", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -1185,6 +1202,12 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.direct_photon_comparison:
+        report = run_direct_photon_comparison_analysis(args)
+        print("direct_forward_photon_comparison:")
+        print(json.dumps(report["verdicts"], indent=2, sort_keys=True))
+        print(f"PRIMARY_FORMULATION={report['PRIMARY_FORMULATION']}")
+        return
     if args.mc_continuous_detector:
         report = run_mc_continuous_detector_analysis(args)
         print("mc_continuous_detector:")

@@ -949,6 +949,49 @@ The explicit verdicts are: `LEGACY_HARD_GATE_DISCONTINUITY_CONFIRMED=true`, `HAR
 
 The formal local-CUDA run took 1,857.93 s and peaked at 1,229.97 MiB allocated / 1,420 MiB reserved; process peak RSS was 17,556.76 MiB. The four matched renders take 2.75/10.41/20.27/82.86 s and sustain approximately 0.48–0.51 million attempted packets/s. Full HD streams 41.472M packets into 17.855M retained events and 285.681M continuous detector writes with 1,420 MiB peak reserved VRAM. Nested Sobol prefix and 1,024-vs-2,048 chunk tests both have exactly zero error. Exact equations, PDFs, seeds, all mean/std/median/95% CI/min/max rows, performance counters, direct numerical evidence for every verdict, and the formal/verification commands are in the [JSON](artifacts/v084_mc_continuous_detector.json) and [CSV](artifacts/v084_mc_continuous_detector.csv). Fourteen plots, including representative RGB and spatial-error maps, are under [`figures/v084_*.png`](figures/).
 
+### Direct Forward Photon Detection Comparison
+
+This supplementary v0.8.4 experiment returns explicitly to the original movement formulation: a point on the zero set emits a packet in a fixed outgoing direction, the packet survives or is absorbed by the forward first-zero-set test, and a surviving trajectory reaches the enclosing detector boundary before being measured. Twelve archived trajectories record source point, normal, direction, path length, visibility sequence, boundary position, detector coordinate, box-pixel ID, and RGB contribution. Reprojecting the actual boundary arrival and projecting its source along the same forward direction agree to $1.11\times10^{-16}$; no reverse camera cast is used.
+
+The common arrival operator is
+
+\[
+H_D(F)=T_{\mathrm{forward}}(F).
+\]
+
+Only its detector measurement changes:
+
+\[
+I_{\mathrm{box}}=M_{\mathrm{box}}H_D(F)
+=\frac{gHW}{N}\sum_i f_i\mathbf 1[u_i\in P_p],
+\qquad
+I_{\mathrm{cont}}=M_{\mathrm{cont}}H_D(F)
+=\frac{gHW}{N}\sum_i f_iB(r_p-r_i)B(c_p-c_i).
+\]
+
+`DIRECT_FORWARD_PHOTON` has no random $W_p$ denominator, threshold, normalized splat, or post-hoc confidence gate. Each retained event writes once to its finite box pixel. The historical normalized splat remains unchanged as formulation A. In every B/C comparison, the surface samples, Sobol indices, packet identities, directions, appearance, visibility results, detector coordinates, and transported RGB are generated once; the hard and cubic accumulators consume that same pass.
+
+The matched-density sweep uses 65,536/262,144/518,400/2,073,600 emitters at 256²/512²/960×540/1920×1080 over the same 20 views. Foreground median hard-hit count is one at every resolution; mean counts are 1.469/1.532/1.548/1.574, and zero-hit fractions are 27.22%/30.57%/30.97%/34.31%. The fixed-65,536 historical control is kept separate: its Full-HD foreground zero-hit fraction is 91.21%, demonstrating why that starved setting cannot judge direct detection. The matched Full-HD pass comprises 41.472M attempted packets and 17.855M retained direct hits.
+
+For the operator-matched 256² high-prefix test, N/2N/4N/8N is 32,768/65,536/131,072/262,144. Direct RMSE to its own 8N reference is 0.45765/0.25593/0.14064/0; continuous RMSE is 0.19218/0.09019/0.04713/0. The corresponding empirical RMSE slopes are −0.8511 and −1.0139. Direct foreground brightness varies by only 0.01927%, so global $1/N$ normalization is sample-count invariant, but at the primary 65,536 prefix its reference RMSE is 183.77% higher than C, far outside the predeclared 5% equivalence band. Across the eight pre-existing independent scrambles, scale-normalized self-MSE is 0.34132 for B and 0.08003 for C. Total transported contribution agrees between B and C within $1.04\times10^{-7}$ at all four resolutions; their difference is variance and detector response, not brightness drift.
+
+The direct images retain sharper edges—the B/C silhouette-gradient ratio is 1.73/1.67/1.65/1.54—but are visibly and numerically noisier. Same-event foreground global SSIM is 0.682/0.659/0.641/0.620. Those cross-operator residuals are reported only as detector-model differences. Convergence error is always measured against $I^{\mathrm{ref}}_{\mathrm{box}}$ for B and $I^{\mathrm{ref}}_{\mathrm{cont}}$ for C, never against the other operator's target.
+
+Five controlled coefficient categories and three common-sample perturbation sizes show that B has a stronger but much noisier geometric response: the median direct/continuous response-norm ratio is 9.553, while the perturbation ranking is not preserved. The hard indicator is therefore not assigned a fictitious pathwise derivative. Across six central-FD epsilons, the worst category's direct FD norm changes by 31.15× and median same-sample/independent-scramble SNR is 0.737. Every row records photons crossing box boundaries and the changed-image fraction. By contrast, the v0.8.4 continuous analytic/frozen-FD maximum relative error is 0.09249. `DIRECT_PHOTON_FD_STABLE_ENOUGH=false`; a direct Gauss–Newton control is not forced.
+
+A mandatory small 32-DoF optimization nevertheless trains C for 12 common-prefix steps and evaluates both operators on seed 211. Training-C MSE falls 14.29%; held-out C falls 15.94%, and, critically, held-out direct B also falls 7.37%. Symmetric Chamfer improves 1.63%, point-to-surface mean and p95 improve 6.01% and 5.61%, and normal error improves 2.68%. Thus C is not merely producing a kernel-specific geometry artifact in this test (`CONTINUOUS_DETECTOR_KERNEL_ARTIFACT_DETECTED=false`), although the direct-image and geometry-signal equivalence gates still fail. Legacy and direct optimization are omitted: the preceding v0.8.4 all-category optimization gate failed, and B's supplementary FD test is unusable.
+
+The direct box detector is mathematically supported: it follows the forward trajectory exactly, preserves brightness, and converges. It is not approximately as good as C at the tested matched density, so the project cannot make direct box accumulation its primary image formulation yet. The exact supplementary verdicts are `FORWARD_PACKET_TRANSPORT_PRESERVED=true`, `DIRECT_PHOTON_MC_DERIVED=true`, `DIRECT_PHOTON_SAMPLE_COUNT_INVARIANT=true`, `DIRECT_PHOTON_MATCHED_DENSITY_VALID=true`, `DIRECT_PHOTON_IMAGE_QUALITY_COMPARABLE=false`, `DIRECT_PHOTON_GEOMETRY_SIGNAL_COMPARABLE=false`, `DIRECT_PHOTON_FD_STABLE_ENOUGH=false`, `CONTINUOUS_DETECTOR_GRADIENT_ADVANTAGE=true`, `CONTINUOUS_TRAINING_IMPROVES_DIRECT_HELDOUT=true`, `CONTINUOUS_DETECTOR_KERNEL_ARTIFACT_DETECTED=false`, `DIRECT_PHOTON_DETECTOR_SUPPORTED=true`, `CONTINUOUS_DETECTOR_NEEDED_ONLY_FOR_DIFFERENTIATION=false`, and `DIRECT_FORWARD_PHOTON_FORMULATION_PREFERRED=false`.
+
+Accordingly,
+
+```text
+PRIMARY_FORMULATION =
+CONTINUOUS_DETECTOR_PHOTON_MC
+```
+
+This is a detector-measurement decision, not a retreat from forward light tracing: both box and continuous images remain measurements of the identical forward-moving arrival measure $H_D(F)$. At the present density C is needed for evaluation variance as well as differentiation, so it cannot honestly be described as training-only smoothing. The formal supplement took 241.90 s and peaked at 1,709.57 MiB allocated / 1,786 MiB reserved. Its complete numerical record is appended to the existing [v0.8.4 JSON](artifacts/v084_mc_continuous_detector.json) and [CSV](artifacts/v084_mc_continuous_detector.csv); nine non-overwriting diagnostics are [`figures/v084_photon_trajectory_detector.png`](figures/v084_photon_trajectory_detector.png), [`figures/v084_direct_photon_rgb.png`](figures/v084_direct_photon_rgb.png), [`figures/v084_direct_vs_continuous_detector.png`](figures/v084_direct_vs_continuous_detector.png), [`figures/v084_photon_hit_count_map.png`](figures/v084_photon_hit_count_map.png), [`figures/v084_direct_photon_convergence.png`](figures/v084_direct_photon_convergence.png), [`figures/v084_direct_vs_continuous_silhouette.png`](figures/v084_direct_vs_continuous_silhouette.png), [`figures/v084_geometry_perturbation_response.png`](figures/v084_geometry_perturbation_response.png), [`figures/v084_direct_photon_fd_stability.png`](figures/v084_direct_photon_fd_stability.png), and [`figures/v084_train_continuous_eval_direct.png`](figures/v084_train_continuous_eval_direct.png).
+
 ## Limitations
 
 v0.8 is one controlled Bunny run, not a general benchmark or a real-photo reconstruction. Its 20 direct Fibonacci packet directions are also its detector directions; it preserves a shared scene-centric transport state but does not validate arbitrary off-atlas cameras. The 8,192-element candidate dictionary is only a safety envelope. Visibility, ownership, and footprint topology remain frozen within each Jacobian cell. The 2×2 ablation changes the deterministic sampled target support with photon density, has no repeated stochastic trials, and uses a simplified one-shot K=1024 comparison; its signed effects are descriptive, not confidence intervals. In particular, a million attempted packets aggregated over 20 Full-HD views does not imply dense observations per pixel. The strict negative high-bandwidth verdict applies to this optimizer, dictionary, renderer approximation, and controlled target—not to every possible observation-driven birth method.
