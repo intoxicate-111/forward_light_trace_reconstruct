@@ -1,6 +1,6 @@
 # Zero-Set Forward Light Tracing
 
-This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4 separates photon-arrival visualization from visibility-aware camera image formation, v0.5 factors image formation through a frozen camera-independent outgoing boundary field, v0.6 removes the renderer's mesh surface scaffold and adds depth-sensitive forward RGB transport, v0.7 removes unnecessary attenuation from the default and retests geometry birth against the corrected RGB operator, v0.8 stress-tests that birth mechanism at Full HD, 20 views, and 1.31 million attempted forward packets, and v0.8.1 audits the resulting image-sampling pathology and adds an opt-in resolution-aware footprint. This project makes no claim of novelty.
+This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4–v0.7 establish camera-independent mesh-free RGB transport, and v0.8–v0.8.4 diagnose high-resolution sampling and adopt continuous detector integration. v0.8.5 tests finite-support, root-free zero-set attenuation and shows that removing visibility-root topology does not remove source-sampling topology. This project makes no claim of novelty.
 
 ## Model
 
@@ -991,6 +991,95 @@ CONTINUOUS_DETECTOR_PHOTON_MC
 ```
 
 This is a detector-measurement decision, not a retreat from forward light tracing: both box and continuous images remain measurements of the identical forward-moving arrival measure $H_D(F)$. At the present density C is needed for evaluation variance as well as differentiation, so it cannot honestly be described as training-only smoothing. The formal supplement took 241.90 s and peaked at 1,709.57 MiB allocated / 1,786 MiB reserved. Its complete numerical record is appended to the existing [v0.8.4 JSON](artifacts/v084_mc_continuous_detector.json) and [CSV](artifacts/v084_mc_continuous_detector.csv); nine non-overwriting diagnostics are [`figures/v084_photon_trajectory_detector.png`](figures/v084_photon_trajectory_detector.png), [`figures/v084_direct_photon_rgb.png`](figures/v084_direct_photon_rgb.png), [`figures/v084_direct_vs_continuous_detector.png`](figures/v084_direct_vs_continuous_detector.png), [`figures/v084_photon_hit_count_map.png`](figures/v084_photon_hit_count_map.png), [`figures/v084_direct_photon_convergence.png`](figures/v084_direct_photon_convergence.png), [`figures/v084_direct_vs_continuous_silhouette.png`](figures/v084_direct_vs_continuous_silhouette.png), [`figures/v084_geometry_perturbation_response.png`](figures/v084_geometry_perturbation_response.png), [`figures/v084_direct_photon_fd_stability.png`](figures/v084_direct_photon_fd_stability.png), and [`figures/v084_train_continuous_eval_direct.png`](figures/v084_train_continuous_eval_direct.png).
+
+## v0.8.5: finite-support zero-set energy packets
+
+### 1. Motivation
+
+v0.8.5 asks whether the binary first-zero-set survival test can be replaced by a continuous, zero-set-native forward energy operator without sacrificing the continuous detector adopted in v0.8.4. This is an enabling numerical/operator experiment for the project's scene-centric forward-transport-to-multiview-measurement story. It makes no novelty claim and does not present the attenuation law as physically exact.
+
+### 2. Why binary visibility remains a problem
+
+The v0.8.4 continuous detector removed detector-bin discontinuities, but its forward packet still survived or disappeared according to a selected first root. The archived median topology/full-FD norm fraction was 0.992373. The hard controls here again have unit value jumps for a moving plane, a grazing sphere, and root birth/death, so continuous detector integration alone does not make the scene-side transport continuous.
+
+### 3. Finite-support packet definition
+
+A source now emits a packet supported on a radius-$r$ ball. A fixed unscrambled Sobol rule supplies micro-offsets $u_m$ uniformly in that ball, and the packet samples $x(t)+r u_m$ along its forward direction. The selected Bunny configuration uses median source spacing $h=0.0245572$, $r/h=1$, eight micro-points, and bounded 256-emitter streaming; it never materializes a global packet-interaction graph. The [concept figure](figures/v085_packet_zero_set_concept.png) summarizes the operator.
+
+### 4. Non-SDF level-set normalization
+
+The implicit grid is not assumed to be a signed-distance field. Every interaction therefore uses
+
+$$d_F(x)=\frac{F(x)}{\sqrt{\lVert\nabla F(x)\rVert^2+\eta^2}},\qquad \eta=10^{-6}\operatorname{median}\lVert\nabla F\rVert.$$
+
+Recomputing $\eta$ under each positive rescaling makes the plane, sphere, real-scene transmission, RGB, and translation-gradient tests invariant for $F$, $0.5F$, $2F$, and $10F$: the maximum observed difference is $2.22\times10^{-16}$. The exact rows are plotted in the [scale-invariance figure](figures/v085_levelset_scale_invariance.png).
+
+### 5. Analytic half-space sanity model
+
+For a uniformly filled spherical packet cut by a plane at normalized signed distance $s$, the blocked volume fraction is $1$ for $s\leq-1$, $0$ for $s\geq1$, and $((1-s)^2(2+s))/4$ between them. Independent 256-point Gauss--Legendre integration differs by $4.44\times10^{-16}$; float32 differs from float64 by at most $4.14\times10^{-8}$. The finite-difference derivative error is $9.00\times10^{-5}$ on the sampled grid. See the [sphere-cap validation](figures/v085_sphere_cap_overlap.png).
+
+### 6. Root-free zero-set attenuation
+
+The compact normalized shell is $\psi(q)=\frac{15}{16}(1-q^2)^2$ for $|q|<1$ and zero otherwise. Its packet-convolved surface-barrier optical depth and transmission are
+
+$$\tau=\kappa\int \frac1M\sum_m\frac1\epsilon\psi\!\left(\frac{d_F(x(t)+ru_m)}\epsilon\right)|\hat n_F^T\omega|\,dt,\qquad T=e^{-\tau}.$$
+
+No first root, first owner, or binary path survival variable appears. The launch interval excludes the emitting packet's own $r+\epsilon$ neighborhood. A local-plane Gauss--Legendre reference and fixed packet quadrature are both retained: at 8/32/128 micro-points their influence RMSEs are 0.0682/0.0381/0.0155. A low-curvature sphere with radius $10r$ has RMSE 0.0214 against the tangent-plane model.
+
+### 7. Energy-linearity derivation
+
+For fixed geometry, $E_{out}=T(F)E_{in}$ is linear in transported energy. Scale and superposition tests have maximum absolute error $8.88\times10^{-16}$. Geometry is not linear: $T$ depends nonlinearly on $F$. Differentiation uses $dT/d\lambda=-T\,d\tau/d\lambda$ and $dE_{out}/d\lambda=E_{in}dT/d\lambda+T\,dE_{in}/d\lambda$.
+
+### 8. Path quadrature
+
+The selected shell width is $\epsilon=r$ and the main step is $\epsilon/2$. Against the $\epsilon/8$ reference, steps $\epsilon$, $\epsilon/2$, and $\epsilon/4$ give transmission RMSE 0.01190, 0.002854, and 0.000577; their geometry-derivative relative errors are 0.0559, 0.01485, and 0.003260. The separate 1/8/32/128 micro-point sweep is recorded rather than conflated with path-step convergence.
+
+### 9. Toy topology transitions
+
+The finite operator replaces unit hard jumps by maximum adjacent-grid changes 0.0377 for the [moving plane](figures/v085_plane_transition.png), 0.0105 for the [grazing sphere](figures/v085_grazing_sphere_transition.png), and 0.1549 for [root birth/death](figures/v085_root_birth_death_transition.png). Their 1x/2x/4x FD relative spreads are 0.0347, 0.00245, and 0.3506. Two well-separated sheets transmit $9.9997248\times10^{-5}$ versus the $10^{-4}$ product target, relative error $2.75\times10^{-5}$, without selecting a first root; see the [two-surface path](figures/v085_two_surface_path.png).
+
+### 10. Scale invariance
+
+The positive level-set scale gate passes at $2.22\times10^{-16}$ maximum error. This result depends on scaling $\eta$ with the field gradient statistic; a fixed absolute $\eta$ would not define the same normalized geometry near small gradients.
+
+### 11. Radius/shell-width tradeoff
+
+The 13-row 256-square screen covers $r/h=0,0.25,0.5,1,2$ and $\epsilon/r=0.25,0.5,1$ where applicable. The selected $r/h=1,\epsilon/r=1$ keeps edge and thin-feature ratios at 0.873 and 0.906 in the full 4096-source comparison. The screening subset shows the expected fidelity/opacity/runtime tradeoff rather than a universally optimal radius; all rows are in the [Pareto plot](figures/v085_radius_epsilon_tradeoff.png).
+
+### 12. Image fidelity
+
+Hard visibility plus continuous detector, point-soft attenuation, and finite-packet attenuation share the same latent sources. At 256 square, point-soft versus hard has whole/foreground/silhouette MSE 0.0934/0.4144/0.2487; finite packets improve these to 0.0534/0.2370/0.1422. At 512 square, finite packets have whole/silhouette MSE 0.1475/0.4605 and retain edge/thin-feature ratios 0.857/0.961. These are measurement-model bias values, not geometry errors. Representative RGB appears in the [comparison](figures/v085_hard_vs_soft_transport_rgb.png) and [render sheet](render_res/v085_hard_vs_soft_transport_rgb.png).
+
+### 13. Geometry perturbation signal
+
+The five v0.8.4 parameter classes are reused. At $\delta=10^{-3}$, finite-packet response norms for deep interior, high curvature, occlusion boundary, silhouette, and smooth visible surface are 0.177, 58.0, 193.6, 172.4, and 271.0. The median finite/point-soft norm ratio is 1.139, and the median independent-scramble response cosine is 0.147. Thus finite support does not erase the common-sample geometry signal, although cross-sample direction remains modest. See the [response comparison](figures/v085_geometry_perturbation_response.png).
+
+### 14. Jacobian / finite differences
+
+Autodiff includes the implicit source motion with fixed identity, color/normal terms, packet transmission, continuous detector projection, and cubic detector kernel. Across the best FD epsilon for each of five classes, analytic-versus-mode-C relative errors are 0.00357, 0.0885, 0.0188, 0.0779, and 0.0283; their median is 0.0283. No derivative is invented for sign-changing-cell ordering or source-root identity. The A/B/C/D norms are shown in the [FD figure](figures/v085_frozen_vs_full_fd.png).
+
+### 15. Topology-component decomposition
+
+Mode B changes path attenuation with sources frozen; C also moves fixed-identity source roots; an intermediate recomputes outward owner membership; D rerasterizes the field and rebuilds sign-changing cells and source roots using the same Sobol seed. The visibility/owner component falls to median $1.99\times10^{-16}$ of the D norm, but the source-resampling component is 0.999996. Consequently the full topology/D fraction changes from 0.992373 to 0.999996, a **-0.768% reduction** rather than an improvement. The [before/after figure](figures/v085_topology_fraction_before_after.png) deliberately shows this failed primary gate.
+
+### 16. Small geometry optimization, if allowed
+
+It was not allowed. Although continuity, normalization, energy, path, image-bandwidth, geometry-signal, MC, and frozen-FD gates pass, the full-rerender topology fraction does not improve. No small optimization, direct-photon transfer test, or observation-driven birth is run, and their absence is not interpreted as a negative birth result.
+
+### 17. Scientific verdict
+
+All of `LEVELSET_SCALE_INVARIANT`, `SPHERE_CAP_ANALYTIC_VALIDATED`, `FINITE_PACKET_VALUE_CONTINUOUS`, `FINITE_PACKET_GRADIENT_CONTINUOUS`, `ROOT_FREE_TRANSPORT_IMPLEMENTED`, `ENERGY_TRANSPORT_LINEAR`, `PATH_QUADRATURE_CONVERGED`, `SURFACE_OPACITY_CALIBRATED`, `FINITE_PACKET_MC_VARIANCE_ACCEPTABLE`, `GEOMETRY_SIGNAL_PRESERVED`, `SILHOUETTE_BANDWIDTH_ACCEPTABLE`, `VISIBILITY_TOPOLOGY_COMPONENT_REDUCED`, and `ANALYTIC_SOFT_TRANSPORT_MATCHES_FROZEN_FD` pass. `FULL_RERENDER_MISMATCH_REDUCED`, `FULL_RERENDER_TOPOLOGY_FRACTION_REDUCED`, `SMALL_GEOMETRY_OPTIMIZATION_READY`, and `HIGH_RES_BIRTH_READY_TO_RETEST` fail. Therefore:
+
+```text
+PRIMARY_TRANSPORT =
+UNRESOLVED
+```
+
+The finite packet plus continuous zero-set interaction defines a continuous transport quantity, and fixed Sobol quadrature samples that integral. It does not make geometry linear and does not solve source topology.
+
+### 18. Remaining unresolved topology sources
+
+Sign-changing-cell count/order, cell-to-Sobol assignment, source projection/root identity, and degenerate-gradient behavior remain. The eight-seed test passes its declared variance gate with median geometry-response cosine 0.426 and response-norm CV 0.0479, but source resampling still dominates strict full FD. The formal run took 66.50 s; its main finite render processed 16,384 attempted packets and 12.687M micro/path interactions in 0.345 s, peaking at 398.57 MiB allocated and 446 MiB reserved. Exact configurations, thresholds, 22 boolean verdicts, FD rows, performance counters, and limitations are in the [JSON report](artifacts/v085_finite_packet_zero_set_transport.json) and [CSV record](artifacts/v085_finite_packet_zero_set_transport.csv); the [multi-seed](figures/v085_mc_multiseed.png) and [runtime](figures/v085_runtime_scaling.png) plots remain separate because continuity and variance are different questions.
 
 ## Limitations
 
