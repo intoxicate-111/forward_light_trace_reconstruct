@@ -1,6 +1,6 @@
 # Zero-Set Forward Light Tracing
 
-This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4–v0.7 establish camera-independent mesh-free RGB transport, and v0.8–v0.8.4 diagnose high-resolution sampling and adopt continuous detector integration. v0.8.5 tests finite-support, root-free zero-set attenuation; v0.8.6 removes geometry-dependent source resampling with fixed 3D latent anchors; v0.8.7 introduces persistent parameter-attached 2D geodesic charts; v0.8.8 separates chart sampling density from source energy; and v0.8.9 replaces the dense geodesic field/Jacobian path with compact-support queries, a sparse local geodesic graph, mass-conserving hierarchical quadrature, and Full-HD transport streamed through as many as 2,097,152 emitters. This project makes no claim of novelty.
+This experimental research prototype asks whether samples of a zero set can act as local directional emitters, whether a compact local parameterization induces a sparse geometry-to-image Jacobian, and whether observations can repeatedly turn evidence for nonexistent parameters into a better geometry function space. Version 0.1 isolates transport, v0.2–v0.2.2 validate local geometry derivatives and CUDA/multiview scaling, v0.3a–v0.3b test pre-birth utility prediction, v0.3c performs true sequential parameter birth, v0.3d transfers that protocol to Stanford Bunny geometry, v0.3e tests simultaneous birth and Bunny smoothing headroom, v0.3f separates detector resolution, photon density, optimization, and inverse ambiguity, v0.3g tests whether richer shared multiview evidence permits larger natural birth batches, v0.4–v0.7 establish camera-independent mesh-free RGB transport, and v0.8–v0.8.4 diagnose high-resolution sampling and adopt continuous detector integration. v0.8.5 tests finite-support, root-free zero-set attenuation; v0.8.6 removes geometry-dependent source resampling with fixed 3D latent anchors; v0.8.7 introduces persistent parameter-attached 2D geodesic charts; v0.8.8 separates chart sampling density from source energy; v0.8.9 replaces the dense geodesic field/Jacobian path with compact-support queries, a sparse local geodesic graph, mass-conserving hierarchical quadrature, and Full-HD transport streamed through as many as 2,097,152 emitters; and v0.8.10 replaces independent Sobol disk endpoints with stratified angular rays and radial stops while preserving that sparse transport architecture. This project makes no claim of novelty.
 
 ## Model
 
@@ -84,6 +84,7 @@ python demo.py --continuous-source-field --bunny-artifacts artifacts --bunny-fig
 python demo.py --geodesic-source-charts --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 python demo.py --emitter-scaling --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
 python demo.py --million-emitter-streaming --bunny-artifacts artifacts --bunny-figures figures --render-output render_res
+python demo.py --stratified-geodesic-polar --bunny-artifacts artifacts --bunny-figures figures
 ```
 
 The reference fields are an analytic sphere and analytic torus; the optional Bunny path adds a fixed mesh-derived trilinear level-set evaluator. With the default seed, the sphere is the convex normal/camera sanity check. The side-view torus activates non-convex self-occlusion: some rays emitted from its inner wall cross the hole and re-intersect the opposite tube before reaching the detector. Every run reports zero-set and normal errors, hit and absorption fractions, sparse shape/nnz/density, operator fan-in/fan-out, direct-versus-sparse error, and measured pipeline runtime. `--verify` additionally runs deterministic hand checks for all acceptance gates through production code.
@@ -1487,6 +1488,50 @@ Emitter count grows 32x while transient Full-HD CUDA allocation grows only 1.113
 Eight-seed response-norm CV falls from 0.01029 at 65K to 0.000957 at 1M and image self-MSE falls from $5.59\times10^{-5}$ to $4.91\times10^{-8}$. However, median cross-seed response cosine remains about 0.612, below the 0.90 gate. Full-HD thin response also decreases from 0.0158 to 0.00364, far below the 0.75 target. Consequently variance reduction is supported, but `CROSS_SEED_GEOMETRY_RESPONSE_STABLE`, `FULLHD_SOURCE_DENSITY_ADEQUATE`, `THIN_FEATURE_FIDELITY_RECOVERED`, `SMALL_GEOMETRY_OPTIMIZATION_READY`, and `HIGH_RES_BIRTH_READY_TO_RETEST` remain false. No optimization or birth experiment is run.
 
 The formal Quadro RTX 5000 experiment takes 1,309.33 s. Exact settings, all seeds, graph hashes, dtypes, scale rows, storage modes, evidence for 33 verdicts, and reproduction commands are in the [JSON report](artifacts/v089_sparse_geodesic_million_emitter.json) and [CSV record](artifacts/v089_sparse_geodesic_million_emitter.csv). The 20 diagnostic figures use `figures/v089_*.png`; the [Full-HD four-view 65K/262K/1M/2M montage](render_res/v089_fullhd_million_emitter_comparison.png) is the direct visual result.
+
+## v0.8.10: stratified geodesic polar emitter sampling
+
+v0.8.10 changes only the persistent emitter placement within each of the 1,024 v0.8.9 charts. The Sobol control keeps identities $(k,m)$ with $\rho=\sqrt{u_1}$ and $\theta=2\pi u_2$. The new sampler uses identities $(k,a,b)$ and
+
+$$
+\theta_{k,a}=2\pi\frac{a+1/2+\epsilon^\theta_{k,a}}{N_\theta}.
+$$
+
+AREA_STRATIFIED uses $\rho=\sqrt{(b+1/2+\epsilon^r_{k,a,b})/N_r}$ with equal radial-bin mass. DISTANCE_STRATIFIED uses $\rho=(b+1/2+\epsilon^r_{k,a,b})/N_r$ and the exact disk-area mass $((b+1)^2-b^2)/N_r^2$. Both retain HIERARCHICAL_MASS_CONSERVING chart weights. Across every budget, radial definition, jitter, and seed, total source mass is exactly 9.088634 and the measured mass drift is zero.
+
+### Fixed-step shared rays and sparse derivatives
+
+Numerical integration is independent of emitter spacing. Each $(k,a)$ ray is integrated once on a fixed 32-step grid with step $R_k/32$; arbitrary radial stops are recorded by interpolating the two states that bracket the requested path distance. Thus changing $N_r$, its jitter, or the radial scheme does not change the integrator nodes. The independent diagnostic restarts and replays that same fixed grid for every endpoint. On the four-chart $16\times16$ exact-Jacobian control, shared construction takes 6.234 s versus 100.258 s independently, a **16.08x speedup** and exact 16x ray-step reduction. Positions, normals, residuals, CSR indices, sparse $dx/d\lambda$ and $dn/d\lambda$, JVP, and VJP all agree with maximum error zero.
+
+The v0.8.9 compact-support infrastructure remains the production path. Exact forward AD is restricted to each chart's local basis union, and `SparseGraphBuilder` directly stores int32 columns plus float32 position/normal derivative blocks; no point-by-total-$K$ tensor is created. Full $K_{chart}=1024$ graph scaling is:
+
+| M | Emitters | nnz | Edges/emitter mean / p95 | Edges/ray | Graph MiB | CUDA alloc./reserved MiB | Build s |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 64 | 65,536 | 274,213 | 4.184 / 8 | 33.47 | 7.57 | 416.30 / 472 | 1,706.15 |
+| 256 | 262,144 | 1,096,667 | 4.183 / 8 | 66.94 | 30.28 | 497.00 / 526 | 1,726.67 |
+| 1,024 | 1,048,576 | 4,386,490 | 4.183 / 8 | 133.87 | 121.13 | 708.54 / 746 | 1,719.14 |
+
+Graph memory grows linearly with actual local edges while edges per emitter remain constant. `NO_DENSE_POINT_BY_LAMBDA_TENSOR`, `SHARED_RAY_NUMERICALLY_EQUIVALENT`, and `SPARSE_GEODESIC_GRAPH_PRESERVED` are true.
+
+### Coverage, stability, and fidelity
+
+At the primary $M=256$, $16\times16$, jitter-0.25 setting every angular sector and radial stratum is occupied. The largest angular gap is 0.58655 rad, below the bounded-jitter limit 0.58905 rad; nearest-neighbor chart distance falls from 0.07459 for Sobol to 0.04403. In the matched $M=256$ factorization ablation, $32\times8$, $16\times16$, and $8\times32$ have whole-image MSE 0.50382, 0.50926, and 0.53751 and normalized local-measure error 0.33055, 0.33762, and 0.38240. The selected primary limitation is therefore angular. AREA_STRATIFIED remains the selected radial rule: DISTANCE_STRATIFIED improves MSE slightly (0.50417 versus 0.50926) but loses both thin response and local-measure error.
+
+Eight-seed directional stability improves decisively under the primary 0.25 jitter:
+
+| M | Sobol cosine | Stratified cosine | Sobol response CV | Stratified response CV | Sobol image self-MSE | Stratified image self-MSE |
+|---:|---:|---:|---:|---:|---:|---:|
+| 64 | 0.61159 | 0.97156 | 0.01029 | 0.01609 | 5.59e-5 | 5.60e-4 |
+| 256 | 0.61297 | 0.99036 | 0.00723 | 0.01050 | 1.72e-6 | 7.60e-5 |
+| 1,024 | 0.61210 | **0.99748** | 0.000957 | 0.00415 | 4.91e-8 | 9.61e-6 |
+
+The improvement is directional, not a universal variance reduction: stratified response-norm CV and image self-MSE are worse than Sobol. Jitter 0, 0.10, 0.25, and 0.40 gives median response cosine 1.00000, 0.99799, 0.99036, and 0.97930. Stronger jitter slightly improves the high-frequency aliasing proxy and thin response, but worsens local-measure error, whole-image MSE, response CV, and image self-MSE. The aggregate rank therefore selects **zero jitter**; the nonzero primary 0.25 result is retained as the fair cross-seed test rather than replaced by that deterministic upper bound.
+
+The central hypothesis is only partly supported. At one million emitters, normalized mean local-measure error is 0.32818 for stratified versus 0.32780 for Sobol, and p95 local error is $1.89543\times10^{-4}$ versus $1.89304\times10^{-4}$, so `STRATIFICATION_IMPROVES_LOCAL_MEASURE_MATCH=false`. The thin-region mass error does improve slightly, from $7.92638\times10^{-5}$ to $7.87143\times10^{-5}$.
+
+At Full HD the stratified sampler raises thin response from 0.005889 to 0.006712 and high-frequency response from 0.15989 to 0.19380, so `STRATIFIED_SAMPLING_IMPROVES_THIN_FEATURE=true`. However, whole/foreground/silhouette MSE are respectively 17.41154/1243.99781/99.57055, slightly worse than Sobol's 17.35356/1242.80050/99.33049. Only two of five fidelity metrics improve, hence `FULLHD_STRATIFIED_SOURCE_BETTER=false`; the historical 0.75 thin-response target remains far away. The best declared configuration is $N_\theta=N_r=32$, AREA_STRATIFIED, zero jitter, but it does not justify geometry optimization or birth.
+
+The corrected formal Quadro RTX 5000 run takes 7,077.42 s. Full settings, all eight seeds, four jitter values, both radial schemes, exact digests, local-measure regions, resolution rows, sparse graphs, and verdict evidence are in the [JSON report](artifacts/v0810_stratified_geodesic_polar.json) and [CSV record](artifacts/v0810_stratified_geodesic_polar.csv). Twelve required figures use `figures/v0810_*.png`, including the [Full-HD four-view comparison](figures/v0810_fullhd_comparison.png).
 
 ## Limitations
 

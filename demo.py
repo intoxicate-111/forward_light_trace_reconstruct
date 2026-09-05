@@ -887,6 +887,20 @@ def run_million_emitter_analysis(
     )
 
 
+def run_stratified_geodesic_polar_analysis(
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    from zlt.mesh_field import obtain_stanford_bunny
+    from zlt.stratified_polar import run_stratified_geodesic_polar_experiment
+
+    mesh_path = args.bunny_mesh
+    if mesh_path is None:
+        mesh_path = obtain_stanford_bunny(args.bunny_cache)
+    return run_stratified_geodesic_polar_experiment(
+        mesh_path, args.bunny_artifacts, args.bunny_figures
+    )
+
+
 def run_multiview_analysis(args: argparse.Namespace) -> dict[str, object]:
     config = MultiviewConfig(
         resolution=(args.multiview_resolution[1], args.multiview_resolution[0]),
@@ -1267,6 +1281,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--geodesic-source-charts", action="store_true")
     parser.add_argument("--emitter-scaling", action="store_true")
     parser.add_argument("--million-emitter-streaming", action="store_true")
+    parser.add_argument("--stratified-geodesic-polar", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -1292,6 +1307,16 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.stratified_geodesic_polar:
+        report = run_stratified_geodesic_polar_analysis(args)
+        print("stratified_geodesic_polar:")
+        print(json.dumps(report["verdicts"], indent=2, sort_keys=True))
+        for key in (
+            "BEST_N_THETA", "BEST_N_R", "BEST_RADIAL_SCHEME",
+            "BEST_JITTER_FRACTION", "PRIMARY_LOCAL_SAMPLING_LIMIT",
+        ):
+            print(f"{key}={report[key]}")
+        return
     if args.million_emitter_streaming:
         report = run_million_emitter_analysis(args)
         print("sparse_geodesic_million_emitter_streaming:")
