@@ -1,0 +1,14 @@
+{
+  "strict_json": true,
+  "finite_values": true,
+  "energy_accounting": true,
+  "cache_digests": true,
+  "lambda_closure": true,
+  "csv_rows": 524,
+  "decoded_figures": 7,
+  "historical_files_unchanged": 324,
+  "compileall": true,
+  "demo_verify": true,
+  "git_diff_check": true,
+  "unit_tests": 24
+}

@@ -1,0 +1,9 @@
+{
+  "converged": true,
+  "finite_fullhd": true,
+  "strict_json_csv": true,
+  "figures_decode": true,
+  "historical_files_unchanged": 324,
+  "old_reference_unchanged": true,
+  "csv_rows": 180
+}

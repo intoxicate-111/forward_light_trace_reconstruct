@@ -1,0 +1,24 @@
+Base: 975f820fa7cba98a49c3f27fb6e3f487187a6464
+Tracked modifications:
+ .gitignore |  1 +
+ README.md  | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ demo.py    |  5 +++++
+ 3 files changed, 53 insertions(+)
+
+New files (not staged):
+artifacts/v0814_fixed_measure.csv
+artifacts/v0814_fixed_measure.json
+artifacts/v0814_validation.json
+figures/v0814_density_current.png
+figures/v0814_density_global.png
+figures/v0814_fullhd_comparison.png
+figures/v0814_gradient_error.png
+figures/v0814_lambda_density_difference.png
+figures/v0814_ring_crop.png
+figures/v0814_surface_emitters.png
+scripts/validate_v0814.py
+src/zlt/fixed_measure.py
+tests/test_fixed_measure.py
+
+Historical artifacts/figures unchanged: 324
+No commit or push performed by this task.

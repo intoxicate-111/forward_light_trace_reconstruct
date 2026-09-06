@@ -1,0 +1,15 @@
+{
+  "finite_arrays": true,
+  "strict_json_csv": true,
+  "source_mass_conserved": true,
+  "relative_emitted_rgb_range": 1.8114605917052273e-05,
+  "detector_energy_conserved": true,
+  "nested_source_identity": true,
+  "historical_files_unchanged": 340,
+  "figures_decoded": 7,
+  "compileall": true,
+  "demo_verify": true,
+  "unit_tests": 31,
+  "git_diff_check": true,
+  "csv_rows": 824
+}

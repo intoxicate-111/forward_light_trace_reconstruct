@@ -1671,6 +1671,79 @@ git diff --check
 
 The formal run used `MPLCONFIGDIR=/tmp/mpl-v0813 PYTHONPATH=src /home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/miniconda3/envs/test/bin/python -m zlt.density_matrix`, equivalent to the demo entry point above. Exact prior source/reference caches are required. Formal intermediate states and images live in ignored `runs/v0813_density_sparse/`; the interrupted initialization trial in `runs/v0813_density/` is excluded from the report. New evidence is confined to [JSON](artifacts/v0813_density_matrix.json), [CSV](artifacts/v0813_density_matrix.csv), and `figures/v0813_*.png`. Historical results are not edited. See the report's `sources`, `cells`, `axis_evidence`, `verdicts`, `commands` and `seed_list` for exact settings and measured runtime/VRAM logs.
 
+## v0.8.14: fixed global source measure versus geodesic charts
+
+**Reference superseded by v0.8.15 below.** The historical MSE/spatial-cosine numbers in this section use the inadequate 4,096-splat reference. They are retained for reproducibility, not valid evidence against source-measure bias or for a Full-HD geometry-bandwidth failure. Density and own-forward AD/FD checks do not depend on that reference.
+
+This diagnostic compares the unchanged E3C3 source with **4,194,304 persistent global emitters**, at 1920×1080 in all four views. It does not optimize geometry, perform birth, change the 64-coordinate geometry field/support, redesign geodesics, or retune transport/material/camera/capture parameters. The 1,024 chart centers are **not** 1,024 lambda parameters. Geometry probes use existing coordinates 0 and 17, with all other coefficients zero.
+
+The global source samples triangle area on a fixed marching-cubes approximation of the **existing scalar grid's zero surface**, using a scrambled three-dimensional Sobol sequence (seed 101). Triangle choice is area-CDF weighted and barycentric sampling is uniform within each triangle. Six fixed-normal attachment iterations push samples to the trilinear field. This is a precisely defined **reference-area measure pushed onto the field**, not a claim of exact uniform area on the interpolated surface or on every subsequent deformed surface. The mesh has 117,300 triangles and area 9.220094; maximum attachment displacement is 0.0023733 and maximum field residual is 4.265e-7. Sample IDs, face IDs, barycentric coordinates and normal-line attachments persist under lambda.
+
+Every global sample has equal weight. A single explicitly recorded normalization, **1.003437735**, matches the current total pre-view-selection RGB source budget `sum(w*color)=1.5489680757546012`; this normalization is fixed under lambda. The original position-color function, gate, lobe and transmission remain unchanged. Per-view post-gate/pre-transmission flux and detected energy are reported separately and are **not** artificially matched. The fixed scalar source weight sum therefore differs by that small normalization; equality of uncolored weight sums is not confused with equality of emitted RGB energy.
+
+Four-view reference MSE changes **17.328206 → 17.317575** and spatial gradient cosine changes **−0.000771 → 0.009192**. This is a small signed alignment improvement, not directional recovery. The global source visibly removes large chart-centered petals/rings in the matched crop, but retains sampling texture. Foreground MSE changes **1244.0902 → 1244.2447**. The same 4,096-splat hard reference remains untouched; it is not a dense visible-radiance oracle. Empty >8-pixel reference interiors are reported as null.
+
+Crucially, the historical cosine compares **spatial image gradients**, not `dI/dlambda`. External reference geometry-Jacobian columns are not available. The new own-forward test separately differentiates fixed-identity attachment, normals, color, gate/lobe, finite-packet attenuation and detector readout with respect to lambda and compares against central finite differences. It uses 1,024 persistent random global IDs and one Full-HD view, with 128-emitter AD blocks, not a dense million-emitter Jacobian. Full-HD forward fidelity uses the full 4.19-million sample budget; this bounded derivative test does not claim to validate every lambda column.
+
+Density probes use 8,192 identical reference-area locations and 17-nearest Euclidean neighbors, with weighted and unweighted density CV/quantiles. Curvature and nearby sheets can bias this approximate surface-area estimator. Lambda-density tests use 65,536 fixed IDs per method at ±0.001, including regenerated current geodesics, frozen current normal attachments, and global normal attachments. Fixed normal attachments can still change **Eulerian** density through shape motion; tangential motion and current-minus-frozen density derivatives isolate additional redistribution. Frozen current reattachment has a nonzero baseline correction, which is reported rather than assumed absent. Its reference-gradient improvement is not tested: the required false verdict means **not established**, not proof of no effect.
+
+Diagnostic subsets use reproducible random IDs (seeds 103/105/107), never power-of-two stride decimation of Sobol samples. Such decimation aliases digital sequence coordinates and was rejected during preflight; neither a biased density subset nor a null derivative is accepted as evidence. Full source sampling, transport and the Full-HD images were unaffected by this diagnostic correction.
+
+The measured weighted-density CV falls **0.29503 → 0.11124** (62.3% reduction); current density is moderately nonuniform, below the declared strong-CV threshold of .5. The mean foreground fraction without a center within .5 px changes **2.51% → 1.94%**: both methods have substantial projected coverage. At lambda 0/17, smoothed plus-minus density changes are **3.537% / 0.641%** for regenerated geodesics, **3.525% / 0.540%** for frozen current attachments, and **3.117% / 0.536%** for the global source. Current tangential displacement derivatives have RMS **0.01996 / 0.03113**, versus roundoff for the normal-line controls. Lambda therefore does control additional source redistribution, but most measured projected-density change is shared with surface motion. The current/frozen comparison is approximate: the frozen reattachment correction reaches 0.000426 at baseline, and current perturbed geodesic field residual reaches 0.000265; neither existing mapping nor integration was silently repaired.
+
+Own-forward closure passes all five epsilons from 1e-3 to 1e-5. At **epsilon=1e-5**, cosine is **0.9999999999999991**, relative L2 **4.78e-8**, norm ratio **0.9999999709**, and active-component sign agreement **100%**. This is a nonzero lambda-17 column, not a null-column pass. The current density/RGB high-pass correlation is **0.3382** (global **0.3342**), below the declared strong-association threshold .5; it does not independently establish a chart-density cause for the ring texture. Radial banding decreases 34.9%, but spatial gradient error decreases only 0.033%. The declared material alignment threshold is a signed cosine gain >.05; measured gain is only .009963.
+
+Required verdicts:
+
+```ini
+LAMBDA_CENTERED_EMISSION_HAS_STRONG_DENSITY_NONUNIFORMITY=false
+LAMBDA_PERTURBATION_CHANGES_EMITTER_DENSITY=true
+GLOBAL_FIXED_MEASURE_REDUCES_DENSITY_NONUNIFORMITY=true
+GLOBAL_FIXED_MEASURE_IMPROVES_REFERENCE_GRADIENT_ALIGNMENT=false
+FROZEN_EMITTER_LAYOUT_IMPROVES_REFERENCE_GRADIENT_ALIGNMENT=false
+GLOBAL_FORWARD_GRADIENT_PASSES_FINITE_DIFFERENCE_CLOSURE=true
+RING_FLOWER_STRUCTURE_CORRELATES_WITH_EMITTER_DENSITY=false
+LAMBDA_DEPENDENT_EMITTER_REDISTRIBUTION_IS_PRIMARY_LIMITATION=false
+PRIMARY_LIMITATION=OTHER
+```
+
+These are operational evidence thresholds, not universal no-effect claims: moderate nonuniformity/correlation and a small positive alignment change remain in the tables. **The experiment confirms coupling of geometry and source distribution, but does not establish that coupling as the main reason for reference-gradient mismatch.** Reference definition, transport formulation and geometry bandwidth are not separately isolated. In particular, absent external lambda-Jacobian reference data, no claim of recovered or unrecovered external *geometry*-gradient direction is justified from spatial cosine alone.
+
+The final cached-transport run takes **132.89 s**, including Full-HD metrics/density probes/figures; the initial global attachment and transport took **12.13 s / 21.50 s** separately. Readout takes **21.83 s**, peaking at **457.76 MiB** allocated CUDA; bounded lambda closure takes **9.18 s**, peaking at **803.73 MiB**. CPU peak is **4009.49 MiB**. Maximum detector-energy discrepancy is **3.55e-7 relative**. This timing excludes exploratory rejected subset runs and is not presented as an uncached end-to-end benchmark. Validation passes compileall, CPU demo verification, 24 unit tests, strict JSON/CSV and finite-state checks, seven decoded figures, source/detector energy checks, and byte-for-byte preservation of **324 historical artifacts/figures**. See [validation](artifacts/v0814_validation.json) and [git diff summary](artifacts/v0814_git_diff.txt).
+
+Run locally with the existing baseline caches:
+
+```bash
+OMP_NUM_THREADS=8 OPENBLAS_NUM_THREADS=8 MPLCONFIGDIR=/tmp/mpl-v0814 PYTHONPATH=src python demo.py --fixed-measure
+MPLCONFIGDIR=/tmp/mpl-v0814 PYTHONPATH=src python scripts/validate_v0814.py
+```
+
+Evidence: [JSON](artifacts/v0814_fixed_measure.json), [CSV](artifacts/v0814_fixed_measure.csv), and `figures/v0814_*.png`. Persistent identity, unchanged transport, energy-matched source and full images are cached in ignored `runs/v0814_fixed_measure/`. The historical artifacts remain immutable.
+
+## v0.8.15: dense matched-measure MSE reference
+
+The new Full-HD comparison replaces the 4,096-splat target, without changing either evaluated image. It integrates a **global uniform surface-area source** on the existing grid's fixed marching-cubes isosurface using an independent scrambled Sobol sequence (seed 211, distinct from the global candidate's seed 101). Each source's visibility comes from a CPU BVH camera-to-surface first hit, not the production soft transmission. First-hit triangle identity avoids a tuned ray-launch exclusion. The color function, outward gate .05, ambient .35, four orthographic views, source normalization, detector window 2.8, sensor gain 1.5 and C3 pixel-integrated cubic response remain matched to the evaluated images. The target is **accumulated surface-source energy, not point-sampled radiance**; no projected-area factor or reciprocal cosine is introduced.
+
+This is an independent hard-visibility reference, not the soft renderer grading itself. Its triangulated surface approximates the same scalar grid; it is not an exact trilinear zero-set intersection or a real-camera image. Thus a remaining discrepancy can include source-measure bias, hard-versus-soft visibility and the explicitly documented surface approximation. It must not automatically be assigned to geometry or an incorrect lambda Jacobian.
+
+Reference quadrature is doubled from 8,388,608 samples. Promotion requires **every view** to have <2% successive RGB relative L2 change and <10% spatial-gradient relative L2 change. These declared empirical tolerances are not an exact error bound. Unconverged output is saved only as `reference_candidate.npy`, never activated. Metrics use unclipped linear RGB; figures share one display exposure.
+
+The latest reference selector is [artifacts/mse_reference.json](artifacts/mse_reference.json); `zlt.dense_reference.load_mse_reference()` verifies its digest and refuses to fall back to the old sparse reference. New comparison results live in [v0815 JSON](artifacts/v0815_dense_reference.json) and [CSV](artifacts/v0815_dense_reference.csv), with [validation](artifacts/v0815_validation.json). Historical v0.8.12–v0.8.14 references/reports remain untouched; their old reproduction commands intentionally retain their original targets. Use the new command for current MSE evaluation:
+
+The activated reference uses **134,217,728 samples**, stored at `runs/v0815_dense_reference/reference.npy`. Compared with the preceding 67,108,864-sample level, per-view RGB relative changes are **0.662%–0.723%** and spatial-gradient relative changes **4.82%–5.98%**, passing the declared thresholds. These residual quadrature uncertainties should remain visible when interpreting small high-frequency differences. Source RGB energy differs from the matched baseline by only 2.29 ppm. Cumulative integration time is **452.01 s**, with final-invocation peak CUDA allocation **965.78 MiB**; the final resumed invocation takes 252.20 s including initialization, metrics and figures.
+
+| Unchanged candidate image | New whole-image MSE | New foreground MSE | Spatial-gradient cosine |
+|---|---:|---:|---:|
+| Current geodesic E3C3 | 0.03210933 | 0.11395669 | 0.47573680 |
+| Global fixed measure | 0.01847674 | 0.06557435 | 0.47258620 |
+
+The global method now has **42.46% lower MSE** than the geodesic source, while their spatial-gradient alignment is similar. Both cosines are far from the old near-zero values. **The images did not improve during this change; the reference was corrected.** The old near-zero-reference-alignment argument is withdrawn. This does not establish external lambda-gradient recovery, nor isolate all remaining hard/soft visibility error. Compileall, CPU demo verification, 28 unit tests (including independent foreground/occluded-surface BVH checks and Sobol continuation identity), finite-array/JSON/CSV checks and figure decoding pass. The old reference and all 324 committed historical artifact/figure files remain byte-identical; the uncommitted v0.8.14 comparison JSON/CSV are also hash-checked unchanged.
+
+```bash
+OMP_NUM_THREADS=8 OPENBLAS_NUM_THREADS=8 MPLCONFIGDIR=/tmp/mpl-v0815 PYTHONPATH=src python demo.py --dense-reference
+MPLCONFIGDIR=/tmp/mpl-v0815 PYTHONPATH=src python scripts/validate_v0815.py
+```
+
 ## Limitations
 
 v0.8 is one controlled Bunny run, not a general benchmark or a real-photo reconstruction. Its 20 direct Fibonacci packet directions are also its detector directions; it preserves a shared scene-centric transport state but does not validate arbitrary off-atlas cameras. The 8,192-element candidate dictionary is only a safety envelope. Visibility, ownership, and footprint topology remain frozen within each Jacobian cell. The 2×2 ablation changes the deterministic sampled target support with photon density, has no repeated stochastic trials, and uses a simplified one-shot K=1024 comparison; its signed effects are descriptive, not confidence intervals. In particular, a million attempted packets aggregated over 20 Full-HD views does not imply dense observations per pixel. The strict negative high-bandwidth verdict applies to this optimizer, dictionary, renderer approximation, and controlled target—not to every possible observation-driven birth method.

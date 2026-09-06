@@ -1,0 +1,8 @@
+{
+  "version": "0.8.15",
+  "path": "runs/v0815_dense_reference/reference.npy",
+  "digest": "374640130c0c52eec0dc935a1fc662ad6f40a53d6530b33df4d073513afdaea7",
+  "report": "artifacts/v0815_dense_reference.json",
+  "definition": "Uniform fixed grid-isosurface triangle-area measure; independent BVH first-hit hard visibility, unchanged position color, gate .05, ambient .35, source budget, sensor gain 1.5, window 2.8 and C3 pixel-integrated cubic readout. NOT point-sampled radiance. No soft transmission or chart pattern enters the target.",
+  "validated": true
+}

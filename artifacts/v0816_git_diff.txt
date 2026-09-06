@@ -1,0 +1,44 @@
+Cumulative working-tree diff, including pre-existing uncommitted v0814/v0815 work.
+HEAD: 975f820fa7cba98a49c3f27fb6e3f487187a6464
+ .gitignore |  3 +++
+ README.md  | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ demo.py    | 15 +++++++++++++
+ 3 files changed, 91 insertions(+)
+
+Untracked outputs/code:
+artifacts/mse_reference.json
+artifacts/v0814_fixed_measure.csv
+artifacts/v0814_fixed_measure.json
+artifacts/v0814_git_diff.txt
+artifacts/v0814_validation.json
+artifacts/v0815_dense_reference.csv
+artifacts/v0815_dense_reference.json
+artifacts/v0815_validation.json
+artifacts/v0816_global_sample_convergence.csv
+artifacts/v0816_global_sample_convergence.json
+artifacts/v0816_prior_evidence.md
+artifacts/v0816_validation.json
+figures/v0814_density_current.png
+figures/v0814_density_global.png
+figures/v0814_fullhd_comparison.png
+figures/v0814_gradient_error.png
+figures/v0814_lambda_density_difference.png
+figures/v0814_ring_crop.png
+figures/v0814_surface_emitters.png
+figures/v0815_dense_reference.png
+figures/v0816_global_sample_adjacent_rgb.png
+figures/v0816_global_sample_coverage.png
+figures/v0816_global_sample_full_views.png
+figures/v0816_global_sample_matched_crop.png
+figures/v0816_global_sample_mse.png
+figures/v0816_global_sample_residuals.png
+figures/v0816_global_sample_spacing.png
+scripts/validate_v0814.py
+scripts/validate_v0815.py
+scripts/validate_v0816.py
+src/zlt/dense_reference.py
+src/zlt/fixed_measure.py
+src/zlt/global_convergence.py
+tests/test_dense_reference.py
+tests/test_fixed_measure.py
+tests/test_global_convergence.py
