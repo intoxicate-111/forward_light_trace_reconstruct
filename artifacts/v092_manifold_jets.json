@@ -1,0 +1,3780 @@
+{
+  "version": "v092_manifold_jets",
+  "config": {
+    "operator": "v0817_CURRENT_fixed_measure_C3",
+    "h": 0.02455721885871518,
+    "epsilon": 0.02455721885871518,
+    "path_step": 0.01227860942935759,
+    "eta": 9.787458785644276e-07,
+    "kappa": 4.605170185988091,
+    "launch": 1.05,
+    "micro": 1,
+    "ambient": 0.35,
+    "gate_width": 0.05,
+    "gain": 1.5,
+    "extent": 2.8,
+    "capture": 4,
+    "resolution": [
+      64,
+      64
+    ],
+    "views": 4,
+    "count": 256,
+    "mass": 1.0034377352493191,
+    "seed": 101,
+    "base_grid_digest": "c262097d30d246d7437b6ae3736508e68189236e524ef0748013219b3f7859ca",
+    "source_dtype": "float64",
+    "transport_dtype": "float64",
+    "detector_dtype": "float64 diagnostic",
+    "precision_note": "As v0817; float64 detector in bounded FD diagnostics only.",
+    "stage": "REDUCED_COST_REPRESENTATION_VALIDATION",
+    "note": "Same CURRENT operator/constants/cameras/C3; only source count and resolution reduced, double detector for FD. Not Full-HD performance evidence. Fixed/birth pilot: 256 shared source IDs, not sampling-convergence evidence."
+  },
+  "fd": {
+    "passed": true,
+    "coefficients": [
+      {
+        "mode": "constant",
+        "norm": 117.51201614237932,
+        "steps": [
+          {
+            "epsilon": 0.001,
+            "relative_l2": 0.0001335870812801201,
+            "cosine": 0.9999999940722816,
+            "norm_ratio": 0.9999225985082061,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 0.0001,
+            "relative_l2": 1.3001482662201163e-06,
+            "cosine": 0.999999999999468,
+            "norm_ratio": 0.9999992087899032,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-05,
+            "relative_l2": 1.299213529920122e-08,
+            "cosine": 1.0000000000000009,
+            "norm_ratio": 0.9999999920983547,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-06,
+            "relative_l2": 1.137237032754515e-09,
+            "cosine": 1.0000000000000022,
+            "norm_ratio": 0.9999999998666205,
+            "sign_agreement": 1.0
+          }
+        ],
+        "resolved_intervals": [
+          [
+            0.0001,
+            1e-05
+          ],
+          [
+            1e-05,
+            1e-06
+          ]
+        ],
+        "passed": true
+      },
+      {
+        "mode": "u",
+        "norm": 25.154878135769838,
+        "steps": [
+          {
+            "epsilon": 0.001,
+            "relative_l2": 4.220133934730301e-06,
+            "cosine": 0.9999999999951023,
+            "norm_ratio": 0.9999971684544844,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 0.0001,
+            "relative_l2": 4.218443850466246e-08,
+            "cosine": 0.9999999999999953,
+            "norm_ratio": 0.9999999716732177,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-05,
+            "relative_l2": 6.942609061079777e-10,
+            "cosine": 0.9999999999999942,
+            "norm_ratio": 0.9999999996717212,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-06,
+            "relative_l2": 5.169404366981576e-09,
+            "cosine": 0.9999999999999982,
+            "norm_ratio": 1.0000000002434468,
+            "sign_agreement": 1.0
+          }
+        ],
+        "resolved_intervals": [
+          [
+            0.001,
+            0.0001
+          ],
+          [
+            0.0001,
+            1e-05
+          ],
+          [
+            1e-05,
+            1e-06
+          ]
+        ],
+        "passed": true
+      },
+      {
+        "mode": "v",
+        "norm": 23.811021503663206,
+        "steps": [
+          {
+            "epsilon": 0.001,
+            "relative_l2": 3.617807855757897e-05,
+            "cosine": 0.9999999993509423,
+            "norm_ratio": 1.000003276561778,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 0.0001,
+            "relative_l2": 1.7962885650232122e-07,
+            "cosine": 0.999999999999986,
+            "norm_ratio": 0.9999999421400317,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-05,
+            "relative_l2": 1.904233079708239e-09,
+            "cosine": 1.000000000000003,
+            "norm_ratio": 0.9999999993659525,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-06,
+            "relative_l2": 5.685950624206911e-09,
+            "cosine": 0.999999999999997,
+            "norm_ratio": 0.9999999997952179,
+            "sign_agreement": 1.0
+          }
+        ],
+        "resolved_intervals": [
+          [
+            0.001,
+            0.0001
+          ],
+          [
+            0.0001,
+            1e-05
+          ],
+          [
+            1e-05,
+            1e-06
+          ]
+        ],
+        "passed": true
+      },
+      {
+        "mode": "uu",
+        "norm": 8.986285729551907,
+        "steps": [
+          {
+            "epsilon": 0.001,
+            "relative_l2": 6.216993283561816e-07,
+            "cosine": 0.9999999999998954,
+            "norm_ratio": 0.9999995877387065,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 0.0001,
+            "relative_l2": 6.494619117788806e-09,
+            "cosine": 0.9999999999999994,
+            "norm_ratio": 0.9999999958690368,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-05,
+            "relative_l2": 1.8731895527530076e-08,
+            "cosine": 1.0000000000000024,
+            "norm_ratio": 0.9999999999961552,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-06,
+            "relative_l2": 1.4475413016854526e-08,
+            "cosine": 1.0000000000000053,
+            "norm_ratio": 0.9999999993131052,
+            "sign_agreement": 1.0
+          }
+        ],
+        "resolved_intervals": [
+          [
+            0.001,
+            0.0001
+          ],
+          [
+            0.0001,
+            1e-05
+          ],
+          [
+            1e-05,
+            1e-06
+          ]
+        ],
+        "passed": true
+      },
+      {
+        "mode": "uv",
+        "norm": 5.110260464663313,
+        "steps": [
+          {
+            "epsilon": 0.001,
+            "relative_l2": 8.984080125272771e-07,
+            "cosine": 0.9999999999996549,
+            "norm_ratio": 0.9999996580346003,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 0.0001,
+            "relative_l2": 9.03256992666774e-09,
+            "cosine": 0.9999999999999946,
+            "norm_ratio": 0.9999999965077617,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-05,
+            "relative_l2": 2.7166681686653745e-09,
+            "cosine": 0.9999999999999988,
+            "norm_ratio": 0.999999999964919,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-06,
+            "relative_l2": 2.580553543753462e-08,
+            "cosine": 1.0000000000000009,
+            "norm_ratio": 0.9999999997247155,
+            "sign_agreement": 1.0
+          }
+        ],
+        "resolved_intervals": [
+          [
+            0.001,
+            0.0001
+          ],
+          [
+            0.0001,
+            1e-05
+          ],
+          [
+            1e-05,
+            1e-06
+          ]
+        ],
+        "passed": true
+      },
+      {
+        "mode": "vv",
+        "norm": 8.272288300526995,
+        "steps": [
+          {
+            "epsilon": 0.001,
+            "relative_l2": 2.0887068855144204e-06,
+            "cosine": 0.9999999999979078,
+            "norm_ratio": 0.9999995770801466,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 0.0001,
+            "relative_l2": 1.0744574908580551e-08,
+            "cosine": 0.9999999999999976,
+            "norm_ratio": 0.9999999952627211,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-05,
+            "relative_l2": 1.5088148278267479e-09,
+            "cosine": 0.9999999999999979,
+            "norm_ratio": 0.9999999999458283,
+            "sign_agreement": 1.0
+          },
+          {
+            "epsilon": 1e-06,
+            "relative_l2": 1.5958942844446068e-08,
+            "cosine": 1.0000000000000027,
+            "norm_ratio": 0.9999999999080832,
+            "sign_agreement": 1.0
+          }
+        ],
+        "resolved_intervals": [
+          [
+            0.001,
+            0.0001
+          ],
+          [
+            0.0001,
+            1e-05
+          ],
+          [
+            1e-05,
+            1e-06
+          ]
+        ],
+        "passed": true
+      }
+    ]
+  },
+  "fixed": [
+    {
+      "trajectory": [
+        {
+          "iteration": 0,
+          "mse": 0.026096154011556776,
+          "geometry": {
+            "radial_mae": 0.011739758635213347,
+            "radial_p95": 0.023145096279821618,
+            "radial_max": 0.024913700189033605,
+            "min_gradient": 3.333333333333333,
+            "pole_mae": 0.012001493231047313,
+            "equator_mae": 0.011627168892871359
+          },
+          "gradient_percentiles": [
+            0.00010510715108291812,
+            0.012409082580056064,
+            0.02548547346573989,
+            0.047590482365803294
+          ],
+          "image_jacobian_nnz": 79228,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 9.754661604103076,
+          "damping": 0.0005423996738753587,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.013081585331073717
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 1,
+          "mse": 0.013081585331073717,
+          "geometry": {
+            "radial_mae": 0.0071455922107241995,
+            "radial_p95": 0.01861828146545269,
+            "radial_max": 0.021435804069955156,
+            "min_gradient": 3.1561949473302464,
+            "pole_mae": 0.006354952658243425,
+            "equator_mae": 0.0074856997277131365
+          },
+          "gradient_percentiles": [
+            1.749870161729675e-05,
+            0.0003988686065540623,
+            0.0010462667518018856,
+            0.004094818107805709
+          ],
+          "image_jacobian_nnz": 79026,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 9.572367825337057,
+          "damping": 0.0005655071683633033,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.013032653302317452
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 2,
+          "mse": 0.013032653302317452,
+          "geometry": {
+            "radial_mae": 0.007168492584021675,
+            "radial_p95": 0.018468096637288232,
+            "radial_max": 0.02123534749601208,
+            "min_gradient": 3.146815232035476,
+            "pole_mae": 0.006407783607891571,
+            "equator_mae": 0.0074957249368821114
+          },
+          "gradient_percentiles": [
+            7.407006112147429e-08,
+            6.268586644566304e-06,
+            1.9687317780352955e-05,
+            0.000200906286122942
+          ],
+          "image_jacobian_nnz": 79003,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 9.567415144589008,
+          "damping": 0.0005696335665696499,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.013032564153327852
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 3,
+          "mse": 0.013032564153327852,
+          "geometry": {
+            "radial_mae": 0.007169585065623457,
+            "radial_p95": 0.018459225023126313,
+            "radial_max": 0.021225304542936696,
+            "min_gradient": 3.146648932749356,
+            "pole_mae": 0.006408501509714234,
+            "equator_mae": 0.007496978550567648
+          },
+          "gradient_percentiles": [
+            1.1961878988119987e-08,
+            1.1666149469807882e-07,
+            4.952276773707488e-07,
+            1.204738530457176e-05
+          ],
+          "image_jacobian_nnz": 79034,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 9.567673544498934,
+          "damping": 0.0005698319943040964,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.013032563851089864
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 4,
+          "mse": 0.013032563851089864,
+          "geometry": {
+            "radial_mae": 0.0071696258510706625,
+            "radial_p95": 0.018458695471878717,
+            "radial_max": 0.021224704859062582,
+            "min_gradient": 3.1466449396190894,
+            "pole_mae": 0.006408508717282491,
+            "equator_mae": 0.007497033780130379
+          }
+        }
+      ],
+      "initial_mse": 0.026096154011556776,
+      "final_mse": 0.013032563851089864,
+      "geometry": {
+        "radial_mae": 0.0071696258510706625,
+        "radial_p95": 0.018458695471878717,
+        "radial_max": 0.021224704859062582,
+        "min_gradient": 3.1466449396190894,
+        "pole_mae": 0.006408508717282491,
+        "equator_mae": 0.007497033780130379
+      },
+      "seconds": 6.360714515903965,
+      "name": "scalar",
+      "budget": 12,
+      "centers": 12,
+      "scalar_dofs": 12,
+      "label": "fixed_scalar_12",
+      "topology": {
+        "grid": 64,
+        "components": 1,
+        "watertight": true,
+        "component_areas": [
+          12.676116385743747
+        ],
+        "radial_scan": {
+          "root_coverage": 1.0,
+          "radial_mae": 0.007424043319456068,
+          "radial_median": 0.005116853992149117,
+          "radial_p95": 0.02267341003047451,
+          "radial_max": 0.04117761335110126,
+          "signed_radial_bias": 0.004172581837138977,
+          "min_zeroset_gradient_norm": 3.1420494534967256,
+          "median_zeroset_gradient_norm": 3.334991662616079,
+          "multiple_crossing_fraction": 0.0,
+          "no_crossing_count": 0,
+          "directions": 512,
+          "scan_steps": 81
+        },
+        "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+      },
+      "coefficients": [
+        0.05452611825421999,
+        0.018262425354352,
+        0.04464940661590591,
+        -0.038532631895994,
+        -0.08956513478392564,
+        -0.08593407310145626,
+        -0.10042575138224354,
+        -0.1375832491676339,
+        -0.0037105581774186562,
+        0.06102405654680913,
+        -0.04348236423584635,
+        0.005153792926281514
+      ]
+    },
+    {
+      "trajectory": [
+        {
+          "iteration": 0,
+          "mse": 0.026096154011556776,
+          "geometry": {
+            "radial_mae": 0.011739758635213347,
+            "radial_p95": 0.023145096279821618,
+            "radial_max": 0.024913700189033605,
+            "min_gradient": 3.333333333333333,
+            "pole_mae": 0.012001493231047313,
+            "equator_mae": 0.011627168892871359
+          },
+          "gradient_percentiles": [
+            0.0032077678701039995,
+            0.04676573067944061,
+            0.09294134978097016,
+            0.16933008769566563
+          ],
+          "image_jacobian_nnz": 139399,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 11.352552327314793,
+          "damping": 0.0062423504504231665,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.01183824642635839
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 1,
+          "mse": 0.01183824642635839,
+          "geometry": {
+            "radial_mae": 0.0067871315329592515,
+            "radial_p95": 0.017865649212841526,
+            "radial_max": 0.020480031839223978,
+            "min_gradient": 3.291567515369107,
+            "pole_mae": 0.005973456480515611,
+            "equator_mae": 0.007137148175630537
+          },
+          "gradient_percentiles": [
+            0.0001810875508778658,
+            0.0012831293917342597,
+            0.00674074190267497,
+            0.02128588920146828
+          ],
+          "image_jacobian_nnz": 139357,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 12.834086527225926,
+          "damping": 0.006250794433811836,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.01168234526221891
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 2,
+          "mse": 0.01168234526221891,
+          "geometry": {
+            "radial_mae": 0.006784810844856932,
+            "radial_p95": 0.017614954953922013,
+            "radial_max": 0.02004059130447544,
+            "min_gradient": 3.287871420364428,
+            "pole_mae": 0.006082710664858015,
+            "equator_mae": 0.007086831592677695
+          },
+          "gradient_percentiles": [
+            5.478522876491517e-07,
+            4.213505047838078e-05,
+            0.00026664372588801127,
+            0.001243288467117204
+          ],
+          "image_jacobian_nnz": 139399,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 12.879869533261878,
+          "damping": 0.006243767049177102,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.011681934359366585
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 3,
+          "mse": 0.011681934359366585,
+          "geometry": {
+            "radial_mae": 0.006786606975590563,
+            "radial_p95": 0.017639652924593408,
+            "radial_max": 0.020014560728406794,
+            "min_gradient": 3.2876480348844854,
+            "pole_mae": 0.006086293882724353,
+            "equator_mae": 0.007087858976432452
+          },
+          "gradient_percentiles": [
+            1.9257577620601885e-07,
+            2.5583286639328654e-06,
+            1.136426931927501e-05,
+            8.614506608907137e-05
+          ],
+          "image_jacobian_nnz": 139396,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 12.88112936017932,
+          "damping": 0.006243594096390169,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.0116819326796187
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 4,
+          "mse": 0.0116819326796187,
+          "geometry": {
+            "radial_mae": 0.0067866770713517904,
+            "radial_p95": 0.01764529518486966,
+            "radial_max": 0.020012759489980603,
+            "min_gradient": 3.2876338201272137,
+            "pole_mae": 0.00608635232859779,
+            "equator_mae": 0.007087934083597925
+          }
+        }
+      ],
+      "initial_mse": 0.026096154011556776,
+      "final_mse": 0.0116819326796187,
+      "geometry": {
+        "radial_mae": 0.0067866770713517904,
+        "radial_p95": 0.01764529518486966,
+        "radial_max": 0.020012759489980603,
+        "min_gradient": 3.2876338201272137,
+        "pole_mae": 0.00608635232859779,
+        "equator_mae": 0.0070879340835979235
+      },
+      "seconds": 11.38026699400507,
+      "name": "p0",
+      "budget": 12,
+      "centers": 12,
+      "scalar_dofs": 12,
+      "label": "fixed_p0_12",
+      "topology": {
+        "grid": 64,
+        "components": 1,
+        "watertight": true,
+        "component_areas": [
+          12.691284548441818
+        ],
+        "radial_scan": {
+          "root_coverage": 1.0,
+          "radial_mae": 0.008007172219738817,
+          "radial_median": 0.005585170577615539,
+          "radial_p95": 0.02335037425920729,
+          "radial_max": 0.042598121285482904,
+          "signed_radial_bias": 0.0047577068055204425,
+          "min_zeroset_gradient_norm": 3.2853433139625854,
+          "median_zeroset_gradient_norm": 3.371979632467978,
+          "multiple_crossing_fraction": 0.0,
+          "no_crossing_count": 0,
+          "directions": 512,
+          "scan_steps": 81
+        },
+        "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+      },
+      "coefficients": [
+        -0.017169176117817125,
+        -0.00497794486308928,
+        -0.013292659760242536,
+        0.013350572836410965,
+        0.02892622389032685,
+        0.027713247473001128,
+        0.03284704824660616,
+        0.045927013316018894,
+        0.0005552129062724427,
+        -0.017959097674991157,
+        0.012023464365612866,
+        -0.004821052922999959
+      ]
+    },
+    {
+      "trajectory": [
+        {
+          "iteration": 0,
+          "mse": 0.026096154011556776,
+          "geometry": {
+            "radial_mae": 0.011739758635213347,
+            "radial_p95": 0.023145096279821618,
+            "radial_max": 0.024913700189033605,
+            "min_gradient": 3.333333333333333,
+            "pole_mae": 0.012001493231047313,
+            "equator_mae": 0.011627168892871359
+          },
+          "gradient_percentiles": [
+            3.704929438603497e-05,
+            0.011900525604806134,
+            0.038310044567928754,
+            0.0733400602746102
+          ],
+          "image_jacobian_nnz": 139998,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 106.4404327831172,
+          "damping": 0.00590629701716864,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.019197065872678328
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 1,
+          "mse": 0.019197065872678328,
+          "geometry": {
+            "radial_mae": 0.00954435634330081,
+            "radial_p95": 0.022368166631018965,
+            "radial_max": 0.024878441541652974,
+            "min_gradient": 3.1908135810586065,
+            "pole_mae": 0.010517613428747383,
+            "equator_mae": 0.009125692680846141
+          },
+          "gradient_percentiles": [
+            2.2723986790261746e-05,
+            0.0006034624677014197,
+            0.0029349026817524007,
+            0.0031411988167802593
+          ],
+          "image_jacobian_nnz": 139899,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 116.55621034607917,
+          "damping": 0.006206451120748003,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.019153390090165784
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 2,
+          "mse": 0.019153390090165784,
+          "geometry": {
+            "radial_mae": 0.009634064196683046,
+            "radial_p95": 0.022318803537729255,
+            "radial_max": 0.024878082517064026,
+            "min_gradient": 3.1821915953655884,
+            "pole_mae": 0.010495086600102468,
+            "equator_mae": 0.009263680257781954
+          },
+          "gradient_percentiles": [
+            2.6477314139297957e-06,
+            2.0357628228443576e-05,
+            0.00018852265438261154,
+            0.00032618098031604115
+          ],
+          "image_jacobian_nnz": 140032,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 117.30139633308376,
+          "damping": 0.0062083770505945565,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.01915281418389798
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 3,
+          "mse": 0.01915281418389798,
+          "geometry": {
+            "radial_mae": 0.0096457219365047,
+            "radial_p95": 0.022308162191357894,
+            "radial_max": 0.024878110612669202,
+            "min_gradient": 3.1811414052464326,
+            "pole_mae": 0.010493305420586569,
+            "equator_mae": 0.009281118985251606
+          },
+          "gradient_percentiles": [
+            6.528263955424613e-08,
+            2.1208078812668274e-06,
+            2.48464839281947e-05,
+            4.313870311403034e-05
+          ],
+          "image_jacobian_nnz": 140012,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 117.35679281845535,
+          "damping": 0.00620893950659512,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.019152802003288522
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 4,
+          "mse": 0.019152802003288522,
+          "geometry": {
+            "radial_mae": 0.009647371245498705,
+            "radial_p95": 0.02230597691129882,
+            "radial_max": 0.024878119903722462,
+            "min_gradient": 3.1810024862601116,
+            "pole_mae": 0.010493137284901243,
+            "equator_mae": 0.00928355010005739
+          }
+        }
+      ],
+      "initial_mse": 0.026096154011556776,
+      "final_mse": 0.019152802003288522,
+      "geometry": {
+        "radial_mae": 0.009647371245498705,
+        "radial_p95": 0.02230597691129882,
+        "radial_max": 0.024878119903722462,
+        "min_gradient": 3.1810024862601116,
+        "pole_mae": 0.010493137284901243,
+        "equator_mae": 0.00928355010005739
+      },
+      "seconds": 11.035217483062297,
+      "name": "p1",
+      "budget": 12,
+      "centers": 4,
+      "scalar_dofs": 12,
+      "label": "fixed_p1_12",
+      "topology": {
+        "grid": 64,
+        "components": 1,
+        "watertight": true,
+        "component_areas": [
+          12.570128144879261
+        ],
+        "radial_scan": {
+          "root_coverage": 1.0,
+          "radial_mae": 0.004247037889228978,
+          "radial_median": 0.001470387553490493,
+          "radial_p95": 0.016752139359268718,
+          "radial_max": 0.026972707552704644,
+          "signed_radial_bias": 6.031710943406234e-05,
+          "min_zeroset_gradient_norm": 3.1801572748406164,
+          "median_zeroset_gradient_norm": 3.3346049531305577,
+          "multiple_crossing_fraction": 0.0,
+          "no_crossing_count": 0,
+          "directions": 512,
+          "scan_steps": 81
+        },
+        "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+      },
+      "coefficients": [
+        0.006543958571134368,
+        0.1497528876617333,
+        0.008230112515269613,
+        -0.012318219883293301,
+        -0.044938500307379614,
+        -0.011716992814358994,
+        -0.001312083368520738,
+        0.06033941061894086,
+        -0.016137377363683775,
+        0.010450728053040115,
+        0.08829065222387575,
+        0.06554783075521259
+      ]
+    },
+    {
+      "trajectory": [
+        {
+          "iteration": 0,
+          "mse": 0.026096154011556776,
+          "geometry": {
+            "radial_mae": 0.011739758635213347,
+            "radial_p95": 0.023145096279821618,
+            "radial_max": 0.024913700189033605,
+            "min_gradient": 3.333333333333333,
+            "pole_mae": 0.012001493231047313,
+            "equator_mae": 0.011627168892871359
+          },
+          "gradient_percentiles": [
+            3.7049294386035044e-05,
+            0.0018875287262459517,
+            0.012835748249108252,
+            0.0733400602746102
+          ],
+          "image_jacobian_nnz": 138514,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 646.2628144843414,
+          "damping": 0.00590629701716864,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.02128666602687784
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 1,
+          "mse": 0.02128666602687784,
+          "geometry": {
+            "radial_mae": 0.0103897145967482,
+            "radial_p95": 0.022331990184824013,
+            "radial_max": 0.02487621022656472,
+            "min_gradient": 3.2410247690820744,
+            "pole_mae": 0.011396019594122652,
+            "equator_mae": 0.009956834793408354
+          },
+          "gradient_percentiles": [
+            1.1806895469203827e-05,
+            0.0004905081581321321,
+            0.0018303457486326907,
+            0.0024746386758445456
+          ],
+          "image_jacobian_nnz": 138375,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 656.8985382956938,
+          "damping": 0.006077183343832677,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.021046141620634923
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 2,
+          "mse": 0.021046141620634923,
+          "geometry": {
+            "radial_mae": 0.010529538737607357,
+            "radial_p95": 0.022057466756592627,
+            "radial_max": 0.0248736374300198,
+            "min_gradient": 3.2323026418422502,
+            "pole_mae": 0.011291607413267945,
+            "equator_mae": 0.010201721486066212
+          },
+          "gradient_percentiles": [
+            5.893911353157504e-06,
+            9.636359168862568e-05,
+            0.00029212414208694117,
+            0.0005045742732342435
+          ],
+          "image_jacobian_nnz": 138434,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 659.378301294625,
+          "damping": 0.00607535768665662,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.020997195680020075
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 3,
+          "mse": 0.020997195680020075,
+          "geometry": {
+            "radial_mae": 0.010601022366716192,
+            "radial_p95": 0.022042741084052152,
+            "radial_max": 0.02487256676475047,
+            "min_gradient": 3.2292960383674103,
+            "pole_mae": 0.011261281077321186,
+            "equator_mae": 0.010317000463271588
+          },
+          "gradient_percentiles": [
+            2.119508450839044e-06,
+            2.2145478965810903e-05,
+            0.00015536229852537565,
+            0.00024029396179834088
+          ],
+          "image_jacobian_nnz": 138400,
+          "image_jacobian_entries": 589824,
+          "regularized_condition": 660.60578746767,
+          "damping": 0.006076864578571122,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.02098372978817004
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 4,
+          "mse": 0.02098372978817004,
+          "geometry": {
+            "radial_mae": 0.010640248119982472,
+            "radial_p95": 0.022036423435440766,
+            "radial_max": 0.024872115209417123,
+            "min_gradient": 3.2279718345149004,
+            "pole_mae": 0.011247313571756422,
+            "equator_mae": 0.010379108232906527
+          }
+        }
+      ],
+      "initial_mse": 0.026096154011556776,
+      "final_mse": 0.02098372978817004,
+      "geometry": {
+        "radial_mae": 0.010640248119982472,
+        "radial_p95": 0.022036423435440766,
+        "radial_max": 0.024872115209417123,
+        "min_gradient": 3.2279718345149004,
+        "pole_mae": 0.011247313571756422,
+        "equator_mae": 0.010379108232906527
+      },
+      "seconds": 10.838806503918022,
+      "name": "p2",
+      "budget": 12,
+      "centers": 2,
+      "scalar_dofs": 12,
+      "label": "fixed_p2_12",
+      "topology": {
+        "grid": 64,
+        "components": 1,
+        "watertight": true,
+        "component_areas": [
+          12.584829318055094
+        ],
+        "radial_scan": {
+          "root_coverage": 1.0,
+          "radial_mae": 0.002996077570071506,
+          "radial_median": 0.00047955310474190327,
+          "radial_p95": 0.01592986204679625,
+          "radial_max": 0.030176932198446305,
+          "signed_radial_bias": 0.0006241668809934624,
+          "min_zeroset_gradient_norm": 3.224271883375611,
+          "median_zeroset_gradient_norm": 3.3365754804393775,
+          "multiple_crossing_fraction": 0.0,
+          "no_crossing_count": 0,
+          "directions": 512,
+          "scan_steps": 81
+        },
+        "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+      },
+      "coefficients": [
+        -0.016343254380239352,
+        0.149530291843651,
+        0.05848522489628384,
+        0.27203567078452523,
+        -0.10314805447398255,
+        0.18148626804869483,
+        -0.018335005478070144,
+        -0.06027833318549944,
+        -0.011365115904989082,
+        0.011255926119519996,
+        0.0065670543269637695,
+        0.16612035717090595
+      ]
+    },
+    {
+      "trajectory": [
+        {
+          "iteration": 0,
+          "mse": 0.026096154011556776,
+          "geometry": {
+            "radial_mae": 0.011739758635213347,
+            "radial_p95": 0.023145096279821618,
+            "radial_max": 0.024913700189033605,
+            "min_gradient": 3.333333333333333,
+            "pole_mae": 0.012001493231047313,
+            "equator_mae": 0.011627168892871359
+          },
+          "gradient_percentiles": [
+            0.00010510715108291812,
+            0.01352717003083962,
+            0.04578682764806328,
+            0.055668898550264384
+          ],
+          "image_jacobian_nnz": 156347,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 70.96118053061801,
+          "damping": 0.0005423996738753587,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.002689702571295277
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 1,
+          "mse": 0.002689702571295277,
+          "geometry": {
+            "radial_mae": 0.0032580868910020025,
+            "radial_p95": 0.009272415662904609,
+            "radial_max": 0.01434657515799631,
+            "min_gradient": 3.1823050069742957,
+            "pole_mae": 0.0033282315414405084,
+            "equator_mae": 0.00322791293522678
+          },
+          "gradient_percentiles": [
+            5.0823396147283926e-05,
+            0.0004972411664729611,
+            0.0035181441698651176,
+            0.0056352828629269575
+          ],
+          "image_jacobian_nnz": 156635,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 69.45732737789275,
+          "damping": 0.0005313227876384725,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.0025686522344752147
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 2,
+          "mse": 0.0025686522344752147,
+          "geometry": {
+            "radial_mae": 0.0032403178823782776,
+            "radial_p95": 0.009106971438615719,
+            "radial_max": 0.013657763955770008,
+            "min_gradient": 3.1704906044713015,
+            "pole_mae": 0.003360501070567676,
+            "equator_mae": 0.003188618969023062
+          },
+          "gradient_percentiles": [
+            1.6562727425804104e-07,
+            8.338073395867157e-06,
+            3.847944063540241e-05,
+            5.390009822059212e-05
+          ],
+          "image_jacobian_nnz": 156496,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 69.59049859252899,
+          "damping": 0.0005371279842330818,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.0025686276754140662
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 3,
+          "mse": 0.0025686276754140662,
+          "geometry": {
+            "radial_mae": 0.003242087863953613,
+            "radial_p95": 0.00908882903146685,
+            "radial_max": 0.01364485041728769,
+            "min_gradient": 3.1703245076400774,
+            "pole_mae": 0.003363231316351922,
+            "equator_mae": 0.00318997587605043
+          },
+          "gradient_percentiles": [
+            1.2047176294636907e-08,
+            1.7349243202887083e-07,
+            6.69777491186886e-07,
+            1.0000989067946452e-06
+          ],
+          "image_jacobian_nnz": 156496,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 69.5981268957502,
+          "damping": 0.0005371933041177898,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.0025686276625210593
+            },
+            {
+              "alpha": 0.5,
+              "mse": 0.002568627665924249
+            },
+            {
+              "alpha": 0.25,
+              "mse": 0.002568627669908257
+            },
+            {
+              "alpha": 0.125,
+              "mse": 0.002568627672470533
+            },
+            {
+              "alpha": 0.0625,
+              "mse": 0.0025686276738945166
+            }
+          ],
+          "accepted": false
+        }
+      ],
+      "initial_mse": 0.026096154011556776,
+      "final_mse": 0.0025686276754140662,
+      "geometry": {
+        "radial_mae": 0.003242087863953613,
+        "radial_p95": 0.00908882903146685,
+        "radial_max": 0.01364485041728769,
+        "min_gradient": 3.1703245076400774,
+        "pole_mae": 0.003363231316351922,
+        "equator_mae": 0.00318997587605043
+      },
+      "seconds": 9.046959230909124,
+      "name": "scalar",
+      "budget": 24,
+      "centers": 24,
+      "scalar_dofs": 24,
+      "label": "fixed_scalar_24",
+      "topology": {
+        "grid": 64,
+        "components": 1,
+        "watertight": true,
+        "component_areas": [
+          12.759819789331985
+        ],
+        "radial_scan": {
+          "root_coverage": 1.0,
+          "radial_mae": 0.010649433253873014,
+          "radial_median": 0.009704946406055015,
+          "radial_p95": 0.022687793865843252,
+          "radial_max": 0.0370825063229856,
+          "signed_radial_bias": 0.007506789602304281,
+          "min_zeroset_gradient_norm": 3.1633635691265534,
+          "median_zeroset_gradient_norm": 3.3169349174670444,
+          "multiple_crossing_fraction": 0.0,
+          "no_crossing_count": 0,
+          "directions": 512,
+          "scan_steps": 81
+        },
+        "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+      },
+      "coefficients": [
+        0.045816000066905206,
+        0.020465099211633635,
+        0.0399680387693233,
+        0.00025968083318943155,
+        -0.07175049373889618,
+        -0.06478914315709453,
+        -0.06452559983675396,
+        -0.11855127943968655,
+        -0.012252281623453836,
+        -0.013665588945304062,
+        -0.032524024592070405,
+        -0.010836544529465076,
+        -0.078631340811945,
+        -0.07462961469989084,
+        -0.06762469730204879,
+        -0.06790370626343303,
+        -0.030160417742582088,
+        -0.07509022907877484,
+        -0.02039605131700786,
+        -0.0031547506961485416,
+        -0.013185308368997789,
+        0.017253723741170693,
+        0.057071726905001584,
+        0.06588491195124341
+      ]
+    },
+    {
+      "trajectory": [
+        {
+          "iteration": 0,
+          "mse": 0.026096154011556776,
+          "geometry": {
+            "radial_mae": 0.011739758635213347,
+            "radial_p95": 0.023145096279821618,
+            "radial_max": 0.024913700189033605,
+            "min_gradient": 3.333333333333333,
+            "pole_mae": 0.012001493231047313,
+            "equator_mae": 0.011627168892871359
+          },
+          "gradient_percentiles": [
+            0.0032077678701039982,
+            0.049507247127991316,
+            0.1631740626063872,
+            0.19850595560029685
+          ],
+          "image_jacobian_nnz": 278698,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 91.9091260026968,
+          "damping": 0.0062423504504231665,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.002351281906105332
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 1,
+          "mse": 0.002351281906105332,
+          "geometry": {
+            "radial_mae": 0.0030771123915792056,
+            "radial_p95": 0.008669270001073525,
+            "radial_max": 0.013068793799406953,
+            "min_gradient": 3.2797716225445472,
+            "pole_mae": 0.0030098456797167774,
+            "equator_mae": 0.003106048351430642
+          },
+          "gradient_percentiles": [
+            0.00015209227883116879,
+            0.002649799350294349,
+            0.018719028554321438,
+            0.024527672867407677
+          ],
+          "image_jacobian_nnz": 280620,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 102.07145766010939,
+          "damping": 0.00621593792844704,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.0020642754332057256
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 2,
+          "mse": 0.0020642754332057256,
+          "geometry": {
+            "radial_mae": 0.002927244248045839,
+            "radial_p95": 0.00802212510714364,
+            "radial_max": 0.011923139411980976,
+            "min_gradient": 3.2768823471666417,
+            "pole_mae": 0.002989733414370402,
+            "equator_mae": 0.0029003634334816416
+          },
+          "gradient_percentiles": [
+            2.345208010290477e-06,
+            3.631430484430057e-05,
+            0.0003134115689516782,
+            0.000402353505438764
+          ],
+          "image_jacobian_nnz": 281129,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 102.7555928366045,
+          "damping": 0.006218884754224486,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.0020641671272695816
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 3,
+          "mse": 0.0020641671272695816,
+          "geometry": {
+            "radial_mae": 0.002929514225031882,
+            "radial_p95": 0.008057660876594683,
+            "radial_max": 0.01190870763343943,
+            "min_gradient": 3.27679308799119,
+            "pole_mae": 0.0029919947492728733,
+            "equator_mae": 0.002902637128012014
+          },
+          "gradient_percentiles": [
+            6.735441412104433e-09,
+            6.160108912130046e-07,
+            4.302939632810984e-06,
+            6.804421261098424e-06
+          ],
+          "image_jacobian_nnz": 281129,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 102.77518946754684,
+          "damping": 0.006219114785575692,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.0020641670886277098
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 4,
+          "mse": 0.0020641670886277098,
+          "geometry": {
+            "radial_mae": 0.0029295714512503714,
+            "radial_p95": 0.008057404619073637,
+            "radial_max": 0.011908441613207366,
+            "min_gradient": 3.276791180941604,
+            "pole_mae": 0.0029920711124699737,
+            "equator_mae": 0.0029026861221223862
+          }
+        }
+      ],
+      "initial_mse": 0.026096154011556776,
+      "final_mse": 0.0020641670886277098,
+      "geometry": {
+        "radial_mae": 0.002929571451250372,
+        "radial_p95": 0.008057404619073637,
+        "radial_max": 0.011908441613207366,
+        "min_gradient": 3.276791180941604,
+        "pole_mae": 0.0029920711124699737,
+        "equator_mae": 0.0029026861221223867
+      },
+      "seconds": 11.491688045905903,
+      "name": "p0",
+      "budget": 24,
+      "centers": 24,
+      "scalar_dofs": 24,
+      "label": "fixed_p0_24",
+      "topology": {
+        "grid": 64,
+        "components": 1,
+        "watertight": true,
+        "component_areas": [
+          12.763756664925655
+        ],
+        "radial_scan": {
+          "root_coverage": 1.0,
+          "radial_mae": 0.010866895592820898,
+          "radial_median": 0.01006559395136708,
+          "radial_p95": 0.022598951875079255,
+          "radial_max": 0.036521477908900035,
+          "signed_radial_bias": 0.007651325785464271,
+          "min_zeroset_gradient_norm": 3.2703067921872604,
+          "median_zeroset_gradient_norm": 3.400056741122727,
+          "multiple_crossing_fraction": 0.0,
+          "no_crossing_count": 0,
+          "directions": 512,
+          "scan_steps": 81
+        },
+        "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+      },
+      "coefficients": [
+        -0.015040743509089644,
+        -0.006663826011751647,
+        -0.011905723672114546,
+        -0.0010236980442097031,
+        0.022606644704833923,
+        0.01918780344054575,
+        0.01925180363870672,
+        0.03749002238375694,
+        0.0027528470238651365,
+        0.0038233589259606842,
+        0.00854383960595698,
+        0.003565592607408802,
+        0.024448840135201266,
+        0.02252071199416382,
+        0.02062234517002821,
+        0.020216568462833616,
+        0.007919697111819252,
+        0.02273069236744292,
+        0.005680909171571906,
+        -0.0017815432465933911,
+        0.002559948204414044,
+        -0.005513811172452742,
+        -0.01674210964596352,
+        -0.01882276222241657
+      ]
+    },
+    {
+      "trajectory": [
+        {
+          "iteration": 0,
+          "mse": 0.026096154011556776,
+          "geometry": {
+            "radial_mae": 0.011739758635213347,
+            "radial_p95": 0.023145096279821618,
+            "radial_max": 0.024913700189033605,
+            "min_gradient": 3.333333333333333,
+            "pole_mae": 0.012001493231047313,
+            "equator_mae": 0.011627168892871359
+          },
+          "gradient_percentiles": [
+            3.7049294386035186e-05,
+            0.011900525604806134,
+            0.06796797613008246,
+            0.16933008769566563
+          ],
+          "image_jacobian_nnz": 279928,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 212.64098057380812,
+          "damping": 0.0062423504504231665,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.006893136673016859
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 1,
+          "mse": 0.006893136673016859,
+          "geometry": {
+            "radial_mae": 0.005266261228157689,
+            "radial_p95": 0.014314932224556508,
+            "radial_max": 0.018444750068191018,
+            "min_gradient": 3.2139652914163377,
+            "pole_mae": 0.005324425239750471,
+            "equator_mae": 0.005241240955014426
+          },
+          "gradient_percentiles": [
+            1.735499425048619e-05,
+            0.001130154477812314,
+            0.005966727502300456,
+            0.027580353005377745
+          ],
+          "image_jacobian_nnz": 280842,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 205.8130048530482,
+          "damping": 0.006184766592755701,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.006496226356410145
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 2,
+          "mse": 0.006496226356410145,
+          "geometry": {
+            "radial_mae": 0.005224451087862347,
+            "radial_p95": 0.013678303375025224,
+            "radial_max": 0.018117747740106438,
+            "min_gradient": 3.200236793453774,
+            "pole_mae": 0.00533017175445475,
+            "equator_mae": 0.00517897348268014
+          },
+          "gradient_percentiles": [
+            2.520649030404489e-06,
+            4.857269967958961e-05,
+            0.00022237465257623297,
+            0.0007000026951894069
+          ],
+          "image_jacobian_nnz": 280839,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 205.94528612089965,
+          "damping": 0.006191426424932377,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.006492869468861458
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 3,
+          "mse": 0.006492869468861458,
+          "geometry": {
+            "radial_mae": 0.005254356134005999,
+            "radial_p95": 0.013708241426767576,
+            "radial_max": 0.01808009722841053,
+            "min_gradient": 3.1972139299790903,
+            "pole_mae": 0.005345870346286728,
+            "equator_mae": 0.005214989685147808
+          },
+          "gradient_percentiles": [
+            2.1326589541536752e-10,
+            3.87211420794307e-06,
+            3.195499152698615e-05,
+            6.588638982736945e-05
+          ],
+          "image_jacobian_nnz": 280631,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 206.03749721261158,
+          "damping": 0.006192195909527324,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.006492756379545135
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 4,
+          "mse": 0.006492756379545135,
+          "geometry": {
+            "radial_mae": 0.0052607030453525215,
+            "radial_p95": 0.013716842905899794,
+            "radial_max": 0.018074403327407174,
+            "min_gradient": 3.1965650770050003,
+            "pole_mae": 0.005348610089533369,
+            "equator_mae": 0.005222888283330593
+          }
+        }
+      ],
+      "initial_mse": 0.026096154011556776,
+      "final_mse": 0.006492756379545135,
+      "geometry": {
+        "radial_mae": 0.005260703045352521,
+        "radial_p95": 0.013716842905899794,
+        "radial_max": 0.018074403327407174,
+        "min_gradient": 3.1965650770050003,
+        "pole_mae": 0.005348610089533369,
+        "equator_mae": 0.005222888283330591
+      },
+      "seconds": 11.027022068854421,
+      "name": "p1",
+      "budget": 24,
+      "centers": 8,
+      "scalar_dofs": 24,
+      "label": "fixed_p1_24",
+      "topology": {
+        "grid": 64,
+        "components": 1,
+        "watertight": true,
+        "component_areas": [
+          12.704821598054263
+        ],
+        "radial_scan": {
+          "root_coverage": 1.0,
+          "radial_mae": 0.008994292411844592,
+          "radial_median": 0.007394230833233095,
+          "radial_p95": 0.02339751151856031,
+          "radial_max": 0.03935298457545322,
+          "signed_radial_bias": 0.005182721857389046,
+          "min_zeroset_gradient_norm": 3.193108227380213,
+          "median_zeroset_gradient_norm": 3.383691272269661,
+          "multiple_crossing_fraction": 0.0,
+          "no_crossing_count": 0,
+          "directions": 512,
+          "scan_steps": 81
+        },
+        "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+      },
+      "coefficients": [
+        0.012272676259608256,
+        0.13315070228963352,
+        -0.02075082647984291,
+        -0.013314139227945563,
+        -0.03619482348049816,
+        -0.01355630377696678,
+        -0.00282169670705337,
+        0.05828424624188492,
+        -0.01653303325432243,
+        0.009204899975475031,
+        0.07729244192484955,
+        0.06909650152004765,
+        0.027362527956177163,
+        0.007709348260106625,
+        -0.008895100902000894,
+        0.026315706155113357,
+        -0.026448815980283674,
+        -0.010257214733632261,
+        0.016314347436953806,
+        0.13782723686708934,
+        -0.04357238473061704,
+        0.03941677184343863,
+        -0.08275363391447867,
+        -0.0275175992138608
+      ]
+    },
+    {
+      "trajectory": [
+        {
+          "iteration": 0,
+          "mse": 0.026096154011556776,
+          "geometry": {
+            "radial_mae": 0.011739758635213347,
+            "radial_p95": 0.023145096279821618,
+            "radial_max": 0.024913700189033605,
+            "min_gradient": 3.333333333333333,
+            "pole_mae": 0.012001493231047313,
+            "equator_mae": 0.011627168892871359
+          },
+          "gradient_percentiles": [
+            3.704929438603476e-05,
+            0.0031755177304493686,
+            0.01976287017266527,
+            0.0733400602746102
+          ],
+          "image_jacobian_nnz": 279497,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 809.3882221639429,
+          "damping": 0.00590629701716864,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.01701012966123989
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 1,
+          "mse": 0.01701012966123989,
+          "geometry": {
+            "radial_mae": 0.008956889565500802,
+            "radial_p95": 0.02190855162514229,
+            "radial_max": 0.0248473212865008,
+            "min_gradient": 3.210214696070357,
+            "pole_mae": 0.009366837281421292,
+            "equator_mae": 0.008780543341333887
+          },
+          "gradient_percentiles": [
+            6.985309122620579e-05,
+            0.0005548611600165201,
+            0.0016749744379599958,
+            0.004220710902199051
+          ],
+          "image_jacobian_nnz": 280645,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 826.425316269924,
+          "damping": 0.006073800382848976,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.01659489536947957
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 2,
+          "mse": 0.01659489536947957,
+          "geometry": {
+            "radial_mae": 0.00905311986873604,
+            "radial_p95": 0.02168819547855283,
+            "radial_max": 0.024837237807631807,
+            "min_gradient": 3.19144760917488,
+            "pole_mae": 0.009080378981219776,
+            "equator_mae": 0.009041393881801696
+          },
+          "gradient_percentiles": [
+            5.207278140189259e-06,
+            6.569636968974609e-05,
+            0.00028551435038936314,
+            0.0005807897610353819
+          ],
+          "image_jacobian_nnz": 279661,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 826.4828301258397,
+          "damping": 0.006054492420513611,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.016525724585613952
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 3,
+          "mse": 0.016525724585613952,
+          "geometry": {
+            "radial_mae": 0.00911143591079237,
+            "radial_p95": 0.02151456231511456,
+            "radial_max": 0.024834052511550908,
+            "min_gradient": 3.179517150686613,
+            "pole_mae": 0.009011913169482487,
+            "equator_mae": 0.009154247369344665
+          },
+          "gradient_percentiles": [
+            1.3529069393216028e-07,
+            1.6691305822895972e-05,
+            0.0001096978309756358,
+            0.0002881417177600033
+          ],
+          "image_jacobian_nnz": 279563,
+          "image_jacobian_entries": 1179648,
+          "regularized_condition": 826.4371121702452,
+          "damping": 0.006050758065880334,
+          "trials": [
+            {
+              "alpha": 1.0,
+              "mse": 0.0165092402193912
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 4,
+          "mse": 0.0165092402193912,
+          "geometry": {
+            "radial_mae": 0.00914171703613709,
+            "radial_p95": 0.021498305383456186,
+            "radial_max": 0.024833058764872185,
+            "min_gradient": 3.1724674020144796,
+            "pole_mae": 0.008992657426326996,
+            "equator_mae": 0.009205837650412944
+          }
+        }
+      ],
+      "initial_mse": 0.026096154011556776,
+      "final_mse": 0.0165092402193912,
+      "geometry": {
+        "radial_mae": 0.00914171703613709,
+        "radial_p95": 0.021498305383456186,
+        "radial_max": 0.024833058764872185,
+        "min_gradient": 3.1724674020144796,
+        "pole_mae": 0.008992657426326996,
+        "equator_mae": 0.009205837650412944
+      },
+      "seconds": 10.82547939592041,
+      "name": "p2",
+      "budget": 24,
+      "centers": 4,
+      "scalar_dofs": 24,
+      "label": "fixed_p2_24",
+      "topology": {
+        "grid": 64,
+        "components": 1,
+        "watertight": true,
+        "component_areas": [
+          12.624671252685037
+        ],
+        "radial_scan": {
+          "root_coverage": 1.0,
+          "radial_mae": 0.005168129658507323,
+          "radial_median": 0.003047182291993966,
+          "radial_p95": 0.01782257189905042,
+          "radial_max": 0.027454898749055934,
+          "signed_radial_bias": 0.002141166210748234,
+          "min_zeroset_gradient_norm": 3.170296052128353,
+          "median_zeroset_gradient_norm": 3.35338871239944,
+          "multiple_crossing_fraction": 0.0,
+          "no_crossing_count": 0,
+          "directions": 512,
+          "scan_steps": 81
+        },
+        "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+      },
+      "coefficients": [
+        -0.01863390398744739,
+        0.1221685356316884,
+        0.032829650303558444,
+        0.3251102915157775,
+        -0.03230094802113717,
+        0.1754932326269366,
+        -0.01867704468280124,
+        -0.06037111617905915,
+        -0.011821937529779896,
+        0.022273869166485535,
+        0.022121821935777768,
+        0.16000615340671237,
+        -0.009376003160477351,
+        0.08361789988019444,
+        -0.030406194759411854,
+        0.046590784138926984,
+        -0.03602932196286934,
+        0.12035262369027598,
+        -0.00366105072613546,
+        0.08083187602753882,
+        0.06418263397326004,
+        0.1812857223541084,
+        -0.00749642762290407,
+        0.2216385124421414
+      ]
+    }
+  ],
+  "birth": [
+    {
+      "policy": "loss_driven",
+      "sequence": [
+        {
+          "trajectory": [
+            {
+              "iteration": 0,
+              "mse": 0.026096154011556776,
+              "geometry": {
+                "radial_mae": 0.011739758635213347,
+                "radial_p95": 0.023145096279821618,
+                "radial_max": 0.024913700189033605,
+                "min_gradient": 3.333333333333333,
+                "pole_mae": 0.012001493231047313,
+                "equator_mae": 0.011627168892871359
+              },
+              "gradient_percentiles": [
+                0.001181535494899533,
+                0.002476420992018327,
+                0.009009762393391144,
+                0.01306955391018378
+              ],
+              "image_jacobian_nnz": 72776,
+              "image_jacobian_entries": 294912,
+              "regularized_condition": 308.4703357141682,
+              "damping": 0.0014092058048491857,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.023014987337971766
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 1,
+              "mse": 0.023014987337971766,
+              "geometry": {
+                "radial_mae": 0.01112116522974355,
+                "radial_p95": 0.022224714974544278,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.2344620262340924,
+                "pole_mae": 0.011551417893489692,
+                "equator_mae": 0.010936084474947726
+              },
+              "gradient_percentiles": [
+                0.00018433787209646145,
+                0.0005223808769399481,
+                0.0019551851530531725,
+                0.002557556237337787
+              ],
+              "image_jacobian_nnz": 72527,
+              "image_jacobian_entries": 294912,
+              "regularized_condition": 306.5153127260095,
+              "damping": 0.0013526155593240484,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.022937763951653412
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 2,
+              "mse": 0.022937763951653412,
+              "geometry": {
+                "radial_mae": 0.011218177724352716,
+                "radial_p95": 0.02220472209799794,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.227526244172101,
+                "pole_mae": 0.011512030635339277,
+                "equator_mae": 0.011091771723537269
+              },
+              "gradient_percentiles": [
+                1.5252541868941416e-05,
+                8.857220918291664e-05,
+                0.0001255069057205425,
+                0.0001314802679682988
+              ],
+              "image_jacobian_nnz": 72630,
+              "image_jacobian_entries": 294912,
+              "regularized_condition": 306.37826419987437,
+              "damping": 0.0013423409262359287,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.02293502220342052
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 3,
+              "mse": 0.02293502220342052,
+              "geometry": {
+                "radial_mae": 0.011241778118620762,
+                "radial_p95": 0.02220472209799794,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.226283660412736,
+                "pole_mae": 0.011505145568842618,
+                "equator_mae": 0.011128485975229238
+              }
+            }
+          ],
+          "initial_mse": 0.026096154011556776,
+          "final_mse": 0.02293502220342052,
+          "geometry": {
+            "radial_mae": 0.011241778118620762,
+            "radial_p95": 0.02220472209799794,
+            "radial_max": 0.024883299127019587,
+            "min_gradient": 3.226283660412736,
+            "pole_mae": 0.011505145568842618,
+            "equator_mae": 0.011128485975229238
+          },
+          "seconds": 8.682912105927244,
+          "stage": 0,
+          "centers": 1,
+          "dofs": 6,
+          "chosen": [
+            0
+          ],
+          "topology": {
+            "grid": 64,
+            "components": 1,
+            "watertight": true,
+            "component_areas": [
+              12.591124394678138
+            ],
+            "radial_scan": {
+              "root_coverage": 1.0,
+              "radial_mae": 0.0020658116981991347,
+              "radial_median": 7.163293047618424e-07,
+              "radial_p95": 0.014869447198070795,
+              "radial_max": 0.031101644193040623,
+              "signed_radial_bias": 0.0009486353026502972,
+              "min_zeroset_gradient_norm": 3.2234428126698607,
+              "median_zeroset_gradient_norm": 3.3333333333357595,
+              "multiple_crossing_fraction": 0.0,
+              "no_crossing_count": 0,
+              "directions": 512,
+              "scan_steps": 81
+            },
+            "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+          },
+          "label": "birth_loss_driven_0",
+          "candidate_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "predicted_reduction": [
+            0.0009489530290343444,
+            0.0003958075310732699,
+            0.001730526807956191,
+            0.0011986104403154214,
+            0.0025741794956524807,
+            0.0031321153401588143,
+            0.0016935912359305073
+          ],
+          "damping": [
+            0.005906296971611829,
+            0.0030458591826959423,
+            0.003854277445175061,
+            0.0019826566694635915,
+            0.0033994004737245673,
+            0.005747594363823968,
+            0.00131134173015575
+          ],
+          "selected": 6,
+          "score_definition": "Full 6x6 block GN prediction for 0.5 MSE"
+        },
+        {
+          "trajectory": [
+            {
+              "iteration": 0,
+              "mse": 0.02293502220342052,
+              "geometry": {
+                "radial_mae": 0.011241778118620763,
+                "radial_p95": 0.02220472209799794,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.226283660412736,
+                "pole_mae": 0.011505145568842618,
+                "equator_mae": 0.011128485975229236
+              },
+              "gradient_percentiles": [
+                2.4861044193280853e-06,
+                0.00019950881521686297,
+                0.023800342197212936,
+                0.09104924329534377
+              ],
+              "image_jacobian_nnz": 143784,
+              "image_jacobian_entries": 589824,
+              "regularized_condition": 951.9652316250335,
+              "damping": 0.005747594363823968,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.015759971602087645
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 1,
+              "mse": 0.015759971602087645,
+              "geometry": {
+                "radial_mae": 0.009862750380584475,
+                "radial_p95": 0.021009391229161685,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.2396230730946254,
+                "pole_mae": 0.011149383615149918,
+                "equator_mae": 0.009309282452866378
+              },
+              "gradient_percentiles": [
+                5.110356530213566e-05,
+                0.0004903692311989694,
+                0.0029259872228834523,
+                0.009273580149421699
+              ],
+              "image_jacobian_nnz": 143475,
+              "image_jacobian_entries": 589824,
+              "regularized_condition": 958.9443086766103,
+              "damping": 0.005164916544356296,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.01528376025168744
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 2,
+              "mse": 0.01528376025168744,
+              "geometry": {
+                "radial_mae": 0.009713033877630065,
+                "radial_p95": 0.021009391229161685,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.2501861062395916,
+                "pole_mae": 0.011080670596784517,
+                "equator_mae": 0.009124720875535692
+              },
+              "gradient_percentiles": [
+                2.4093730447204727e-05,
+                9.388347576405e-05,
+                0.00043939149055318056,
+                0.0005082068192432796
+              ],
+              "image_jacobian_nnz": 143585,
+              "image_jacobian_entries": 589824,
+              "regularized_condition": 960.6999621652694,
+              "damping": 0.005242307717132988,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.015115970127348043
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 3,
+              "mse": 0.015115970127348043,
+              "geometry": {
+                "radial_mae": 0.009642923271143912,
+                "radial_p95": 0.021009391229161685,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.253727946443181,
+                "pole_mae": 0.011074463793337532,
+                "equator_mae": 0.00902712092360811
+              }
+            }
+          ],
+          "initial_mse": 0.02293502220342052,
+          "final_mse": 0.015115970127348043,
+          "geometry": {
+            "radial_mae": 0.009642923271143912,
+            "radial_p95": 0.021009391229161685,
+            "radial_max": 0.024883299127019587,
+            "min_gradient": 3.253727946443181,
+            "pole_mae": 0.011074463793337532,
+            "equator_mae": 0.00902712092360811
+          },
+          "seconds": 8.61680760094896,
+          "stage": 1,
+          "centers": 2,
+          "dofs": 12,
+          "chosen": [
+            0,
+            6
+          ],
+          "topology": {
+            "grid": 64,
+            "components": 1,
+            "watertight": true,
+            "component_areas": [
+              12.625770964782793
+            ],
+            "radial_scan": {
+              "root_coverage": 1.0,
+              "radial_mae": 0.0033609638710231536,
+              "radial_median": 5.8178902327732374e-05,
+              "radial_p95": 0.018996543186149097,
+              "radial_max": 0.031146664601328755,
+              "signed_radial_bias": 0.002288022291675397,
+              "min_zeroset_gradient_norm": 3.2510496438567773,
+              "median_zeroset_gradient_norm": 3.333340689191255,
+              "multiple_crossing_fraction": 0.0,
+              "no_crossing_count": 0,
+              "directions": 512,
+              "scan_steps": 81
+            },
+            "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+          },
+          "label": "birth_loss_driven_1",
+          "candidate_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "predicted_reduction": [
+            0.0009383041619635497,
+            0.00033148892095689024,
+            0.0014312509810249477,
+            0.0012152762200259826,
+            0.001364401104087732,
+            0.0016959469309501876
+          ],
+          "damping": [
+            0.005906095319787041,
+            0.0030521311688887997,
+            0.003835581622961432,
+            0.0019860914576791534,
+            0.0033151315237033648,
+            0.0013113692012888508
+          ],
+          "selected": 7,
+          "score_definition": "Full 6x6 block GN prediction for 0.5 MSE"
+        },
+        {
+          "trajectory": [
+            {
+              "iteration": 0,
+              "mse": 0.015115970127348043,
+              "geometry": {
+                "radial_mae": 0.009642923271143912,
+                "radial_p95": 0.021009391229161685,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.253727946443181,
+                "pole_mae": 0.011074463793337532,
+                "equator_mae": 0.00902712092360811
+              },
+              "gradient_percentiles": [
+                2.810060689933441e-06,
+                0.000236482010621522,
+                0.00500148511224746,
+                0.05327211252821316
+              ],
+              "image_jacobian_nnz": 209814,
+              "image_jacobian_entries": 884736,
+              "regularized_condition": 960.7057178999397,
+              "damping": 0.005373791444971777,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.011637423687159176
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 1,
+              "mse": 0.011637423687159176,
+              "geometry": {
+                "radial_mae": 0.007373976525021732,
+                "radial_p95": 0.015314746397462697,
+                "radial_max": 0.01781864357564822,
+                "min_gradient": 3.2426270165502222,
+                "pole_mae": 0.010491108036704978,
+                "equator_mae": 0.006033087550722235
+              },
+              "gradient_percentiles": [
+                5.760381505207426e-06,
+                0.00016352808401244595,
+                0.0012987096726800945,
+                0.005579381587042857
+              ],
+              "image_jacobian_nnz": 210310,
+              "image_jacobian_entries": 884736,
+              "regularized_condition": 961.185048587026,
+              "damping": 0.005493089405514549,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.011201165624154968
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 2,
+              "mse": 0.011201165624154968,
+              "geometry": {
+                "radial_mae": 0.007027460101318022,
+                "radial_p95": 0.015242078207262543,
+                "radial_max": 0.01740698176517519,
+                "min_gradient": 3.224044104169999,
+                "pole_mae": 0.010218004448126773,
+                "equator_mae": 0.005654991304087442
+              },
+              "gradient_percentiles": [
+                9.756646928436949e-06,
+                0.00010230904243992988,
+                0.0002439431091618982,
+                0.0007545085867427856
+              ],
+              "image_jacobian_nnz": 210558,
+              "image_jacobian_entries": 884736,
+              "regularized_condition": 961.5380095124947,
+              "damping": 0.005602578141252967,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.011032057486177964
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 3,
+              "mse": 0.011032057486177964,
+              "geometry": {
+                "radial_mae": 0.006930120360860076,
+                "radial_p95": 0.01523048708816278,
+                "radial_max": 0.017417659421196996,
+                "min_gradient": 3.203126089836545,
+                "pole_mae": 0.010038981147915026,
+                "equator_mae": 0.00559278918430571
+              }
+            }
+          ],
+          "initial_mse": 0.015115970127348043,
+          "final_mse": 0.011032057486177964,
+          "geometry": {
+            "radial_mae": 0.006930120360860076,
+            "radial_p95": 0.01523048708816278,
+            "radial_max": 0.017417659421196996,
+            "min_gradient": 3.203126089836545,
+            "pole_mae": 0.010038981147915026,
+            "equator_mae": 0.00559278918430571
+          },
+          "seconds": 8.555516290012747,
+          "stage": 2,
+          "centers": 3,
+          "dofs": 18,
+          "chosen": [
+            0,
+            6,
+            7
+          ],
+          "topology": {
+            "grid": 64,
+            "components": 1,
+            "watertight": true,
+            "component_areas": [
+              12.705363004323491
+            ],
+            "radial_scan": {
+              "root_coverage": 1.0,
+              "radial_mae": 0.006458399736200701,
+              "radial_median": 0.0026614191800038434,
+              "radial_p95": 0.024224442356935348,
+              "radial_max": 0.031118204229642288,
+              "signed_radial_bias": 0.005341020821958869,
+              "min_zeroset_gradient_norm": 3.204917009760904,
+              "median_zeroset_gradient_norm": 3.370201932259121,
+              "multiple_crossing_fraction": 0.0,
+              "no_crossing_count": 0,
+              "directions": 512,
+              "scan_steps": 81
+            },
+            "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+          },
+          "label": "birth_loss_driven_2"
+        }
+      ],
+      "final_mse": 0.011032057486177964
+    },
+    {
+      "policy": "random",
+      "sequence": [
+        {
+          "trajectory": [
+            {
+              "iteration": 0,
+              "mse": 0.026096154011556776,
+              "geometry": {
+                "radial_mae": 0.011739758635213347,
+                "radial_p95": 0.023145096279821618,
+                "radial_max": 0.024913700189033605,
+                "min_gradient": 3.333333333333333,
+                "pole_mae": 0.012001493231047313,
+                "equator_mae": 0.011627168892871359
+              },
+              "gradient_percentiles": [
+                0.001181535494899533,
+                0.002476420992018327,
+                0.009009762393391144,
+                0.01306955391018378
+              ],
+              "image_jacobian_nnz": 72776,
+              "image_jacobian_entries": 294912,
+              "regularized_condition": 308.4703357141682,
+              "damping": 0.0014092058048491857,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.023014987337971766
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 1,
+              "mse": 0.023014987337971766,
+              "geometry": {
+                "radial_mae": 0.011121165229743551,
+                "radial_p95": 0.022224714974544278,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.234462026234092,
+                "pole_mae": 0.011551417893489692,
+                "equator_mae": 0.010936084474947727
+              },
+              "gradient_percentiles": [
+                0.00018433787209644844,
+                0.0005223808769399454,
+                0.001955185153053161,
+                0.0025575562373377496
+              ],
+              "image_jacobian_nnz": 72527,
+              "image_jacobian_entries": 294912,
+              "regularized_condition": 306.5153127260096,
+              "damping": 0.0013526155593240488,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.022937763951653412
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 2,
+              "mse": 0.022937763951653412,
+              "geometry": {
+                "radial_mae": 0.011218177724352718,
+                "radial_p95": 0.02220472209799794,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.2275262441721035,
+                "pole_mae": 0.01151203063533928,
+                "equator_mae": 0.01109177172353727
+              },
+              "gradient_percentiles": [
+                1.525254186895842e-05,
+                8.857220918292874e-05,
+                0.0001255069057205308,
+                0.00013148026796826139
+              ],
+              "image_jacobian_nnz": 72630,
+              "image_jacobian_entries": 294912,
+              "regularized_condition": 306.3782641998741,
+              "damping": 0.0013423409262359254,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.02293502220342052
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 3,
+              "mse": 0.02293502220342052,
+              "geometry": {
+                "radial_mae": 0.01124177811862076,
+                "radial_p95": 0.02220472209799794,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.2262836604127356,
+                "pole_mae": 0.011505145568842622,
+                "equator_mae": 0.011128485975229235
+              }
+            }
+          ],
+          "initial_mse": 0.026096154011556776,
+          "final_mse": 0.02293502220342052,
+          "geometry": {
+            "radial_mae": 0.01124177811862076,
+            "radial_p95": 0.02220472209799794,
+            "radial_max": 0.024883299127019587,
+            "min_gradient": 3.2262836604127356,
+            "pole_mae": 0.011505145568842622,
+            "equator_mae": 0.011128485975229235
+          },
+          "seconds": 8.497949481010437,
+          "stage": 0,
+          "centers": 1,
+          "dofs": 6,
+          "chosen": [
+            0
+          ],
+          "topology": {
+            "grid": 64,
+            "components": 1,
+            "watertight": true,
+            "component_areas": [
+              12.591124394678138
+            ],
+            "radial_scan": {
+              "root_coverage": 1.0,
+              "radial_mae": 0.0020658116981991347,
+              "radial_median": 7.163293047618424e-07,
+              "radial_p95": 0.014869447198070795,
+              "radial_max": 0.031101644193040623,
+              "signed_radial_bias": 0.0009486353026502972,
+              "min_zeroset_gradient_norm": 3.2234428126698615,
+              "median_zeroset_gradient_norm": 3.3333333333357595,
+              "multiple_crossing_fraction": 0.0,
+              "no_crossing_count": 0,
+              "directions": 512,
+              "scan_steps": 81
+            },
+            "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+          },
+          "label": "birth_random_0",
+          "candidate_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "predicted_reduction": [
+            0.000948953029034344,
+            0.0003958075310732715,
+            0.0017305268079561911,
+            0.0011986104403154218,
+            0.0025741794956524815,
+            0.003132115340158813,
+            0.0016935912359305077
+          ],
+          "damping": [
+            0.005906296971611829,
+            0.003045859182695946,
+            0.0038542774451750614,
+            0.001982656669463591,
+            0.0033994004737245673,
+            0.005747594363823965,
+            0.00131134173015575
+          ],
+          "selected": 2,
+          "score_definition": "Full 6x6 block GN prediction for 0.5 MSE"
+        },
+        {
+          "trajectory": [
+            {
+              "iteration": 0,
+              "mse": 0.02293502220342052,
+              "geometry": {
+                "radial_mae": 0.01124177811862076,
+                "radial_p95": 0.02220472209799794,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.2262836604127356,
+                "pole_mae": 0.011505145568842618,
+                "equator_mae": 0.011128485975229238
+              },
+              "gradient_percentiles": [
+                2.4861044193355642e-06,
+                7.626084902276316e-05,
+                0.006026862272879057,
+                0.01585885780009685
+              ],
+              "image_jacobian_nnz": 140157,
+              "image_jacobian_entries": 589824,
+              "regularized_condition": 705.2954713572017,
+              "damping": 0.003045859182695944,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.022025202797953187
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 1,
+              "mse": 0.022025202797953187,
+              "geometry": {
+                "radial_mae": 0.010674027108527526,
+                "radial_p95": 0.022200083149185198,
+                "radial_max": 0.024850788485669018,
+                "min_gradient": 3.166305740337542,
+                "pole_mae": 0.010869599679374184,
+                "equator_mae": 0.010589898125537624
+              },
+              "gradient_percentiles": [
+                1.0754850540525872e-05,
+                0.00012192661631311062,
+                0.0005537814715592484,
+                0.0008598583505050119
+              ],
+              "image_jacobian_nnz": 139891,
+              "image_jacobian_entries": 589824,
+              "regularized_condition": 715.1373003150707,
+              "damping": 0.003091172286598376,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.021987677762015035
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 2,
+              "mse": 0.021987677762015035,
+              "geometry": {
+                "radial_mae": 0.010663071080831565,
+                "radial_p95": 0.02219938376727456,
+                "radial_max": 0.024845350619338014,
+                "min_gradient": 3.150122497167005,
+                "pole_mae": 0.010832862517944207,
+                "equator_mae": 0.01059003230620769
+              },
+              "gradient_percentiles": [
+                2.474077126770637e-06,
+                3.227966077011862e-05,
+                9.065703741028091e-05,
+                0.0001440970831172768
+              ],
+              "image_jacobian_nnz": 139813,
+              "image_jacobian_entries": 589824,
+              "regularized_condition": 714.6219168913317,
+              "damping": 0.003086888202426501,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.021978945410810528
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 3,
+              "mse": 0.021978945410810528,
+              "geometry": {
+                "radial_mae": 0.010662104473167518,
+                "radial_p95": 0.022199332352053257,
+                "radial_max": 0.024844482935856282,
+                "min_gradient": 3.1420395650821398,
+                "pole_mae": 0.010826024298331523,
+                "equator_mae": 0.0105915914757506
+              }
+            }
+          ],
+          "initial_mse": 0.02293502220342052,
+          "final_mse": 0.021978945410810528,
+          "geometry": {
+            "radial_mae": 0.010662104473167518,
+            "radial_p95": 0.022199332352053257,
+            "radial_max": 0.024844482935856282,
+            "min_gradient": 3.1420395650821398,
+            "pole_mae": 0.010826024298331523,
+            "equator_mae": 0.0105915914757506
+          },
+          "seconds": 9.212905928026885,
+          "stage": 1,
+          "centers": 2,
+          "dofs": 12,
+          "chosen": [
+            0,
+            2
+          ],
+          "topology": {
+            "grid": 64,
+            "components": 1,
+            "watertight": true,
+            "component_areas": [
+              12.600353791969479
+            ],
+            "radial_scan": {
+              "root_coverage": 1.0,
+              "radial_mae": 0.002910367419029564,
+              "radial_median": 0.00017035361197503818,
+              "radial_p95": 0.015281261641175478,
+              "radial_max": 0.03039057639580256,
+              "signed_radial_bias": 0.0012952463125387107,
+              "min_zeroset_gradient_norm": 3.1497858346473313,
+              "median_zeroset_gradient_norm": 3.334760722814462,
+              "multiple_crossing_fraction": 0.0,
+              "no_crossing_count": 0,
+              "directions": 512,
+              "scan_steps": 81
+            },
+            "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+          },
+          "label": "birth_random_1",
+          "candidate_ids": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "predicted_reduction": [
+            0.0009481650456196062,
+            0.0017032172958411586,
+            0.0011943438470947323,
+            0.0024428858634589325,
+            0.00301562326904645,
+            0.0016411779115883091
+          ],
+          "damping": [
+            0.005906290955385675,
+            0.003852682570899521,
+            0.001983311537354293,
+            0.003381975585816153,
+            0.005735908187674005,
+            0.0013088492226186379
+          ],
+          "selected": 1,
+          "score_definition": "Full 6x6 block GN prediction for 0.5 MSE"
+        },
+        {
+          "trajectory": [
+            {
+              "iteration": 0,
+              "mse": 0.021978945410810524,
+              "geometry": {
+                "radial_mae": 0.010662104473167518,
+                "radial_p95": 0.022199332352053257,
+                "radial_max": 0.024844482935856282,
+                "min_gradient": 3.1420395650821398,
+                "pole_mae": 0.010826024298331523,
+                "equator_mae": 0.0105915914757506
+              },
+              "gradient_percentiles": [
+                3.8939413633086185e-06,
+                2.160751180706265e-05,
+                0.004468735998541362,
+                0.07335451335612225
+              ],
+              "image_jacobian_nnz": 205608,
+              "image_jacobian_entries": 884736,
+              "regularized_condition": 817.7297822644176,
+              "damping": 0.005906290955385676,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.020061984052648026
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 1,
+              "mse": 0.020061984052648026,
+              "geometry": {
+                "radial_mae": 0.01004326639726641,
+                "radial_p95": 0.021986498069049905,
+                "radial_max": 0.024837333158582053,
+                "min_gradient": 3.138694013335901,
+                "pole_mae": 0.01058517876948329,
+                "equator_mae": 0.009810153253910546
+              },
+              "gradient_percentiles": [
+                1.1253259829677619e-06,
+                1.6411184077920146e-05,
+                0.0003279811072119151,
+                0.0018003770814786996
+              ],
+              "image_jacobian_nnz": 205884,
+              "image_jacobian_entries": 884736,
+              "regularized_condition": 821.6340847829248,
+              "damping": 0.006077710971888366,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.020026311504566862
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 2,
+              "mse": 0.020026311504566862,
+              "geometry": {
+                "radial_mae": 0.010076451912276865,
+                "radial_p95": 0.022006310549371577,
+                "radial_max": 0.024834796412825044,
+                "min_gradient": 3.1360545737877494,
+                "pole_mae": 0.010569296780641496,
+                "equator_mae": 0.009864446019181468
+              },
+              "gradient_percentiles": [
+                7.089776601643145e-07,
+                1.1916253878572728e-05,
+                3.719979074946494e-05,
+                0.0002418223588571588
+              ],
+              "image_jacobian_nnz": 205860,
+              "image_jacobian_entries": 884736,
+              "regularized_condition": 821.588800569005,
+              "damping": 0.00607595586937262,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.020019476164733683
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 3,
+              "mse": 0.020019476164733683,
+              "geometry": {
+                "radial_mae": 0.010090638221564516,
+                "radial_p95": 0.0220564824001418,
+                "radial_max": 0.024833790972915493,
+                "min_gradient": 3.133885099192494,
+                "pole_mae": 0.010563402169861832,
+                "equator_mae": 0.009887270489615392
+              }
+            }
+          ],
+          "initial_mse": 0.021978945410810524,
+          "final_mse": 0.020019476164733683,
+          "geometry": {
+            "radial_mae": 0.010090638221564516,
+            "radial_p95": 0.0220564824001418,
+            "radial_max": 0.024833790972915493,
+            "min_gradient": 3.133885099192494,
+            "pole_mae": 0.010563402169861832,
+            "equator_mae": 0.009887270489615392
+          },
+          "seconds": 8.275884818052873,
+          "stage": 2,
+          "centers": 3,
+          "dofs": 18,
+          "chosen": [
+            0,
+            2,
+            1
+          ],
+          "topology": {
+            "grid": 64,
+            "components": 1,
+            "watertight": true,
+            "component_areas": [
+              12.594904233852596
+            ],
+            "radial_scan": {
+              "root_coverage": 1.0,
+              "radial_mae": 0.0038719989481023685,
+              "radial_median": 0.0014211298428561392,
+              "radial_p95": 0.017057967343752846,
+              "radial_max": 0.030600933970344912,
+              "signed_radial_bias": 0.0009978620640552585,
+              "min_zeroset_gradient_norm": 3.1424444149011572,
+              "median_zeroset_gradient_norm": 3.3464085991322277,
+              "multiple_crossing_fraction": 0.0,
+              "no_crossing_count": 0,
+              "directions": 512,
+              "scan_steps": 81
+            },
+            "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+          },
+          "label": "birth_random_2"
+        }
+      ],
+      "final_mse": 0.020019476164733683
+    },
+    {
+      "policy": "uniform",
+      "sequence": [
+        {
+          "trajectory": [
+            {
+              "iteration": 0,
+              "mse": 0.026096154011556776,
+              "geometry": {
+                "radial_mae": 0.011739758635213347,
+                "radial_p95": 0.023145096279821618,
+                "radial_max": 0.024913700189033605,
+                "min_gradient": 3.333333333333333,
+                "pole_mae": 0.012001493231047313,
+                "equator_mae": 0.011627168892871359
+              },
+              "gradient_percentiles": [
+                0.001181535494899533,
+                0.002476420992018327,
+                0.009009762393391144,
+                0.01306955391018378
+              ],
+              "image_jacobian_nnz": 72776,
+              "image_jacobian_entries": 294912,
+              "regularized_condition": 308.4703357141682,
+              "damping": 0.0014092058048491857,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.023014987337971766
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 1,
+              "mse": 0.023014987337971766,
+              "geometry": {
+                "radial_mae": 0.01112116522974355,
+                "radial_p95": 0.022224714974544278,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.2344620262340924,
+                "pole_mae": 0.011551417893489692,
+                "equator_mae": 0.010936084474947726
+              },
+              "gradient_percentiles": [
+                0.00018433787209646115,
+                0.0005223808769399481,
+                0.001955185153053172,
+                0.0025575562373377865
+              ],
+              "image_jacobian_nnz": 72527,
+              "image_jacobian_entries": 294912,
+              "regularized_condition": 306.5153127260094,
+              "damping": 0.001352615559324048,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.022937763951653412
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 2,
+              "mse": 0.022937763951653412,
+              "geometry": {
+                "radial_mae": 0.011218177724352716,
+                "radial_p95": 0.02220472209799794,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.227526244172101,
+                "pole_mae": 0.011512030635339277,
+                "equator_mae": 0.011091771723537267
+              },
+              "gradient_percentiles": [
+                1.525254186894099e-05,
+                8.857220918291457e-05,
+                0.000125506905720542,
+                0.00013148026796829806
+              ],
+              "image_jacobian_nnz": 72630,
+              "image_jacobian_entries": 294912,
+              "regularized_condition": 306.37826419987437,
+              "damping": 0.0013423409262359272,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.02293502220342052
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 3,
+              "mse": 0.02293502220342052,
+              "geometry": {
+                "radial_mae": 0.01124177811862076,
+                "radial_p95": 0.02220472209799794,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.226283660412736,
+                "pole_mae": 0.011505145568842618,
+                "equator_mae": 0.011128485975229236
+              }
+            }
+          ],
+          "initial_mse": 0.026096154011556776,
+          "final_mse": 0.02293502220342052,
+          "geometry": {
+            "radial_mae": 0.01124177811862076,
+            "radial_p95": 0.02220472209799794,
+            "radial_max": 0.024883299127019587,
+            "min_gradient": 3.226283660412736,
+            "pole_mae": 0.011505145568842618,
+            "equator_mae": 0.011128485975229236
+          },
+          "seconds": 8.317881271941587,
+          "stage": 0,
+          "centers": 1,
+          "dofs": 6,
+          "chosen": [
+            0
+          ],
+          "topology": {
+            "grid": 64,
+            "components": 1,
+            "watertight": true,
+            "component_areas": [
+              12.591124394678138
+            ],
+            "radial_scan": {
+              "root_coverage": 1.0,
+              "radial_mae": 0.0020658116981991347,
+              "radial_median": 7.163293047618424e-07,
+              "radial_p95": 0.014869447198070795,
+              "radial_max": 0.031101644193040623,
+              "signed_radial_bias": 0.0009486353026502972,
+              "min_zeroset_gradient_norm": 3.2234428126698607,
+              "median_zeroset_gradient_norm": 3.3333333333357595,
+              "multiple_crossing_fraction": 0.0,
+              "no_crossing_count": 0,
+              "directions": 512,
+              "scan_steps": 81
+            },
+            "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+          },
+          "label": "birth_uniform_0",
+          "candidate_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "predicted_reduction": [
+            0.000948953029034344,
+            0.0003958075310732702,
+            0.001730526807956191,
+            0.0011986104403154214,
+            0.00257417949565248,
+            0.0031321153401588143,
+            0.0016935912359305073
+          ],
+          "damping": [
+            0.005906296971611829,
+            0.0030458591826959427,
+            0.003854277445175061,
+            0.001982656669463591,
+            0.0033994004737245673,
+            0.005747594363823968,
+            0.00131134173015575
+          ],
+          "selected": 1,
+          "score_definition": "Full 6x6 block GN prediction for 0.5 MSE"
+        },
+        {
+          "trajectory": [
+            {
+              "iteration": 0,
+              "mse": 0.02293502220342052,
+              "geometry": {
+                "radial_mae": 0.011241778118620762,
+                "radial_p95": 0.02220472209799794,
+                "radial_max": 0.024883299127019587,
+                "min_gradient": 3.226283660412736,
+                "pole_mae": 0.011505145568842618,
+                "equator_mae": 0.011128485975229236
+              },
+              "gradient_percentiles": [
+                2.4861044193286567e-06,
+                3.0157690590978692e-05,
+                0.00983646983479578,
+                0.0733406752309704
+              ],
+              "image_jacobian_nnz": 138352,
+              "image_jacobian_entries": 589824,
+              "regularized_condition": 655.0804998234133,
+              "damping": 0.00590629697161183,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.021018880927556226
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 1,
+              "mse": 0.021018880927556226,
+              "geometry": {
+                "radial_mae": 0.010626686709693259,
+                "radial_p95": 0.022087241385465972,
+                "radial_max": 0.024876211471987153,
+                "min_gradient": 3.226079413110116,
+                "pole_mae": 0.011263006493881445,
+                "equator_mae": 0.010352962556718453
+              },
+              "gradient_percentiles": [
+                2.2101119843444515e-07,
+                1.1516774217723792e-05,
+                0.0005851547646412103,
+                0.0018027610284983824
+              ],
+              "image_jacobian_nnz": 138469,
+              "image_jacobian_entries": 589824,
+              "regularized_condition": 661.2622559631384,
+              "damping": 0.006077189032500136,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.02098459969638235
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 2,
+              "mse": 0.02098459969638235,
+              "geometry": {
+                "radial_mae": 0.01066233609496426,
+                "radial_p95": 0.022057478605638413,
+                "radial_max": 0.024873638453127844,
+                "min_gradient": 3.2259961535967148,
+                "pole_mae": 0.011246399940379303,
+                "equator_mae": 0.010411090753640474
+              },
+              "gradient_percentiles": [
+                2.276301651563381e-07,
+                5.845343920485643e-06,
+                3.0128925064534116e-05,
+                0.0002420676690685668
+              ],
+              "image_jacobian_nnz": 138440,
+              "image_jacobian_entries": 589824,
+              "regularized_condition": 661.2120396876657,
+              "damping": 0.006075362096039936,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.020978723329629398
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 3,
+              "mse": 0.020978723329629398,
+              "geometry": {
+                "radial_mae": 0.010678111092858182,
+                "radial_p95": 0.022042750350719675,
+                "radial_max": 0.024872567419424785,
+                "min_gradient": 3.225950509679121,
+                "pole_mae": 0.011240055728844216,
+                "equator_mae": 0.010436380718718939
+              }
+            }
+          ],
+          "initial_mse": 0.02293502220342052,
+          "final_mse": 0.020978723329629398,
+          "geometry": {
+            "radial_mae": 0.010678111092858182,
+            "radial_p95": 0.022042750350719675,
+            "radial_max": 0.024872567419424785,
+            "min_gradient": 3.225950509679121,
+            "pole_mae": 0.011240055728844216,
+            "equator_mae": 0.010436380718718939
+          },
+          "seconds": 8.49533538799733,
+          "stage": 1,
+          "centers": 2,
+          "dofs": 12,
+          "chosen": [
+            0,
+            1
+          ],
+          "topology": {
+            "grid": 64,
+            "components": 1,
+            "watertight": true,
+            "component_areas": [
+              12.586211381963178
+            ],
+            "radial_scan": {
+              "root_coverage": 1.0,
+              "radial_mae": 0.0030311595373731853,
+              "radial_median": 0.0004986773488786511,
+              "radial_p95": 0.015835377398325617,
+              "radial_max": 0.03132599423006477,
+              "signed_radial_bias": 0.0006747934565112324,
+              "min_zeroset_gradient_norm": 3.223073565472333,
+              "median_zeroset_gradient_norm": 3.337054972102914,
+              "multiple_crossing_fraction": 0.0,
+              "no_crossing_count": 0,
+              "directions": 512,
+              "scan_steps": 81
+            },
+            "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+          },
+          "label": "birth_uniform_1",
+          "candidate_ids": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "predicted_reduction": [
+            0.0003951025246727306,
+            0.0016630415203413079,
+            0.001200010296869439,
+            0.0023764879148644937,
+            0.0031179598199129596,
+            0.0016243836201566
+          ],
+          "damping": [
+            0.0030453747361435463,
+            0.0038865589629811406,
+            0.001982657725421011,
+            0.003354048979520021,
+            0.005744854446932191,
+            0.001305105141977054
+          ],
+          "selected": 4,
+          "score_definition": "Full 6x6 block GN prediction for 0.5 MSE"
+        },
+        {
+          "trajectory": [
+            {
+              "iteration": 0,
+              "mse": 0.020978723329629398,
+              "geometry": {
+                "radial_mae": 0.010678111092858182,
+                "radial_p95": 0.022042750350719675,
+                "radial_max": 0.024872567419424785,
+                "min_gradient": 3.225950509679121,
+                "pole_mae": 0.011240055728844216,
+                "equator_mae": 0.010436380718718937
+              },
+              "gradient_percentiles": [
+                3.767952505248518e-07,
+                1.189912820866875e-05,
+                0.005016426577218703,
+                0.05383648913906711
+              ],
+              "image_jacobian_nnz": 208643,
+              "image_jacobian_entries": 884736,
+              "regularized_condition": 707.7655779656851,
+              "damping": 0.006076867044649166,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.018688874445505918
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 1,
+              "mse": 0.018688874445505918,
+              "geometry": {
+                "radial_mae": 0.009145286263307961,
+                "radial_p95": 0.02147580619650122,
+                "radial_max": 0.024664227173576192,
+                "min_gradient": 3.227132916612192,
+                "pole_mae": 0.0076184789807132005,
+                "equator_mae": 0.009802069284312412
+              },
+              "gradient_percentiles": [
+                6.266241948016573e-08,
+                3.406352458913343e-05,
+                0.0006224570511708754,
+                0.003112419127131727
+              ],
+              "image_jacobian_nnz": 208863,
+              "image_jacobian_entries": 884736,
+              "regularized_condition": 724.4982007839873,
+              "damping": 0.006079323142829374,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.018461279257250152
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 2,
+              "mse": 0.018461279257250152,
+              "geometry": {
+                "radial_mae": 0.008946988156754043,
+                "radial_p95": 0.021318785720953057,
+                "radial_max": 0.024554903539935058,
+                "min_gradient": 3.2283166049503995,
+                "pole_mae": 0.00750696067069595,
+                "equator_mae": 0.009566441321147747
+              },
+              "gradient_percentiles": [
+                7.977047618100702e-08,
+                1.957055889355097e-05,
+                8.928609344874306e-05,
+                0.0006610320279335086
+              ],
+              "image_jacobian_nnz": 208712,
+              "image_jacobian_entries": 884736,
+              "regularized_condition": 723.8720843691601,
+              "damping": 0.006080724745319824,
+              "trials": [
+                {
+                  "alpha": 1.0,
+                  "mse": 0.018394596796847608
+                }
+              ],
+              "accepted": true
+            },
+            {
+              "iteration": 3,
+              "mse": 0.018394596796847608,
+              "geometry": {
+                "radial_mae": 0.008917929192188593,
+                "radial_p95": 0.02130631646821902,
+                "radial_max": 0.024494818604284152,
+                "min_gradient": 3.2291866323546268,
+                "pole_mae": 0.00759991026929686,
+                "equator_mae": 0.009484898226058221
+              }
+            }
+          ],
+          "initial_mse": 0.020978723329629398,
+          "final_mse": 0.018394596796847608,
+          "geometry": {
+            "radial_mae": 0.008917929192188593,
+            "radial_p95": 0.02130631646821902,
+            "radial_max": 0.024494818604284152,
+            "min_gradient": 3.2291866323546268,
+            "pole_mae": 0.00759991026929686,
+            "equator_mae": 0.009484898226058221
+          },
+          "seconds": 8.54369567008689,
+          "stage": 2,
+          "centers": 3,
+          "dofs": 18,
+          "chosen": [
+            0,
+            1,
+            4
+          ],
+          "topology": {
+            "grid": 64,
+            "components": 1,
+            "watertight": true,
+            "component_areas": [
+              12.637824050679388
+            ],
+            "radial_scan": {
+              "root_coverage": 1.0,
+              "radial_mae": 0.005053388391240789,
+              "radial_median": 0.0022047454946005907,
+              "radial_p95": 0.01925728896254406,
+              "radial_max": 0.030744837220481602,
+              "signed_radial_bias": 0.002663408074720054,
+              "min_zeroset_gradient_norm": 3.224572284931873,
+              "median_zeroset_gradient_norm": 3.3487430200058785,
+              "multiple_crossing_fraction": 0.0,
+              "no_crossing_count": 0,
+              "directions": 512,
+              "scan_steps": 81
+            },
+            "caveat": "Finite grid and 512 rays, not a global topology proof; MC is diagnostic only."
+          },
+          "label": "birth_uniform_2"
+        }
+      ],
+      "final_mse": 0.018394596796847608
+    }
+  ],
+  "seconds": 181.8362778488081,
+  "peak_cuda_mib": 77.15283203125,
+  "figures": [
+    "figures/v092_reconstructions.png",
+    "figures/v092_differences.png",
+    "figures/v092_efficiency.png",
+    "figures/v092_centers_support_orders.png",
+    "figures/v092_birth_sequence.png",
+    "figures/v092_birth_loss.png",
+    "figures/v092_geometry.png",
+    "figures/v092_curvature_regions.png"
+  ],
+  "efficiency": [
+    {
+      "threshold": 0.0234865386104011,
+      "name": "scalar",
+      "reached": true,
+      "centers": 12,
+      "scalar_dofs": 12
+    },
+    {
+      "threshold": 0.0234865386104011,
+      "name": "p0",
+      "reached": true,
+      "centers": 12,
+      "scalar_dofs": 12
+    },
+    {
+      "threshold": 0.0234865386104011,
+      "name": "p1",
+      "reached": true,
+      "centers": 4,
+      "scalar_dofs": 12
+    },
+    {
+      "threshold": 0.0234865386104011,
+      "name": "p2",
+      "reached": true,
+      "centers": 2,
+      "scalar_dofs": 12
+    },
+    {
+      "threshold": 0.01957211550866758,
+      "name": "scalar",
+      "reached": true,
+      "centers": 12,
+      "scalar_dofs": 12
+    },
+    {
+      "threshold": 0.01957211550866758,
+      "name": "p0",
+      "reached": true,
+      "centers": 12,
+      "scalar_dofs": 12
+    },
+    {
+      "threshold": 0.01957211550866758,
+      "name": "p1",
+      "reached": true,
+      "centers": 4,
+      "scalar_dofs": 12
+    },
+    {
+      "threshold": 0.01957211550866758,
+      "name": "p2",
+      "reached": true,
+      "centers": 4,
+      "scalar_dofs": 24
+    },
+    {
+      "threshold": 0.013048077005778388,
+      "name": "scalar",
+      "reached": true,
+      "centers": 12,
+      "scalar_dofs": 12
+    },
+    {
+      "threshold": 0.013048077005778388,
+      "name": "p0",
+      "reached": true,
+      "centers": 12,
+      "scalar_dofs": 12
+    },
+    {
+      "threshold": 0.013048077005778388,
+      "name": "p1",
+      "reached": true,
+      "centers": 8,
+      "scalar_dofs": 24
+    },
+    {
+      "threshold": 0.013048077005778388,
+      "name": "p2",
+      "reached": false,
+      "centers": null,
+      "scalar_dofs": null
+    }
+  ],
+  "initial_mse": 0.026096154011556776,
+  "target": "Independent ellipsoidal warp of the same radial basis profile; axes [1.025,.985,1.015]. No target jet dictionary.",
+  "formulation": "F_theta=F_ref-|grad F_ref| sum_k W(sqrt(u\u00b2+v\u00b2)) collar(w) sum_ij a_ij u^i v^j",
+  "initialization": "F_ref=1-(16/3) W(|x|/2), exact unit-sphere zero set in existing basis-only representation, NOT an analytic sphere base.",
+  "frame_policy": "One small-deformation frozen reference phase; born centers and frames sampled on current surface, gamma remains the same frozen phase reference for both scoring and insertion.",
+  "reference_scalar_dofs": 1,
+  "fd_source_count": 1024,
+  "single_closed_surface_in_sampled_checks": true,
+  "birth_loss_driven_beats_both": true,
+  "limitations": [
+    "Single smooth near-spherical target, two budgets, one seed; no general superiority claim. Threshold counts are minimum within the tested grid, not global minimum budgets.",
+    "All arms use a common frozen current basis-only reference; counts are incremental optimized DoFs, not total unrestricted field capacity.",
+    "Tangent modes describe first-order normal displacement; finite steps include nonlinear root effects.",
+    "No chart rebase or orientation derivative in this small phase; not validated for large deformations.",
+    "Normal displacement requires regular surface points. Exact reference gradient norm may be nonsmooth at off-surface critical points; C2 window continuity is not a global smoothness guarantee for that norm.",
+    "Normal collar is an explicit compact off-surface extension; it may affect transport away from the surface.",
+    "64\u00b2 / 256 sources are formulation diagnostics, not image or source convergence evidence.",
+    "Ellipsoid has no flat region; pole/equator errors do not establish low-vs-high-curvature order preference.",
+    "Finite-grid/ray topology checks are not proof of global absence of accidental components.",
+    "Small dense image Jacobian blocks only; field supports remain sparse. No large-scale performance claim.",
+    "Birth compares full block GN scores with random and farthest-coverage policies, but joint post-birth optimization is not a pure single-block gain measurement.",
+    "No p refinement, radius learning, death, merge, global UV, Eikonal, Bunny, Full-HD or HPC."
+  ],
+  "audit": {
+    "disabled_image_max_abs_error": 8.881784197001252e-16,
+    "saved_image_replay_max_abs_error": 1.7763568394002505e-15,
+    "disabled_field_bitwise_equal": true,
+    "numerical_tolerance": 1e-12,
+    "gate_note": "Field outputs are bitwise identical. Separate CUDA scatter image renders need floating-point tolerance; original exact-zero image gate is retained if it failed.",
+    "fields": [
+      {
+        "name": "birth_loss_driven_0",
+        "sparse_mode_edges": 1704,
+        "mode_fanout_quantiles": [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.02878405136295381,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9174646404578639,
+          1.0722637555654624
+        ]
+      },
+      {
+        "name": "birth_loss_driven_1",
+        "sparse_mode_edges": 3384,
+        "mode_fanout_quantiles": [
+          6.0,
+          12.0,
+          12.0,
+          12.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.031001003846733433,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9165970956251391,
+          1.0432514349708852
+        ]
+      },
+      {
+        "name": "birth_loss_driven_2",
+        "sparse_mode_edges": 5088,
+        "mode_fanout_quantiles": [
+          12.0,
+          17.400000000000205,
+          18.0,
+          18.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.030754790236402485,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9138302075081128,
+          1.043250358932375
+        ]
+      },
+      {
+        "name": "birth_random_0",
+        "sparse_mode_edges": 1704,
+        "mode_fanout_quantiles": [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.02878405136295381,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9174646404578638,
+          1.0722637555654622
+        ]
+      },
+      {
+        "name": "birth_random_1",
+        "sparse_mode_edges": 3396,
+        "mode_fanout_quantiles": [
+          6.0,
+          12.0,
+          12.0,
+          12.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.029155786120831695,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9162601495052011,
+          1.0939434960049093
+        ]
+      },
+      {
+        "name": "birth_random_2",
+        "sparse_mode_edges": 5082,
+        "mode_fanout_quantiles": [
+          12.0,
+          12.0,
+          18.0,
+          18.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.029707139555189,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9152192082353081,
+          1.0963495773835346
+        ]
+      },
+      {
+        "name": "birth_uniform_0",
+        "sparse_mode_edges": 1704,
+        "mode_fanout_quantiles": [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.02878405136295381,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9174646404578639,
+          1.0722637555654624
+        ]
+      },
+      {
+        "name": "birth_uniform_1",
+        "sparse_mode_edges": 3390,
+        "mode_fanout_quantiles": [
+          6.0,
+          12.0,
+          12.0,
+          12.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.028887347532630447,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9172281551958288,
+          1.072566206696205
+        ]
+      },
+      {
+        "name": "birth_uniform_2",
+        "sparse_mode_edges": 5070,
+        "mode_fanout_quantiles": [
+          12.0,
+          12.0,
+          12.0,
+          18.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.028739142826109898,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9160512724071246,
+          1.0711677395661943
+        ]
+      },
+      {
+        "name": "fixed_p0_12",
+        "sparse_mode_edges": 3376,
+        "mode_fanout_quantiles": [
+          7.0,
+          8.0,
+          8.0,
+          9.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.041225322767820316,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9057601606589819,
+          1.0398627006809502
+        ]
+      },
+      {
+        "name": "fixed_p0_24",
+        "sparse_mode_edges": 6760,
+        "mode_fanout_quantiles": [
+          13.0,
+          15.0,
+          15.0,
+          16.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.034691314173629584,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9129268360679168,
+          1.0385763087013322
+        ]
+      },
+      {
+        "name": "fixed_p1_12",
+        "sparse_mode_edges": 3378,
+        "mode_fanout_quantiles": [
+          6.0,
+          9.0,
+          9.0,
+          12.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.026092063943136123,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9316131097851759,
+          1.078754415711518
+        ]
+      },
+      {
+        "name": "fixed_p1_24",
+        "sparse_mode_edges": 6753,
+        "mode_fanout_quantiles": [
+          12.0,
+          15.0,
+          18.0,
+          18.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.041393801538620156,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9062940257745864,
+          1.0713733275235788
+        ]
+      },
+      {
+        "name": "fixed_p2_12",
+        "sparse_mode_edges": 3390,
+        "mode_fanout_quantiles": [
+          6.0,
+          12.0,
+          12.0,
+          12.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.02858731988853025,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.917985366500566,
+          1.0712208371896328
+        ]
+      },
+      {
+        "name": "fixed_p2_24",
+        "sparse_mode_edges": 6756,
+        "mode_fanout_quantiles": [
+          12.0,
+          18.0,
+          18.0,
+          24.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.02627038007643645,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9126688498412914,
+          1.0835081437648764
+        ]
+      },
+      {
+        "name": "fixed_scalar_12",
+        "sparse_mode_edges": 1852,
+        "mode_fanout_quantiles": [
+          4.0,
+          5.0,
+          5.0,
+          6.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.03992207502989653,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9740530062144622,
+          1.0073870339820379
+        ]
+      },
+      {
+        "name": "fixed_scalar_24",
+        "sparse_mode_edges": 3683,
+        "mode_fanout_quantiles": [
+          7.0,
+          9.0,
+          9.0,
+          9.0
+        ],
+        "max_radial_departure_from_phase_reference": 0.03493865788015116,
+        "frozen_vs_current_gradient_norm_ratio": [
+          0.9731134483996846,
+          1.0104609731162117
+        ]
+      }
+    ],
+    "passed": true
+  },
+  "input_sha256": {
+    "runs/v092_manifold_jets/target.npy": "0e975de128171522aa4ca42a76a6e509270cfec69937132abd5ddd679dd1e5bf",
+    "runs/v092_manifold_jets/initial.npy": "809483a02d1712bc287e062962d1bdbb051ffbd747b71c7ae8bc28a671491ed7"
+  },
+  "runtime_scope": "Comparison run including target, fixed, birth and topology checks; excludes FD preflight, final replay audit and plots.",
+  "curvature_regions": {
+    "target_mean_curvature_range": [
+      0.9472868703036442,
+      1.0255127675172033
+    ],
+    "quartiles": [
+      0.974256788515414,
+      1.0087270617926654
+    ],
+    "results": [
+      {
+        "name": "scalar",
+        "scalar_dofs": 24,
+        "lower_curvature_radial_mae": 0.002780133745076467,
+        "higher_curvature_radial_mae": 0.004650775644992199
+      },
+      {
+        "name": "p0",
+        "scalar_dofs": 24,
+        "lower_curvature_radial_mae": 0.002631452562863114,
+        "higher_curvature_radial_mae": 0.0041708822398164955
+      },
+      {
+        "name": "p1",
+        "scalar_dofs": 24,
+        "lower_curvature_radial_mae": 0.002119819656424222,
+        "higher_curvature_radial_mae": 0.009059206847677512
+      },
+      {
+        "name": "p2",
+        "scalar_dofs": 24,
+        "lower_curvature_radial_mae": 0.00513713069531058,
+        "higher_curvature_radial_mae": 0.01702206970620891
+      }
+    ],
+    "note": "Actual ellipsoid mean curvature, bottom/top quartile of 1024 common directions. No truly flat region; location/coverage confounding remains."
+  }
+}

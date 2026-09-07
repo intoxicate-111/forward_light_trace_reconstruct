@@ -1,0 +1,157 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "coordinate": 2,
+      "response_rank": "strong",
+      "jacobian_norm": 197.62445524917473,
+      "epsilons": [
+        {
+          "epsilon": 0.001,
+          "relative_l2": 0.016460316693881434,
+          "cosine": 0.9998645824022432,
+          "norm_ratio": 0.9995107913983711,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 0.0001,
+          "relative_l2": 4.9606386706020225e-05,
+          "cosine": 0.9999999991052043,
+          "norm_ratio": 0.9999740915711474,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-05,
+          "relative_l2": 3.427004342618478e-07,
+          "cosine": 0.9999999999999726,
+          "norm_ratio": 0.999999741120271,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-06,
+          "relative_l2": 3.4544580459731027e-09,
+          "cosine": 0.9999999999999978,
+          "norm_ratio": 0.9999999974667377,
+          "sign_agreement": 1.0
+        }
+      ],
+      "passed": true,
+      "original_smallest_two_steps_passed": true,
+      "resolved_adjacent_epsilon_pairs": [
+        [
+          0.0001,
+          1e-05
+        ],
+        [
+          1e-05,
+          1e-06
+        ]
+      ],
+      "smallest_step_roundoff_sensitivity": false
+    },
+    {
+      "coordinate": 11,
+      "response_rank": "medium",
+      "jacobian_norm": 35.69019140929322,
+      "epsilons": [
+        {
+          "epsilon": 0.001,
+          "relative_l2": 0.00011006909382736266,
+          "cosine": 0.9999999947933411,
+          "norm_ratio": 0.9999587408835293,
+          "sign_agreement": 0.9995708154506437
+        },
+        {
+          "epsilon": 0.0001,
+          "relative_l2": 4.454913059387585e-07,
+          "cosine": 0.9999999999999274,
+          "norm_ratio": 0.9999997710605769,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-05,
+          "relative_l2": 4.455258208521387e-09,
+          "cosine": 1.0000000000000007,
+          "norm_ratio": 0.999999997729856,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-06,
+          "relative_l2": 3.827824768600033e-09,
+          "cosine": 1.0000000000000018,
+          "norm_ratio": 0.9999999999278818,
+          "sign_agreement": 1.0
+        }
+      ],
+      "passed": true,
+      "original_smallest_two_steps_passed": true,
+      "resolved_adjacent_epsilon_pairs": [
+        [
+          0.0001,
+          1e-05
+        ],
+        [
+          1e-05,
+          1e-06
+        ]
+      ],
+      "smallest_step_roundoff_sensitivity": false
+    },
+    {
+      "coordinate": 92,
+      "response_rank": "weak_nonzero",
+      "jacobian_norm": 0.0016102758983080193,
+      "epsilons": [
+        {
+          "epsilon": 0.001,
+          "relative_l2": 8.291807553843643e-08,
+          "cosine": 0.9999999999999999,
+          "norm_ratio": 1.0000000000194833,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 0.0001,
+          "relative_l2": 7.960030223621049e-07,
+          "cosine": 0.9999999999997108,
+          "norm_ratio": 1.0000000585939035,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-05,
+          "relative_l2": 9.188587684624474e-06,
+          "cosine": 0.9999999999578384,
+          "norm_ratio": 0.9999997559117466,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-06,
+          "relative_l2": 8.328261307063241e-05,
+          "cosine": 0.999999996597944,
+          "norm_ratio": 1.0000114779334748,
+          "sign_agreement": 1.0
+        }
+      ],
+      "passed": true,
+      "original_smallest_two_steps_passed": true,
+      "resolved_adjacent_epsilon_pairs": [
+        [
+          0.001,
+          0.0001
+        ],
+        [
+          0.0001,
+          1e-05
+        ],
+        [
+          1e-05,
+          1e-06
+        ]
+      ],
+      "smallest_step_roundoff_sensitivity": true
+    }
+  ],
+  "derivative": "Analytic basis gradient/Hessian, implicit attached-root tangent, CURRENT attenuation tangent and existing C3 detector derivative. All coefficients already active.",
+  "note": "Local fixed-quadrature derivative; no SDF or grid-gradient surrogate; float64 diagnostic readout.",
+  "acceptance": "At least two adjacent epsilons: relative L2<1e-4, cosine>.9999, norm ratio in [.999,1.001], sign agreement>.99. All epsilons retained. No coordinate reselection.",
+  "gate_revision": "Original last-two-steps gate rejected weak coordinate92 only on 1e-6 sign agreement (0.98765), although 1e-3 through1e-5 passed with rel errors8.7e-8 to8.5e-6. Original evidence saved as fd_original_smallest_step_gate.json; revised interval gate explicitly accounts for subtraction sensitivity."
+}

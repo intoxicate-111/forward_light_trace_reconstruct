@@ -1,0 +1,265 @@
+{
+  "disabled_image_max_abs_error": 8.881784197001252e-16,
+  "saved_image_replay_max_abs_error": 1.7763568394002505e-15,
+  "disabled_field_bitwise_equal": true,
+  "numerical_tolerance": 1e-12,
+  "gate_note": "Field outputs are bitwise identical. Separate CUDA scatter image renders need floating-point tolerance; original exact-zero image gate is retained if it failed.",
+  "fields": [
+    {
+      "name": "birth_loss_driven_0",
+      "sparse_mode_edges": 1704,
+      "mode_fanout_quantiles": [
+        6.0,
+        6.0,
+        6.0,
+        6.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.02878405136295381,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9174646404578639,
+        1.0722637555654624
+      ]
+    },
+    {
+      "name": "birth_loss_driven_1",
+      "sparse_mode_edges": 3384,
+      "mode_fanout_quantiles": [
+        6.0,
+        12.0,
+        12.0,
+        12.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.031001003846733433,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9165970956251391,
+        1.0432514349708852
+      ]
+    },
+    {
+      "name": "birth_loss_driven_2",
+      "sparse_mode_edges": 5088,
+      "mode_fanout_quantiles": [
+        12.0,
+        17.400000000000205,
+        18.0,
+        18.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.030754790236402485,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9138302075081128,
+        1.043250358932375
+      ]
+    },
+    {
+      "name": "birth_random_0",
+      "sparse_mode_edges": 1704,
+      "mode_fanout_quantiles": [
+        6.0,
+        6.0,
+        6.0,
+        6.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.02878405136295381,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9174646404578638,
+        1.0722637555654622
+      ]
+    },
+    {
+      "name": "birth_random_1",
+      "sparse_mode_edges": 3396,
+      "mode_fanout_quantiles": [
+        6.0,
+        12.0,
+        12.0,
+        12.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.029155786120831695,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9162601495052011,
+        1.0939434960049093
+      ]
+    },
+    {
+      "name": "birth_random_2",
+      "sparse_mode_edges": 5082,
+      "mode_fanout_quantiles": [
+        12.0,
+        12.0,
+        18.0,
+        18.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.029707139555189,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9152192082353081,
+        1.0963495773835346
+      ]
+    },
+    {
+      "name": "birth_uniform_0",
+      "sparse_mode_edges": 1704,
+      "mode_fanout_quantiles": [
+        6.0,
+        6.0,
+        6.0,
+        6.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.02878405136295381,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9174646404578639,
+        1.0722637555654624
+      ]
+    },
+    {
+      "name": "birth_uniform_1",
+      "sparse_mode_edges": 3390,
+      "mode_fanout_quantiles": [
+        6.0,
+        12.0,
+        12.0,
+        12.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.028887347532630447,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9172281551958288,
+        1.072566206696205
+      ]
+    },
+    {
+      "name": "birth_uniform_2",
+      "sparse_mode_edges": 5070,
+      "mode_fanout_quantiles": [
+        12.0,
+        12.0,
+        12.0,
+        18.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.028739142826109898,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9160512724071246,
+        1.0711677395661943
+      ]
+    },
+    {
+      "name": "fixed_p0_12",
+      "sparse_mode_edges": 3376,
+      "mode_fanout_quantiles": [
+        7.0,
+        8.0,
+        8.0,
+        9.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.041225322767820316,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9057601606589819,
+        1.0398627006809502
+      ]
+    },
+    {
+      "name": "fixed_p0_24",
+      "sparse_mode_edges": 6760,
+      "mode_fanout_quantiles": [
+        13.0,
+        15.0,
+        15.0,
+        16.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.034691314173629584,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9129268360679168,
+        1.0385763087013322
+      ]
+    },
+    {
+      "name": "fixed_p1_12",
+      "sparse_mode_edges": 3378,
+      "mode_fanout_quantiles": [
+        6.0,
+        9.0,
+        9.0,
+        12.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.026092063943136123,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9316131097851759,
+        1.078754415711518
+      ]
+    },
+    {
+      "name": "fixed_p1_24",
+      "sparse_mode_edges": 6753,
+      "mode_fanout_quantiles": [
+        12.0,
+        15.0,
+        18.0,
+        18.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.041393801538620156,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9062940257745864,
+        1.0713733275235788
+      ]
+    },
+    {
+      "name": "fixed_p2_12",
+      "sparse_mode_edges": 3390,
+      "mode_fanout_quantiles": [
+        6.0,
+        12.0,
+        12.0,
+        12.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.02858731988853025,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.917985366500566,
+        1.0712208371896328
+      ]
+    },
+    {
+      "name": "fixed_p2_24",
+      "sparse_mode_edges": 6756,
+      "mode_fanout_quantiles": [
+        12.0,
+        18.0,
+        18.0,
+        24.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.02627038007643645,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9126688498412914,
+        1.0835081437648764
+      ]
+    },
+    {
+      "name": "fixed_scalar_12",
+      "sparse_mode_edges": 1852,
+      "mode_fanout_quantiles": [
+        4.0,
+        5.0,
+        5.0,
+        6.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.03992207502989653,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9740530062144622,
+        1.0073870339820379
+      ]
+    },
+    {
+      "name": "fixed_scalar_24",
+      "sparse_mode_edges": 3683,
+      "mode_fanout_quantiles": [
+        7.0,
+        9.0,
+        9.0,
+        9.0
+      ],
+      "max_radial_departure_from_phase_reference": 0.03493865788015116,
+      "frozen_vs_current_gradient_norm_ratio": [
+        0.9731134483996846,
+        1.0104609731162117
+      ]
+    }
+  ],
+  "passed": true
+}

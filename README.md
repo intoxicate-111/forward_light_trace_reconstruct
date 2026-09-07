@@ -1744,6 +1744,255 @@ OMP_NUM_THREADS=8 OPENBLAS_NUM_THREADS=8 MPLCONFIGDIR=/tmp/mpl-v0815 PYTHONPATH=
 MPLCONFIGDIR=/tmp/mpl-v0815 PYTHONPATH=src python scripts/validate_v0815.py
 ```
 
+## v0.8.17: sharp smooth collision-to-transmission diagnostic
+
+This is a **transfer-only diagnostic**, not a new production default. It reuses
+the exact v0.8.16 16,777,216-emitter global fixed-measure source and its four-view
+optical-depth cache, at 1920×1080 with unchanged C3 (4×4 subpixel quadrature of
+the cubic kernel) detector integration. The v0.8.15 dense hard reference is not
+regenerated. Source weights, positions, normals, color, gate, lobe, packet radius,
+shell width, launch exclusion, and path quadrature are frozen and SHA256 checked.
+No source-density sweep, optimization, birth, marching cubes, or mesh rendering
+is performed. The original input mesh is used only to reconstruct the identical
+scalar grid for bounded derivative diagnostics; its grid digest must match.
+
+The production cache uses **one micro offset**. Thus `p = 1 - exp(-tau)` here is
+a smooth opacity statistic, **not a measured blocked packet-volume fraction**.
+This experiment tests nonlinear survival mapping, not multi-offset averaging in
+isolation. Also, v0.8.16 reached an MSE plateau but **failed its strict RGB
+quadrature-convergence gate**; this run does not retroactively declare it converged.
+
+`finite_packet._transmission(..., return_micro=True)` exposes per-offset optical
+depths while retaining the original mean-before-path-sum reduction for CURRENT.
+The opt-in helper `zlt.collision_transfer.from_micro` applies power or normalized
+sigmoid survival. CURRENT still uses `exp(-historical_tau)`, including for multiple
+offsets; it is not replaced by `1 - mean(opacity)`. Default rendering is unchanged.
+
+The controlled curves use `exp(-log(2)*(p/0.1)^q)` for q=2,4,8, and
+`sigmoid((0.1-p)/s)/sigmoid(0.1/s)` for s=0.02,0.01. Preflight requires T(0.02)
+≥0.95, T(0.20)≤0.01, finite monotone curves and maximum |dT/dp|≤100. With this
+shared midpoint calibration, q=2 fails the T(0.20) gate and is reported but not
+rendered; this is not a claim that no alternative quadratic calibration exists.
+The other four sharp laws are compared with CURRENT. Curves include exact
+transmission and derivatives at all requested opacity checkpoints.
+
+All four sharp candidates worsen the frozen four-view Full-HD result:
+
+| Transfer | MSE | Spatial-gradient cosine | Interior MSE |
+|---|---:|---:|---:|
+| CURRENT | 0.0165186 | 0.695541 | 0.0366527 |
+| POWER q=4 | 0.0602360 | 0.112937 | 0.1462073 |
+| POWER q=8 | 0.0608873 | 0.106043 | 0.1483016 |
+| SIGMOID s=0.02 | 0.0597922 | 0.116718 | 0.1448343 |
+| SIGMOID s=0.01 | 0.0605775 | 0.108024 | 0.1473265 |
+
+CURRENT cache replay has relative RGB L2 error **5.09e-9**. The best sharp
+candidate by MSE is sigmoid(pc=0.10,s=0.02), but it increases MSE by 3.62× and
+reduces detected RGB from 5,457,068 to 4,928,987 (unchanged sensor gain). The
+tested sharp mappings therefore **do not support the hypothesis that this
+survival law is the primary remaining fidelity bottleneck**. This is not proof
+that the historical attenuation model is physically correct or that all
+possible alternative transfer laws would fail. CURRENT remains the best tested
+forward operator and the unchanged production default.
+
+The report separates whole-image and regional MSE, spatial-gradient alignment,
+energy accounting, opacity-bin contributions, and ten normal-to-edge profiles
+in five reference-selected anatomical regions. The best power and sigmoid
+candidates also undergo full-image AD/JVP versus central-FD tests for existing
+lambda coordinates 0 and 17, four epsilons, and identical fixed diagnostic IDs
+including transition/support samples. These are bounded derivative diagnostics,
+not dense 16-million-emitter geometry Jacobians. A failed fidelity or derivative
+gate prevents promotion even if an edge looks higher contrast.
+
+In the tested view, lambda 0 closes for CURRENT and both selected sharp laws
+at epsilon=1e-6 (relative errors 4.59e-8–6.76e-8). Lambda 17 exposes the failure:
+its response norm is 0.0054764 for CURRENT, exactly zero for POWER q=4, and
+8.82e-20 for sigmoid s=0.02 (1.61e-17 of CURRENT). The latter has FD relative
+error 0.674 at epsilon=1e-5 despite an apparently good result at 1e-6; a single
+favorable epsilon is not accepted. Zero-response relative metrics are null,
+not fabricated successful closures. Sharpening also erases local edge contrast;
+profile summaries explicitly count missing/collapsed edges instead of treating
+their narrow residual profiles as correct edge recovery.
+
+Reproduce with the existing ignored input caches available:
+
+```bash
+OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MPLCONFIGDIR=/tmp/mpl-v0817 PYTHONPATH=src python demo.py --collision-transfer
+OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MPLCONFIGDIR=/tmp/mpl-v0817 PYTHONPATH=src python scripts/validate_v0817.py
+```
+
+The two stages may also be run as `python -m zlt.collision_transfer` and
+`python -m zlt.collision_diagnostics`. Evidence lives in
+[JSON](artifacts/v0817_collision_transfer.json),
+[CSV](artifacts/v0817_collision_transfer.csv),
+[validation](artifacts/v0817_validation.json), and `figures/v0817_*.png`.
+Raw images and diagnostic checkpoints remain under ignored
+`runs/v0817_collision_transfer/`; historical artifacts are not modified.
+
+## v0.9.0: matched CURRENT observation-driven geometry birth
+
+This experiment uses the local v0.8.17 CURRENT operator, not the historical hard
+reference, as the inverse target. Both SOFT (smoothed Bunny) and GLOBE (analytic
+unit sphere) share a cached `prepared.gt_field` observation: 16,777,216 sources,
+four 1920×1080 views, unchanged finite-packet attenuation, color, gate, lobe,
+gain and C3 detector. Marching cubes is used only for geometry evaluation/export.
+
+Sources keep their IDs and normalized reference weights under deformation.
+GT uses deterministic implicit-area rejection sampling without a mesh; SOFT
+reuses the historical global reference source; GLOBE uses equal-area Sobol sphere
+sampling. These are different geometry-dependent reference measures, not proof
+of source-layout independence. Fixed detector-window clipping is accounted for
+explicitly, without changing cameras or renormalizing image energy.
+
+Candidate responses include implicit attachment, normals, color, emission,
+CURRENT attenuation and detector motion. Chunk-local analytic tangents feed
+accumulated image columns before exact Gram/norm reductions; there is no global
+16M-emitter autograd graph. Both branches must pass high/medium/weak multi-epsilon
+FD checks, then Full-HD single-candidate predicted-versus-actual validation before
+sequential birth. The declared bank has 32 two-scale compact Wendland candidates;
+top/middle/low/random single-candidate tests use two per stratum with overlap
+disclosed. One top-ranked basis is born at zero per round, followed by one damped
+Gauss–Newton step with fixed backtracking and coefficient limit 0.03. GLOBE may
+refresh proposals on the current surface; born centers and source weights do not
+move or change merely because a new basis is proposed.
+
+Run with the existing historical input caches and a local CUDA device:
+
+```bash
+export OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MPLCONFIGDIR=/tmp/mpl-v090 PYTHONPATH=src
+python -m zlt.matched_preflight
+python -m zlt.matched_setup
+python -m zlt.matched_birth
+python scripts/validate_v090.py
+```
+
+Progress and raw Full-HD images live under `runs/v090_matched_birth/`. Scientific
+reports use `artifacts/v090_*.json` / `.csv` and figures use `figures/v090_*.png`.
+Reduced-source FD/timing checks are explicitly `PREFLIGHT_ONLY`, never headline
+birth evidence. A failed branch gate is recorded without canceling the other
+branch. This workflow does not commit or push, and preserves historical artifacts.
+
+## v0.9.1: basis-only zero-set representation (no fixed geometry base)
+
+The isolated `v091_basis_only_field` experiment represents the complete geometry as
+`F(x) = 1 + sum_k lambda_k B_k(x)`. The fixed positive background is only an
+outside-sign gauge: it contains no sphere or Bunny. There is no `SphereField`,
+grid, or geometry-bearing `F0` in the new field. All coefficients are optimizable;
+centers and one common support radius are fixed. No dynamic birth, multiscale
+bases, source-weight optimization, or old ±0.03 coefficient clamp is used.
+
+The new `BasisOnlyZeroSetField` reuses `BasisLayout`, compact Wendland values and
+gradients, and sparse radius queries. Value and gradient are analytically
+consistent. Outside all supports the value is exactly +1 and the gradient is
+exactly zero; all-zero coefficients therefore produce no zero surface.
+
+Sphere initialization uses a deterministic volumetric center layout and signed
+surface/interior/exterior/boundary constraints in a regularized linear solve.
+A small K=128/256 comparison, both with common radius 0.6, selects K=256; the
+128-basis fit has spurious radial crossings. The selected 256-basis initialization
+has 100% root coverage over 4096 directions, radial MAE 0.01316 and p95 0.03671.
+Its maximum local radial error is 0.16229: this is a minimal nondegenerate sphere
+representation, **not** a high-precision sphere fit. A temporary 112³ diagnostic
+extraction has one watertight component. Extraction is never the representation
+or the observation target.
+
+Fixed-K scalar recovery and a reduced-cost CURRENT-renderer recovery are separate
+tests. The latter uses an analytic sphere only as its target, with persistent
+reference source IDs and weights, unchanged CURRENT attenuation/cameras/color/
+gate/lobe/gain/C3 readout, 1024 sources and four 64×64 views. Float64 detector
+accumulation follows the diagnostic FD policy; no Full-HD claim is made.
+Bracketed radial source attachment is necessary because unconstrained Newton
+can jump into the unsupported constant-background region. This adapter is local
+to v091 and does not modify historical renderer or v090 code.
+
+The fixed-K renderer test accepted all eight Gauss–Newton steps: RGB MSE fell
+from 0.0589907 to 0.00250516 (95.75% reduction). This uses only image residuals
+after initialization, not sphere constraints in the renderer optimizer. Strong,
+medium and weak existing-coordinate derivatives were checked at four epsilons.
+The original smallest-two-step FD gate rejected weak coordinate 92 on tiny
+component sign agreement; this failed check is preserved. The explicit final
+criterion requires two adjacent well-resolved epsilons with relative L2 < 1e-4,
+cosine > .9999, norm ratio within .1%, and sign agreement > .99, without changing
+the selected coordinates. Weak-response subtraction sensitivity is reported,
+not hidden as an exact derivative at every epsilon.
+
+```bash
+export OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MPLCONFIGDIR=/tmp/mpl-v091 PYTHONPATH=src
+python -m zlt.basis_only_experiment
+python -m zlt.basis_renderer
+python -m zlt.basis_report
+python scripts/validate_v091.py
+```
+
+Evidence: `artifacts/v091_basis_only_field.json` / `.csv`,
+`artifacts/v091_sphere_initialization.json`, `artifacts/v091_basis_only_fd.json`,
+`artifacts/v091_validation.json`, and `figures/v091_*.png`. Exact coefficients,
+centers and raw diagnostics are in `runs/v091_basis_only_field/`. This experiment
+does not stop the concurrent v090 run, overwrite its artifacts, commit, or push.
+
+## v0.9.2: local manifold normal-deformation jets
+
+This isolated branch inserts tangent-chart normal displacement before the
+**unchanged** v091 radial attachment and CURRENT transport/readout. Its field is
+`F_theta = F_ref - |grad F_ref| h`, where `h` is a sum of normalized tangent-plane
+Wendland-windowed polynomials of order 0/1/2 (1/3/6 coefficients). These are
+surface deformation modes, not an ambient 3D Taylor expansion. A C2 normal collar
+is unity for `|w| <= r/2` and zero at `|w| >= r`, providing an explicit compact
+off-surface extension. Sparse radius queries precede mode evaluation.
+
+`F_ref` is the current field frozen for one local phase, not a new permanent
+sphere base. This pilot initializes the existing basis-only representation with
+one radial basis, `1 - (16/3) W(|x|/2)`, whose zero set is exactly the unit sphere.
+It does not call analytic sphere geometry during reconstruction. The independent
+target is an ellipsoidal coordinate warp of the same scalar profile, with axes
+`[1.025, 0.985, 1.015]`. Counts below are **incremental optimized parameters**;
+all arms share one frozen reference coefficient. This is a local-deformation
+branch, not a claim that all original basis coefficients are jointly optimized.
+
+All reconstruction arms share 256 persistent sources, four 64×64 views, seed,
+mass, CURRENT transmission, lobe/gate, color, C3 detector and image MSE. Six-mode
+image FD uses 1024 sources and four epsilons; every coefficient has at least two
+adjacent resolved epsilons. The tests do not establish source convergence.
+
+| Incremental DoFs | Scalar MSE | p=0 MSE | p=1 MSE | p=2 MSE |
+|---|---:|---:|---:|---:|
+| 12 | 0.0130326 | 0.0116819 | 0.0191528 | 0.0209837 |
+| 24 | 0.00256863 | 0.00206417 | 0.00649276 | 0.0165092 |
+
+Initial MSE is 0.0260962. At 24 DoFs the center counts are respectively 24, 24,
+8 and 4. Higher order reduces center count but **does not win at equal scalar
+budget** here. Threshold tables contain the minimum *tested* budgets, not a
+proof of minimum required capacity. The near-spherical target has no flat patch,
+so this experiment cannot establish curvature-dependent order preference.
+
+Birth starts with one p=2 jet and adds two six-coefficient blocks. Each candidate
+is scored using its full 6×6 image-space Gauss–Newton block, not one scalar
+column. Candidate frames come from the current surface; scoring and insertion
+use the same frozen phase gradient scale. Existing coefficients remain jointly
+optimizable. At three jets / 18 DoFs, MSE is 0.0110321 for loss-driven selection,
+0.0200195 for random and 0.0183946 for farthest-coverage selection. This supports
+the scoring mechanism on one target/seed, not general superiority. All 17 saved
+reconstructions/checkpoints have one watertight component in the 64³ extraction
+diagnostic; extraction never supplies the observation target or geometry model.
+
+```bash
+export OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MPLCONFIGDIR=/tmp/mpl-v092 PYTHONPATH=src
+python -m zlt.jet_experiment --fd-only
+python -m zlt.jet_experiment
+python -m zlt.jet_experiment --audit-only
+python -m zlt.jet_report
+python scripts/validate_v092.py
+```
+
+The full comparison took 181.84 seconds (excluding FD, final audit and plotting),
+with 77.15 MiB peak allocated CUDA memory. See
+`artifacts/v092_manifold_jets.json`, `.csv`, `.md`,
+`artifacts/v092_manifold_jet_fd.json`, `artifacts/v092_jet_audit.json`,
+`artifacts/v092_validation.json`, and `figures/v092_*.png`. Raw states and failed
+checks are retained in `runs/v092_manifold_jets/`. `enabled=False` bypasses jets.
+No old renderer/results were changed; no HPC, Full-HD, mesh-deformation pipeline,
+Eikonal, topology-changing birth, order learning, commit or push is involved.
+
 ## Limitations
 
 v0.8 is one controlled Bunny run, not a general benchmark or a real-photo reconstruction. Its 20 direct Fibonacci packet directions are also its detector directions; it preserves a shared scene-centric transport state but does not validate arbitrary off-atlas cameras. The 8,192-element candidate dictionary is only a safety envelope. Visibility, ownership, and footprint topology remain frozen within each Jacobian cell. The 2×2 ablation changes the deterministic sampled target support with photon density, has no repeated stochastic trials, and uses a simplified one-shot K=1024 comparison; its signed effects are descriptive, not confidence intervals. In particular, a million attempted packets aggregated over 20 Full-HD views does not imply dense observations per pixel. The strict negative high-bandwidth verdict applies to this optimizer, dictionary, renderer approximation, and controlled target—not to every possible observation-driven birth method.

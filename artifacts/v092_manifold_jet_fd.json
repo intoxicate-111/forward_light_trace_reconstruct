@@ -1,0 +1,295 @@
+{
+  "passed": true,
+  "coefficients": [
+    {
+      "mode": "constant",
+      "norm": 117.51201614237932,
+      "steps": [
+        {
+          "epsilon": 0.001,
+          "relative_l2": 0.0001335870812801201,
+          "cosine": 0.9999999940722816,
+          "norm_ratio": 0.9999225985082061,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 0.0001,
+          "relative_l2": 1.3001482662201163e-06,
+          "cosine": 0.999999999999468,
+          "norm_ratio": 0.9999992087899032,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-05,
+          "relative_l2": 1.299213529920122e-08,
+          "cosine": 1.0000000000000009,
+          "norm_ratio": 0.9999999920983547,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-06,
+          "relative_l2": 1.137237032754515e-09,
+          "cosine": 1.0000000000000022,
+          "norm_ratio": 0.9999999998666205,
+          "sign_agreement": 1.0
+        }
+      ],
+      "resolved_intervals": [
+        [
+          0.0001,
+          1e-05
+        ],
+        [
+          1e-05,
+          1e-06
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "mode": "u",
+      "norm": 25.154878135769838,
+      "steps": [
+        {
+          "epsilon": 0.001,
+          "relative_l2": 4.220133934730301e-06,
+          "cosine": 0.9999999999951023,
+          "norm_ratio": 0.9999971684544844,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 0.0001,
+          "relative_l2": 4.218443850466246e-08,
+          "cosine": 0.9999999999999953,
+          "norm_ratio": 0.9999999716732177,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-05,
+          "relative_l2": 6.942609061079777e-10,
+          "cosine": 0.9999999999999942,
+          "norm_ratio": 0.9999999996717212,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-06,
+          "relative_l2": 5.169404366981576e-09,
+          "cosine": 0.9999999999999982,
+          "norm_ratio": 1.0000000002434468,
+          "sign_agreement": 1.0
+        }
+      ],
+      "resolved_intervals": [
+        [
+          0.001,
+          0.0001
+        ],
+        [
+          0.0001,
+          1e-05
+        ],
+        [
+          1e-05,
+          1e-06
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "mode": "v",
+      "norm": 23.811021503663206,
+      "steps": [
+        {
+          "epsilon": 0.001,
+          "relative_l2": 3.617807855757897e-05,
+          "cosine": 0.9999999993509423,
+          "norm_ratio": 1.000003276561778,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 0.0001,
+          "relative_l2": 1.7962885650232122e-07,
+          "cosine": 0.999999999999986,
+          "norm_ratio": 0.9999999421400317,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-05,
+          "relative_l2": 1.904233079708239e-09,
+          "cosine": 1.000000000000003,
+          "norm_ratio": 0.9999999993659525,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-06,
+          "relative_l2": 5.685950624206911e-09,
+          "cosine": 0.999999999999997,
+          "norm_ratio": 0.9999999997952179,
+          "sign_agreement": 1.0
+        }
+      ],
+      "resolved_intervals": [
+        [
+          0.001,
+          0.0001
+        ],
+        [
+          0.0001,
+          1e-05
+        ],
+        [
+          1e-05,
+          1e-06
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "mode": "uu",
+      "norm": 8.986285729551907,
+      "steps": [
+        {
+          "epsilon": 0.001,
+          "relative_l2": 6.216993283561816e-07,
+          "cosine": 0.9999999999998954,
+          "norm_ratio": 0.9999995877387065,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 0.0001,
+          "relative_l2": 6.494619117788806e-09,
+          "cosine": 0.9999999999999994,
+          "norm_ratio": 0.9999999958690368,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-05,
+          "relative_l2": 1.8731895527530076e-08,
+          "cosine": 1.0000000000000024,
+          "norm_ratio": 0.9999999999961552,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-06,
+          "relative_l2": 1.4475413016854526e-08,
+          "cosine": 1.0000000000000053,
+          "norm_ratio": 0.9999999993131052,
+          "sign_agreement": 1.0
+        }
+      ],
+      "resolved_intervals": [
+        [
+          0.001,
+          0.0001
+        ],
+        [
+          0.0001,
+          1e-05
+        ],
+        [
+          1e-05,
+          1e-06
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "mode": "uv",
+      "norm": 5.110260464663313,
+      "steps": [
+        {
+          "epsilon": 0.001,
+          "relative_l2": 8.984080125272771e-07,
+          "cosine": 0.9999999999996549,
+          "norm_ratio": 0.9999996580346003,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 0.0001,
+          "relative_l2": 9.03256992666774e-09,
+          "cosine": 0.9999999999999946,
+          "norm_ratio": 0.9999999965077617,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-05,
+          "relative_l2": 2.7166681686653745e-09,
+          "cosine": 0.9999999999999988,
+          "norm_ratio": 0.999999999964919,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-06,
+          "relative_l2": 2.580553543753462e-08,
+          "cosine": 1.0000000000000009,
+          "norm_ratio": 0.9999999997247155,
+          "sign_agreement": 1.0
+        }
+      ],
+      "resolved_intervals": [
+        [
+          0.001,
+          0.0001
+        ],
+        [
+          0.0001,
+          1e-05
+        ],
+        [
+          1e-05,
+          1e-06
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "mode": "vv",
+      "norm": 8.272288300526995,
+      "steps": [
+        {
+          "epsilon": 0.001,
+          "relative_l2": 2.0887068855144204e-06,
+          "cosine": 0.9999999999979078,
+          "norm_ratio": 0.9999995770801466,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 0.0001,
+          "relative_l2": 1.0744574908580551e-08,
+          "cosine": 0.9999999999999976,
+          "norm_ratio": 0.9999999952627211,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-05,
+          "relative_l2": 1.5088148278267479e-09,
+          "cosine": 0.9999999999999979,
+          "norm_ratio": 0.9999999999458283,
+          "sign_agreement": 1.0
+        },
+        {
+          "epsilon": 1e-06,
+          "relative_l2": 1.5958942844446068e-08,
+          "cosine": 1.0000000000000027,
+          "norm_ratio": 0.9999999999080832,
+          "sign_agreement": 1.0
+        }
+      ],
+      "resolved_intervals": [
+        [
+          0.001,
+          0.0001
+        ],
+        [
+          0.0001,
+          1e-05
+        ],
+        [
+          1e-05,
+          1e-06
+        ]
+      ],
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "compileall": true,
+  "demo_verify": true,
+  "unit_tests": true,
+  "historical_artifacts_unchanged": true,
+  "preexisting_untracked_preserved": true,
+  "strict_json": 176,
+  "csv_parse": 4,
+  "figures_decode": 16,
+  "all_primary_arrays_finite_fullhd": 99,
+  "explicit_preflight_arrays_finite_expected_shape": 1,
+  "target_digest": true,
+  "current_regression": true,
+  "target_replay": true,
+  "both_branches_reported": true,
+  "SOFT_full_source": true,
+  "GLOBE_full_source": true,
+  "diff_check": true,
+  "head_unchanged": true,
+  "git_diff_summary": " .gitignore               |   3 +\n README.md                | 186 +++++++++++++++++++++++++++++++++++++++++++++++\n demo.py                  |   7 ++\n src/zlt/finite_packet.py |  17 ++++-\n 4 files changed, 209 insertions(+), 4 deletions(-)\n",
+  "git_status": " M .gitignore\n M README.md\n M demo.py\n M src/zlt/finite_packet.py\n?? artifacts/v0817_collision_transfer.csv\n?? artifacts/v0817_collision_transfer.json\n?? artifacts/v0817_validation.json\n?? artifacts/v090_birth_fd.json\n?? artifacts/v090_birth_performance.csv\n?? artifacts/v090_globe_birth.csv\n?? artifacts/v090_globe_birth.json\n?? artifacts/v090_matched_birth.csv\n?? artifacts/v090_matched_birth.json\n?? artifacts/v090_matched_birth.md\n?? artifacts/v090_soft_birth.csv\n?? artifacts/v090_soft_birth.json\n?? artifacts/v091_basis_only_fd.json\n?? artifacts/v091_basis_only_field.csv\n?? artifacts/v091_basis_only_field.json\n?? artifacts/v091_sphere_initialization.json\n?? artifacts/v091_validation.json\n?? figures/v0817_blocking_bins.png\n?? figures/v0817_edge_profiles.png\n?? figures/v0817_fullhd_comparison.png\n?? figures/v0817_matched_edge_crops.png\n?? figures/v0817_transfer_curves.png\n?? figures/v090_birth_centers.png\n?? figures/v090_final_fullhd_comparison.png\n?? figures/v090_geometry_trajectory.png\n?? figures/v090_globe_baseline.png\n?? figures/v090_globe_birth_checkpoints.png\n?? figures/v090_globe_evolution.png\n?? figures/v090_globe_predicted_vs_actual.png\n?? figures/v090_globe_residuals.png\n?? figures/v090_gt_target.png\n?? figures/v090_loss_trajectory.png\n?? figures/v090_runtime_per_birth.png\n?? figures/v090_selected_utility.png\n?? figures/v090_soft_baseline.png\n?? figures/v090_soft_birth_checkpoints.png\n?? figures/v090_soft_predicted_vs_actual.png\n?? figures/v090_soft_residuals.png\n?? figures/v091_basis_only_radial_error.png\n?? figures/v091_basis_only_sign_slice.png\n?? figures/v091_basis_only_sphere.png\n?? figures/v091_basis_only_zero_components.png\n?? figures/v091_lambda_perturbations.png\n?? figures/v091_renderer_images.png\n?? figures/v091_renderer_recovery.png\n?? figures/v091_scalar_recovery.png\n?? scripts/finish_v090.py\n?? scripts/validate_v0817.py\n?? scripts/validate_v090.py\n?? scripts/validate_v091.py\n?? src/zlt/basis_initialization.py\n?? src/zlt/basis_only.py\n?? src/zlt/basis_only_experiment.py\n?? src/zlt/basis_renderer.py\n?? src/zlt/basis_report.py\n?? src/zlt/collision_diagnostics.py\n?? src/zlt/collision_transfer.py\n?? src/zlt/matched_birth.py\n?? src/zlt/matched_jacobian.py\n?? src/zlt/matched_operator.py\n?? src/zlt/matched_preflight.py\n?? src/zlt/matched_report.py\n?? src/zlt/matched_setup.py\n?? src/zlt/matched_support_check.py\n?? tests/test_basis_only.py\n?? tests/test_collision_transfer.py\n?? tests/test_matched_operator.py\n",
+  "passed": true
+}

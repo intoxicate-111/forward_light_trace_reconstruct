@@ -1,0 +1,16 @@
+{
+  "strict_json_csv": true,
+  "finite_values": true,
+  "frozen_digests": true,
+  "source_mass": true,
+  "current_replay": true,
+  "micro_tau_regression": true,
+  "detector_energy_accounting": true,
+  "derivative_tests_recorded": 6,
+  "historical_files_unchanged": 352,
+  "figures_decoded": 5,
+  "compileall": true,
+  "demo_verify": true,
+  "unit_tests": 36,
+  "git_diff_check": true
+}

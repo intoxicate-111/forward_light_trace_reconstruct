@@ -1289,6 +1289,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fixed-measure", action="store_true")
     parser.add_argument("--dense-reference", action="store_true")
     parser.add_argument("--global-convergence", action="store_true")
+    parser.add_argument("--collision-transfer", action="store_true")
     parser.add_argument("--bunny-mesh", type=Path, default=None)
     parser.add_argument(
         "--bunny-cache", type=Path, default=Path("data/stanford_bunny/cache")
@@ -1314,6 +1315,12 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.collision_transfer:
+        from zlt.collision_transfer import run_experiment
+        from zlt.collision_diagnostics import finalize
+        run_experiment()
+        finalize()
+        return
     if args.global_convergence:
         from zlt.global_convergence import run_experiment
         run_experiment()

@@ -235,11 +235,16 @@ def _transmission(
     kappa: float,
     surface_barrier: bool,
     launch_exclusion_factor: float,
-) -> tuple[Tensor, Tensor, int]:
-    """Root-free path quadrature; no root identity or first hit is selected."""
+    return_micro: bool = False,
+) -> tuple[Tensor, Tensor, int] | tuple[Tensor, Tensor, int, Tensor]:
+    """Root-free quadrature; optional per-micro evidence leaves CURRENT intact.
+
+    ``return_micro`` appends [emitter, micro] integrated optical depths. The
+    original mean-before-path-sum reduction is retained bit-for-bit for CURRENT.
+    """
     if origins.numel() == 0:
         empty = torch.empty(0, dtype=origins.dtype, device=origins.device)
-        return empty, empty, 0
+        return (empty, empty, 0, empty.reshape(0, offsets.shape[0])) if return_micro else (empty, empty, 0)
     start = launch_exclusion_factor * (radius + epsilon)
     available = (maximum_times - start).clamp_min(0.0)
     steps = max(1, int(math.ceil(float(available.max().detach()) / path_step)))
@@ -257,8 +262,12 @@ def _transmission(
             -1, steps, offsets.shape[0], -1
         ).reshape(-1, 3)
         influence = influence * (unit_gradient * repeated_direction).sum(1).abs()
-    influence = influence.reshape(origins.shape[0], steps, offsets.shape[0]).mean(2)
+    micro_influence = influence.reshape(origins.shape[0], steps, offsets.shape[0])
+    influence = micro_influence.mean(2)
     tau = kappa * (influence * valid).sum(1) * path_step
+    if return_micro:
+        tau_micro = kappa * (micro_influence * valid[..., None]).sum(1) * path_step
+        return torch.exp(-tau), tau, flat.shape[0], tau_micro
     return torch.exp(-tau), tau, flat.shape[0]
 
 

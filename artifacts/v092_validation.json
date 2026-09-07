@@ -1,0 +1,19 @@
+{
+  "compileall": true,
+  "unit_tests": true,
+  "demo_verify": true,
+  "diff_check": true,
+  "historical_artifacts_and_renderer_unchanged": true,
+  "head_unchanged": true,
+  "strict_json_files": 12,
+  "fd_six_modes": true,
+  "fixed_eight_cases": true,
+  "birth_three_policies": true,
+  "equal_birth_budgets": true,
+  "disabled_and_saved_image_replay": true,
+  "finite_arrays": true,
+  "array_count": 19,
+  "figures_decode": true,
+  "csv_parse": true,
+  "passed": true
+}

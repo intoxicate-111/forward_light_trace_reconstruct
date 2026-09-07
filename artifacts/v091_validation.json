@@ -1,0 +1,31 @@
+{
+  "compileall": true,
+  "full_tests": true,
+  "demo_verify": true,
+  "historical_artifacts_unchanged": true,
+  "all_preexisting_renderer_and_v090_code_unchanged": true,
+  "v090_policy": "No old experiment writes/stops by v091. Its report hashes may legitimately change from its own ongoing process.",
+  "fixed_background": true,
+  "strict_json_files": 11,
+  "csv_parse": true,
+  "figures_decode": 8,
+  "finite_arrays": 23,
+  "single_scale": true,
+  "no_hidden_base": true,
+  "all_geometry_in_coefficients": true,
+  "coefficient_digest": true,
+  "layout_digest": true,
+  "no_birth": true,
+  "target_digest": true,
+  "initial_detector_energy": true,
+  "head_unchanged": true,
+  "git_diff_check": true,
+  "code_hashes": {
+    "src/zlt/basis_only.py": "7e68128d011cd0a0c2ae1261b31dbd1cd46fe0b6f0f05656a7e8bb18912d6346",
+    "src/zlt/basis_report.py": "d737d7d6fb82cc63ee2b2f49842c45b5bb65a2cf6d2ad237285d773de7788f5d",
+    "src/zlt/basis_renderer.py": "2913a3d880c3d6b9530a76acf26d82b4a84ac5ffef3852fa17fd1e0f859b99e5",
+    "src/zlt/basis_only_experiment.py": "ff972ac18855a5f689a1651bb6959d4b87cbdf2c906d3a6253e924b48480dd03",
+    "src/zlt/basis_initialization.py": "4d6818f417073d5b1e7d9dbdf01f1ecf490acf18c1c131e90f3f98b8fb856754"
+  },
+  "passed": true
+}
