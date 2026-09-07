@@ -1,0 +1,25 @@
+{
+  "compileall": true,
+  "unit_tests": true,
+  "demo_verify": true,
+  "git_diff_check": true,
+  "git_staged_diff_check": true,
+  "historical_files_unchanged": true,
+  "strict_json": true,
+  "csv_parse": true,
+  "finite_arrays": true,
+  "figures_decode": true,
+  "sparse_vs_original_AD": true,
+  "image_FD": true,
+  "path_tangent_FD": true,
+  "bounded_experiment_acceptance": true,
+  "negative_results_retained": true,
+  "new_code_sha256": {
+    "src/zlt/critical_continuation.py": "411c76fb0e408a234014d4ca8af07384731a1d7cbfb7c3b1d201d71478a70a3f",
+    "src/zlt/critical_experiment.py": "a6ca15eb4d6aed5da36b5bc31e0da6297c96e0ef6b6ec77a483d6c6df7772605",
+    "scripts/report_v093.py": "3424028614772d72ee92730f7019a66118069d827f1a470f5ee9d7c912d61fca",
+    "scripts/validate_v093.py": "f2c29feb9c27d2561b957deeec787eff65ed88862678ab42c3bf1a5aaaa0a78f",
+    "tests/test_critical_continuation.py": "ad4cf0fbdb9858ab1ba92d78b558a9cb01a48d4da45125dbf0251d864030d04e"
+  },
+  "passed": true
+}

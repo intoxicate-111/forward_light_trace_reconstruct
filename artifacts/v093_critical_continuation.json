@@ -1,0 +1,1154 @@
+{
+  "version": "v093",
+  "scalar": {
+    "max_residual": 1.6653345369377348e-16,
+    "min_spatial_jacobian": 1.9999999999999996,
+    "path_tangent_fd_relative_l2": 6.274913674566416e-06,
+    "max_implicit_derivative": 0.5000000000000001,
+    "start_real": [
+      1.0
+    ],
+    "start_imag": [
+      0.0
+    ],
+    "final_real": [
+      -1.0
+    ],
+    "final_imag": [
+      1.2246467991473532e-16
+    ],
+    "endpoint_imag_max": 1.2246467991473532e-16,
+    "min_distance_to_discriminant": 0.9999999999999999,
+    "real_path": [
+      {
+        "mu": 1.0,
+        "spatial_gradient": 2.0,
+        "implicit_derivative": 0.5
+      },
+      {
+        "mu": 0.1,
+        "spatial_gradient": 0.6324555320336759,
+        "implicit_derivative": 1.5811388300841895
+      },
+      {
+        "mu": 0.01,
+        "spatial_gradient": 0.2,
+        "implicit_derivative": 5.0
+      },
+      {
+        "mu": 0.001,
+        "spatial_gradient": 0.06324555320336758,
+        "implicit_derivative": 15.811388300841898
+      },
+      {
+        "mu": 0.0001,
+        "spatial_gradient": 0.02,
+        "implicit_derivative": 50.0
+      },
+      {
+        "mu": 9.999999999999999e-06,
+        "spatial_gradient": 0.006324555320336759,
+        "implicit_derivative": 158.11388300841895
+      },
+      {
+        "mu": 1e-06,
+        "spatial_gradient": 0.002,
+        "implicit_derivative": 500.0
+      },
+      {
+        "mu": 1e-07,
+        "spatial_gradient": 0.0006324555320336759,
+        "implicit_derivative": 1581.1388300841895
+      },
+      {
+        "mu": 1e-08,
+        "spatial_gradient": 0.0002,
+        "implicit_derivative": 5000.0
+      },
+      {
+        "mu": 1e-09,
+        "spatial_gradient": 6.324555320336759e-05,
+        "implicit_derivative": 15811.388300841896
+      },
+      {
+        "mu": 1e-10,
+        "spatial_gradient": 2e-05,
+        "implicit_derivative": 49999.99999999999
+      },
+      {
+        "mu": 1e-11,
+        "spatial_gradient": 6.324555320336758e-06,
+        "implicit_derivative": 158113.88300841898
+      },
+      {
+        "mu": 1e-12,
+        "spatial_gradient": 2e-06,
+        "implicit_derivative": 500000.0
+      },
+      {
+        "mu": 1e-13,
+        "spatial_gradient": 6.324555320336758e-07,
+        "implicit_derivative": 1581138.8300841898
+      },
+      {
+        "mu": 1e-14,
+        "spatial_gradient": 2e-07,
+        "implicit_derivative": 5000000.0
+      }
+    ],
+    "passed": true
+  },
+  "sphere_torus": {
+    "branches": {
+      "pole": {
+        "max_residual": 4.441434166503682e-16,
+        "min_spatial_jacobian": 2.3999999999999995,
+        "path_tangent_fd_relative_l2": 2.6179633031327124e-06,
+        "max_implicit_derivative": 1.8090680674665824,
+        "start_real": [
+          0.5999999999999999
+        ],
+        "start_imag": [
+          0.0
+        ],
+        "final_real": [
+          0.0
+        ],
+        "final_imag": [
+          -0.6633249580710799
+        ],
+        "endpoint_imag_max": 0.6633249580710799,
+        "min_distance_to_discriminant": 0.19999999999999987,
+        "returns_real": false
+      },
+      "inner": {
+        "max_residual": 4.577566798522237e-16,
+        "min_spatial_jacobian": 2.3999999999999995,
+        "path_tangent_fd_relative_l2": 2.6179633031302895e-06,
+        "max_implicit_derivative": 1.8090680674665824,
+        "start_real": [
+          0.0
+        ],
+        "start_imag": [
+          0.5999999999999999
+        ],
+        "final_real": [
+          0.6633249580710799
+        ],
+        "final_imag": [
+          0.0
+        ],
+        "endpoint_imag_max": 0.0,
+        "min_distance_to_discriminant": 0.19999999999999987,
+        "returns_real": true
+      },
+      "outer": {
+        "max_residual": 4.271113254555058e-15,
+        "min_spatial_jacobian": 5.122499389946279,
+        "path_tangent_fd_relative_l2": 6.779495326335512e-06,
+        "max_implicit_derivative": 0.7682212795973761,
+        "start_real": [
+          1.2806248474865698
+        ],
+        "start_imag": [
+          0.0
+        ],
+        "final_real": [
+          1.562049935181331
+        ],
+        "final_imag": [
+          0.0
+        ],
+        "endpoint_imag_max": 0.0,
+        "min_distance_to_discriminant": 0.19999999999999987,
+        "returns_real": true
+      }
+    },
+    "real_path": [
+      {
+        "a": 0.99,
+        "pole": 0.14106735979665894,
+        "gradient": 0.5642694391866357,
+        "dz_da": 7.017923929582521
+      },
+      {
+        "a": 0.999,
+        "pole": 0.04471017781221601,
+        "gradient": 0.17884071124886405,
+        "dz_da": 22.343905770087243
+      },
+      {
+        "a": 0.9999,
+        "pole": 0.014141782065918275,
+        "gradient": 0.0565671282636731,
+        "dz_da": 70.70537470731932
+      },
+      {
+        "a": 0.99999,
+        "pole": 0.004472124774634615,
+        "gradient": 0.01788849909853846,
+        "dz_da": 223.60512069605704
+      },
+      {
+        "a": 0.999999,
+        "pole": 0.0014142132088478148,
+        "gradient": 0.005656852835391259,
+        "dz_da": 707.1062508422739
+      },
+      {
+        "a": 0.9999999,
+        "pole": 0.0004472135842108574,
+        "gradient": 0.0017888543368434295,
+        "dz_da": 2236.0678103384907
+      },
+      {
+        "a": 0.99999999,
+        "pole": 0.00014142135620009053,
+        "gradient": 0.0005656854248003621,
+        "dz_da": 7071.067743015746
+      },
+      {
+        "a": 0.999999999,
+        "pole": 4.4721358917592574e-05,
+        "gradient": 0.0001788854356703703,
+        "dz_da": 22360.680068838832
+      },
+      {
+        "a": 0.9999999999,
+        "pole": 1.4142136208793713e-05,
+        "gradient": 5.656854483517485e-05,
+        "dz_da": 70710.67518626999
+      },
+      {
+        "a": 0.99999999999,
+        "pole": 4.472136140012669e-06,
+        "gradient": 1.7888544560050677e-05,
+        "dz_da": 223606.7884970888
+      },
+      {
+        "a": 0.999999999999,
+        "pole": 1.4141979198682754e-06,
+        "gradient": 5.6567916794731016e-06,
+        "dz_da": 707114.6025247615
+      }
+    ],
+    "critical_origin": {
+      "a": 1.0,
+      "F": 0.0,
+      "gradient": 0.0
+    },
+    "regular_complex_paths": true,
+    "all_tracked_branches_return_real": false,
+    "caveat": "Pole starts real and ends imaginary; inner starts imaginary and ends real. Outer is real at both endpoints. Regular complex continuation does NOT guarantee real re-entry of every root.",
+    "real_topology": [
+      {
+        "c": null,
+        "a": 0.0,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 2,
+        "genus": 0.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger."
+      },
+      {
+        "c": null,
+        "a": 0.8,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 2,
+        "genus": 0.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger."
+      },
+      {
+        "c": null,
+        "a": 1.2,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 0,
+        "genus": 1.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger."
+      }
+    ]
+  },
+  "image": {
+    "candidates": [
+      {
+        "name": "opposite_side",
+        "c0": -0.005,
+        "target_c": 0.005,
+        "views": [
+          0,
+          1
+        ],
+        "mode": [
+          1.0
+        ],
+        "critical_location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "critical_coordinate": "c=lambda[0]=F_c(origin); singular event at c=0",
+        "critical_point_F": -0.005,
+        "critical_point_gradient": 0.0,
+        "critical_point_is_on_surface": false,
+        "source_gradient_min": 0.4371750537905766,
+        "normal_line_denominator_min": 0.43717505379057653,
+        "representative_surface_location": [
+          -0.07340180095624149,
+          0.25016230725211763,
+          0.2457252025604248
+        ],
+        "support_center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "support_radius": 0.8,
+        "affected_geometry_parameters": 1,
+        "geometry_support_pairs": 64,
+        "source_count": 64,
+        "nonzero_image_entries": [
+          846,
+          813,
+          0
+        ],
+        "image_entries": [
+          3072,
+          3072,
+          3072
+        ],
+        "image_nonzero_fraction": [
+          0.275390625,
+          0.2646484375,
+          0.0
+        ],
+        "Jv_norm": 15.716230106785282,
+        "per_view_Jv_norm": [
+          11.433185601804599,
+          10.783420411173449,
+          0.0
+        ],
+        "multiview_Jv_norm": 15.716230106785282,
+        "g_c": -2.6253628926705517,
+        "h_c": 246.99988876942413,
+        "delta_c": 0.010629004351987152,
+        "c_pred": 0.005629004351987152,
+        "sign_crossing_predicted": true,
+        "observable": true,
+        "complex_continuation_used": true,
+        "initial_loss": 3.4865589894299714e-05,
+        "initial_retraced_target_loss": 3.4865589894299714e-05,
+        "trials": [
+          {
+            "label": "small_minus",
+            "c": -0.00501,
+            "loss": 3.4874139858193344e-05,
+            "linear_prediction_loss": 3.4874140017646435e-05,
+            "retraced_loss": 3.4874139858193344e-05,
+            "min_surface_gradient": 0.43720218084557333,
+            "changed_owner_entries": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "label": "small_plus",
+            "c": -0.0049900000000000005,
+            "loss": 3.485704765217187e-05,
+            "linear_prediction_loss": 3.485704781131395e-05,
+            "retraced_loss": 3.485704765217187e-05,
+            "min_surface_gradient": 0.4371479549243309,
+            "changed_owner_entries": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "label": "same_side_update",
+            "c": -0.0025,
+            "loss": 3.297276601900772e-05,
+            "linear_prediction_loss": 3.2980325382817965e-05,
+            "retraced_loss": 1.2318446867398472e-05,
+            "min_surface_gradient": 0.43130267165265607,
+            "changed_owner_entries": [
+              0,
+              1,
+              0
+            ]
+          },
+          {
+            "label": "near_singularity",
+            "c": -1e-08,
+            "loss": 3.1576653979244474e-05,
+            "linear_prediction_loss": 3.159758795742207e-05,
+            "retraced_loss": 1.0710502436417469e-05,
+            "min_surface_gradient": 0.4273333344158547,
+            "changed_owner_entries": [
+              0,
+              1,
+              0
+            ]
+          },
+          {
+            "label": "GN_endpoint",
+            "c": 0.005629004351987152,
+            "loss": 3.031812973112884e-05,
+            "linear_prediction_loss": 3.0323761506972095e-05,
+            "retraced_loss": 3.970023363493897e-05,
+            "min_surface_gradient": 0.42588859198268353,
+            "changed_owner_entries": [
+              1,
+              3,
+              0
+            ]
+          }
+        ],
+        "retraced_target_evidence": {
+          "g_c": -2.6253628926705517,
+          "h_c": 246.99988876942413,
+          "c_pred": 0.005629004351987152,
+          "sign_crossing": true
+        },
+        "frozen_target_evidence": {
+          "g_c": -2.5093784679033324,
+          "c_pred": 0.0051594315706184465
+        },
+        "retraced_backtracking": [
+          {
+            "alpha": 1.0,
+            "c": 0.005629004351987152,
+            "loss": 3.970023363493897e-05
+          },
+          {
+            "alpha": 0.5,
+            "c": 0.000314502175993576,
+            "loss": 1.054385672410956e-05
+          }
+        ],
+        "accepted_real_coordinate": 0.000314502175993576,
+        "accepted_retraced_loss": 1.054385672410956e-05,
+        "raw_GN_retraced_improves": false,
+        "continuation": {
+          "max_residual": 8.4963503246826555e-16,
+          "path_tangent_fd_relative_l2": 1.079799854317687e-05,
+          "max_implicit_derivative": 2.042940220902119,
+          "start_real": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "start_imag": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "final_real": [
+            -0.0009621850585532285,
+            -0.0025654661188350995,
+            -0.008459698778573749,
+            -0.0014674844401378522,
+            -0.0019590928396698436,
+            -0.004959826972638394,
+            -0.0033992460144786933,
+            -0.0005339530168686432,
+            -0.00037065721634483916,
+            -0.004005655596417459,
+            -0.005912553171038483,
+            -0.0014948434935292774,
+            -0.0011051146386670452,
+            -0.010521434069398584,
+            -0.003022637075987701,
+            -0.000702990746020938,
+            -0.0006539087325914489,
+            -0.002853865163545462,
+            -0.009687423599030836,
+            -0.0010317791845071225,
+            -0.0017548035929934216,
+            -0.006991124819127084,
+            -0.00468805033072435,
+            -0.0004622655462498696,
+            -0.0005762129158937136,
+            -0.0036000885714126737,
+            -0.005283001483989387,
+            -0.0020841469543694544,
+            -0.001244258956133957,
+            -0.0070686428873459614,
+            -0.002194141525534696,
+            -0.000800782680712111,
+            -0.0008391418918566109,
+            -0.0023950155729897935,
+            -0.007757480688475065,
+            -0.001290767484371225,
+            -0.002113795669231018,
+            -0.00563651901044838,
+            -0.0038046789605891626,
+            -0.0005824970159909749,
+            -0.0004378533123874495,
+            -0.004292283343725031,
+            -0.006392461324937191,
+            -0.0016946001868912931,
+            -0.0010155496008349856,
+            -0.008945687356697091,
+            -0.0027006304081358843,
+            -0.0006470542560063434,
+            -0.000759408307844313,
+            -0.0030703127603256574,
+            -0.010661812540755877,
+            -0.0011780363681841508,
+            -0.0016353085412218113,
+            -0.006159257655391195,
+            -0.004135160205054554,
+            -0.00041557888674041834,
+            -0.000490795006717294,
+            -0.0033464308450936275,
+            -0.004911837518648195,
+            -0.001847144622833257,
+            -0.0013392843321635166,
+            -0.00807922439082815,
+            -0.002485392502114788,
+            -0.0008769437750456678
+          ],
+          "final_imag": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -1.1704190886730496e-97,
+            0.0,
+            0.0,
+            0.0,
+            -1.8726705418768793e-96,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -1.8726705418768793e-96,
+            3.745341083753759e-96,
+            0.0,
+            0.0,
+            0.0,
+            3.745341083753759e-96,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            4.6816763546921983e-97,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -2.3408381773460992e-97,
+            0.0,
+            -1.8726705418768793e-96,
+            -5.852095443365248e-98,
+            9.363352709384397e-97,
+            0.0,
+            3.745341083753759e-96,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -5.852095443365248e-98,
+            0.0,
+            0.0,
+            1.1985091468012028e-94,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            9.363352709384397e-97,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "endpoint_imag_max": 1.1985091468012028e-94,
+          "min_normal_line_denominator": 0.42337738162231553
+        },
+        "min_complex_spatial_gradient": 0.42684666388277825,
+        "min_distance_to_c_zero": 0.000314502175993576,
+        "min_complex_radial_modulus": 0.10672303109727332,
+        "max_complex_radial_modulus": 0.4456003237425511,
+        "min_real_radial_squared": 0.011389783492408809,
+        "endpoint_imaginary_max": 9.465900252492367e-95,
+        "endpoint_point_match": 3.885780586188048e-16,
+        "endpoint_real_F_max": 7.235558723353575e-16,
+        "endpoint_frozen_cell_loss": 3.143686538315986e-05,
+        "endpoint_loss": 1.054385672410956e-05,
+        "endpoint_topology": {
+          "c": 0.000314502175993576,
+          "a": null,
+          "grid": 144,
+          "components": 1,
+          "watertight": true,
+          "euler": 0,
+          "genus": 1.0,
+          "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+          "meridian": {
+            "inner_radius": 0.01252556742113815,
+            "pole": null,
+            "outer_radius": 1.4142135623730951,
+            "axis_intersections": 0,
+            "inferred_genus": 1,
+            "positive_z_derivative_over_z_lower_bound": 3.9901718070002006,
+            "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+            "grid_agrees": true
+          }
+        },
+        "final_real_side": "positive"
+      },
+      {
+        "name": "same_side",
+        "c0": -0.005,
+        "target_c": -0.007,
+        "views": [
+          0,
+          1
+        ],
+        "mode": [
+          1.0
+        ],
+        "critical_location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "critical_coordinate": "c=lambda[0]=F_c(origin); singular event at c=0",
+        "critical_point_F": -0.005,
+        "critical_point_gradient": 0.0,
+        "critical_point_is_on_surface": false,
+        "source_gradient_min": 0.4371750537905766,
+        "normal_line_denominator_min": 0.43717505379057653,
+        "representative_surface_location": [
+          -0.07340180095624149,
+          0.25016230725211763,
+          0.2457252025604248
+        ],
+        "support_center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "support_radius": 0.8,
+        "affected_geometry_parameters": 1,
+        "geometry_support_pairs": 64,
+        "source_count": 64,
+        "nonzero_image_entries": [
+          846,
+          813,
+          0
+        ],
+        "image_entries": [
+          3072,
+          3072,
+          3072
+        ],
+        "image_nonzero_fraction": [
+          0.275390625,
+          0.2646484375,
+          0.0
+        ],
+        "Jv_norm": 15.716230106785282,
+        "per_view_Jv_norm": [
+          11.433185601804599,
+          10.783420411173449,
+          0.0
+        ],
+        "multiview_Jv_norm": 15.716230106785282,
+        "g_c": 0.4922293035820802,
+        "h_c": 246.99988876942413,
+        "delta_c": -0.0019928320860159543,
+        "c_pred": -0.006992832086015954,
+        "sign_crossing_predicted": false,
+        "observable": true,
+        "complex_continuation_used": false,
+        "initial_loss": 1.5965880260705142e-07,
+        "initial_retraced_target_loss": 1.5965880260705142e-07,
+        "trials": [
+          {
+            "label": "small_minus",
+            "c": -0.00501,
+            "loss": 1.5806054185491952e-07,
+            "linear_prediction_loss": 1.5806051385660152e-07,
+            "retraced_loss": 1.5806054185491952e-07,
+            "min_surface_gradient": 0.43720218084557333,
+            "changed_owner_entries": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "label": "small_plus",
+            "c": -0.0049900000000000005,
+            "loss": 1.6126515999547055e-07,
+            "linear_prediction_loss": 1.6126513171846391e-07,
+            "retraced_loss": 1.6126515999547055e-07,
+            "min_surface_gradient": 0.4371479549243309,
+            "changed_owner_entries": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "label": "same_side_update",
+            "c": -0.0025,
+            "loss": 8.153934576755077e-07,
+            "linear_prediction_loss": 8.114973154194379e-07,
+            "retraced_loss": 2.1012500714279438e-05,
+            "min_surface_gradient": 0.43130267165265607,
+            "changed_owner_entries": [
+              0,
+              1,
+              0
+            ]
+          },
+          {
+            "label": "near_singularity",
+            "c": -1e-08,
+            "loss": 1.9896418352135254e-06,
+            "linear_prediction_loss": 1.9658527659055796e-06,
+            "retraced_loss": 2.2206944115437488e-05,
+            "min_surface_gradient": 0.4273333344158547,
+            "changed_owner_entries": [
+              0,
+              1,
+              0
+            ]
+          },
+          {
+            "label": "GN_endpoint",
+            "c": -0.006992832086015954,
+            "loss": 2.0359559122775678e-12,
+            "linear_prediction_loss": 2.1701435655107035e-12,
+            "retraced_loss": 2.0359559122775678e-12,
+            "min_surface_gradient": 0.44312455212803786,
+            "changed_owner_entries": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "retraced_target_evidence": {
+          "g_c": 0.4922293035820802,
+          "h_c": 246.99988876942413,
+          "c_pred": -0.006992832086015954,
+          "sign_crossing": false
+        },
+        "frozen_target_evidence": {
+          "g_c": 0.4922293035820802,
+          "c_pred": -0.006992832086015954
+        },
+        "retraced_backtracking": [
+          {
+            "alpha": 1.0,
+            "c": -0.006992832086015954,
+            "loss": 2.0359559122775678e-12
+          }
+        ],
+        "accepted_real_coordinate": -0.006992832086015954,
+        "accepted_retraced_loss": 2.0359559122775678e-12,
+        "raw_GN_retraced_improves": true,
+        "endpoint_loss": 2.0359559122775678e-12,
+        "final_real_side": "negative"
+      },
+      {
+        "name": "invisible_opposite",
+        "c0": -0.005,
+        "target_c": 0.005,
+        "views": [
+          2
+        ],
+        "mode": [
+          1.0
+        ],
+        "critical_location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "critical_coordinate": "c=lambda[0]=F_c(origin); singular event at c=0",
+        "critical_point_F": -0.005,
+        "critical_point_gradient": 0.0,
+        "critical_point_is_on_surface": false,
+        "source_gradient_min": 0.4371750537905766,
+        "normal_line_denominator_min": 0.43717505379057653,
+        "representative_surface_location": [
+          -0.07340180095624149,
+          0.25016230725211763,
+          0.2457252025604248
+        ],
+        "support_center": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "support_radius": 0.8,
+        "affected_geometry_parameters": 1,
+        "geometry_support_pairs": 64,
+        "source_count": 64,
+        "nonzero_image_entries": [
+          846,
+          813,
+          0
+        ],
+        "image_entries": [
+          3072,
+          3072,
+          3072
+        ],
+        "image_nonzero_fraction": [
+          0.275390625,
+          0.2646484375,
+          0.0
+        ],
+        "Jv_norm": 0.0,
+        "per_view_Jv_norm": [
+          11.433185601804599,
+          10.783420411173449,
+          0.0
+        ],
+        "multiview_Jv_norm": 15.716230106785282,
+        "g_c": 0.0,
+        "h_c": 0.0,
+        "delta_c": null,
+        "c_pred": null,
+        "sign_crossing_predicted": null,
+        "observable": false,
+        "complex_continuation_used": false,
+        "initial_loss": 0.0,
+        "initial_retraced_target_loss": 0.0,
+        "trials": [],
+        "retraced_target_evidence": {
+          "g_c": 0.0,
+          "h_c": 0.0,
+          "c_pred": null,
+          "sign_crossing": null
+        },
+        "frozen_target_evidence": {
+          "g_c": 0.0,
+          "c_pred": null
+        },
+        "final_real_side": "negative_unchanged",
+        "endpoint_loss": 0.0,
+        "decision": "UNDERDETERMINED: image null mode; no step and no complex motion"
+      }
+    ],
+    "fd": [
+      {
+        "epsilon": 0.0001,
+        "relative_l2": 1.7817120319125285e-07
+      },
+      {
+        "epsilon": 1e-05,
+        "relative_l2": 1.779618640792707e-09
+      },
+      {
+        "epsilon": 1e-06,
+        "relative_l2": 1.1708825559298287e-09
+      },
+      {
+        "epsilon": 1e-07,
+        "relative_l2": 1.180440131302623e-08
+      }
+    ],
+    "sparse_vs_original_AD_max_error": 1.6653345369377348e-15,
+    "real_critical_curve": [
+      {
+        "c": -0.001,
+        "pole": 0.022275808569549582,
+        "equation_residual": 4.336808689942018e-19,
+        "spatial_gradient": 0.08978702169512803,
+        "normal_line_denominator": 0.08978702169512803,
+        "implicit_derivative": 11.055824128169556
+      },
+      {
+        "c": -0.0001,
+        "pole": 0.007068267508120861,
+        "equation_residual": 1.3552527156068805e-20,
+        "spatial_gradient": 0.028295990586608557,
+        "normal_line_denominator": 0.028295990586608557,
+        "implicit_derivative": 35.313592174478785
+      },
+      {
+        "c": -9.999999999999999e-06,
+        "pole": 0.0022359783288640814,
+        "equation_residual": 3.3881317890172014e-21,
+        "spatial_gradient": 0.008944650932119987,
+        "normal_line_denominator": 0.008944650932119987,
+        "implicit_derivative": 111.78997644708224
+      },
+      {
+        "c": -1e-06,
+        "pole": 0.0007071039355597816,
+        "equation_residual": 2.117582368135751e-22,
+        "spatial_gradient": 0.002828439194892097,
+        "normal_line_denominator": 0.002828439194892097,
+        "implicit_derivative": 353.5491246091251
+      },
+      {
+        "c": -1e-07,
+        "pole": 0.00022360670765736326,
+        "equation_residual": 5.293955920339377e-23,
+        "spatial_gradient": 0.0008944275735359468,
+        "normal_line_denominator": 0.0008944275735359468,
+        "implicit_derivative": 1118.0326376052626
+      },
+      {
+        "c": -1e-08,
+        "pole": 7.0710675268619e-05,
+        "equation_residual": 6.617444900424222e-24,
+        "spatial_gradient": 0.0002828427245799165,
+        "normal_line_denominator": 0.0002828427245799165,
+        "implicit_derivative": 3535.5334784517977
+      },
+      {
+        "c": -1e-09,
+        "pole": 2.2360679684861368e-05,
+        "equation_residual": 7.031035206700735e-24,
+        "spatial_gradient": 8.944271948287949e-05,
+        "normal_line_denominator": 8.944271948287949e-05,
+        "implicit_derivative": 11180.33975229644
+      },
+      {
+        "c": -1e-10,
+        "pole": 7.071067809015009e-06,
+        "equation_residual": 2.3264454728053903e-25,
+        "spatial_gradient": 2.828427125957075e-05,
+        "normal_line_denominator": 2.828427125957075e-05,
+        "implicit_derivative": 35355.339016570455
+      },
+      {
+        "c": -1e-11,
+        "pole": 2.2360679774096953e-06,
+        "equation_residual": 4.184370676781917e-25,
+        "spatial_gradient": 8.944271910382268e-06,
+        "normal_line_denominator": 8.944271910382268e-06,
+        "implicit_derivative": 111803.39886146602
+      },
+      {
+        "c": -1e-12,
+        "pole": 7.071067811837946e-07,
+        "equation_residual": 2.764673482873767e-25,
+        "spatial_gradient": 2.8284271247586896e-06,
+        "normal_line_denominator": 2.8284271247586896e-06,
+        "implicit_derivative": 353553.3905889491
+      }
+    ],
+    "initial_topology": {
+      "c": -0.005,
+      "a": null,
+      "grid": 144,
+      "components": 1,
+      "watertight": true,
+      "euler": 2,
+      "genus": 0.0,
+      "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+      "meridian": {
+        "inner_radius": 0.0,
+        "pole": 0.04913097161662203,
+        "outer_radius": 1.4142135623730951,
+        "axis_intersections": 2,
+        "inferred_genus": 0,
+        "positive_z_derivative_over_z_lower_bound": 3.84375,
+        "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+        "grid_agrees": true
+      }
+    },
+    "target_topology": {
+      "c": 0.005,
+      "a": null,
+      "grid": 144,
+      "components": 1,
+      "watertight": true,
+      "euler": 0,
+      "genus": 1.0,
+      "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+      "meridian": {
+        "inner_radius": 0.04918851507694949,
+        "pole": null,
+        "outer_radius": 1.4142135623730951,
+        "axis_intersections": 0,
+        "inferred_genus": 1,
+        "positive_z_derivative_over_z_lower_bound": 3.84375,
+        "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+        "grid_agrees": true
+      }
+    },
+    "chart_failure_control": {
+      "surface_gradient_min": 0.4371750537905766,
+      "denominator_max": 5.551115123125783e-17,
+      "stable_fraction": 0.0
+    },
+    "operator": "Existing reference-direction fixed first-arrival transport cell, bilinear detector, frozen color. Real endpoint retracing reported separately; NOT the v0817 CURRENT soft/C3 operator.",
+    "source_measure": "64 deterministic local neck observations; no complete-surface coverage or surface-area claim."
+  },
+  "seconds": 7.062356162816286,
+  "verdicts": {
+    "scalar_monodromy": true,
+    "analytic_detour_regular": true,
+    "meaningful_image_mode": true,
+    "real_target_predicts_crossing": true,
+    "same_side_not_forced": true,
+    "invisible_mode_underdetermined": true,
+    "complex_sample_path_regular": true,
+    "real_reentry": true,
+    "actual_retraced_loss_improves": true,
+    "endpoint_genus_changed": true,
+    "raw_full_GN_step_improves": false,
+    "every_analytic_branch_returns_real": false,
+    "complex_bypass_proven_necessary": false,
+    "globally_regular_complexified_compact_field_proven": false
+  },
+  "figures": [
+    "figures/v093_analytic_paths.png",
+    "figures/v093_real_critical_collapse.png",
+    "figures/v093_image_evidence.png",
+    "figures/v093_real_images.png",
+    "figures/v093_image_bypass.png",
+    "figures/v093_topology_meridian.png"
+  ],
+  "scope": "Local analytic continuation and image-driven branch selection verified; not a global real-surface continuation theorem or production topology optimizer."
+}
