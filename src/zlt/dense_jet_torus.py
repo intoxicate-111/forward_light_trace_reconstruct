@@ -141,10 +141,14 @@ def _mesh_topology(vertices, faces, n):
     watertight = bool(mesh.is_watertight)
     euler = int(mesh.euler_number)
     genus = int(round((2*len(components)-euler)/2)) if watertight else None
+    clearance = float(np.min(DOMAIN-np.abs(vertices)))
     return {
         "grid": n, "vertices": int(len(vertices)), "faces": int(len(faces)),
         "components": int(len(components)), "watertight": watertight,
         "euler_number": euler, "inferred_genus": genus,
+        "bounds_min": vertices.min(0).tolist(), "bounds_max": vertices.max(0).tolist(),
+        "boundary_clearance": clearance,
+        "extraction_boundary_contact": clearance <= DOMAIN/(n-1),
         "component_areas": [float(x.area) for x in components],
         "diagnostic_only": True,
     }
@@ -168,7 +172,7 @@ def extract_surface(field, count: int, *, n: int = 56, seed: int = 719, face_qua
     spacing = 2*DOMAIN/(n-1)
     vertices, faces, _, _ = marching_cubes(values, 0., spacing=(spacing,)*3)
     vertices -= DOMAIN
-    if np.any(np.isclose(np.abs(vertices), DOMAIN, atol=2*spacing)):
+    if float(np.min(DOMAIN-np.abs(vertices))) <= spacing/2:
         raise RuntimeError("ZERO_SET_TOUCHES_EXTRACTION_BOUNDARY")
     triangles = vertices[faces]
     areas = np.linalg.norm(np.cross(triangles[:, 1]-triangles[:, 0], triangles[:, 2]-triangles[:, 0]), axis=1)/2
@@ -229,10 +233,16 @@ def render(field, cfg, *, seed=719):
     for view in range(cfg["views"]):
         p = surface.points; normal = surface.normals
         d = state["directions"][view].to(DEVICE).expand_as(p)
-        t, _, _ = transmission_prefixes(field, p, d, boundary.exit_times(p, d),
-            radius=cfg["h"], epsilon=cfg["epsilon"], path_step=cfg["path_step"],
-            offsets=p.new_zeros((1, 3)), counts=(1,), eta=cfg["eta"], kappa=cfg["kappa"],
-            launch_exclusion_factor=cfg["launch"])
+        parts = []
+        for start in range(0, len(p), cfg.get("transport_chunk", len(p))):
+            pc = p[start:start+cfg.get("transport_chunk", len(p))]
+            dc = d[start:start+len(pc)]
+            part, _, _ = transmission_prefixes(field, pc, dc, boundary.exit_times(pc, dc),
+                radius=cfg["h"], epsilon=cfg["epsilon"], path_step=cfg["path_step"],
+                offsets=pc.new_zeros((1, 3)), counts=(1,), eta=cfg["eta"], kappa=cfg["kappa"],
+                launch_exclusion_factor=cfg["launch"])
+            parts.append(part)
+        t = torch.cat(parts)
         transmissions.append(t[:, 0].cpu())
         cosine = (normal*d).sum(1)
         energy = state["weights"].to(DEVICE)[:, None]*t*state["colors"].to(DEVICE)*gate(cosine, "CURRENT_SOFT_W005")[:, None]*lobe(cosine, "CURRENT_LOBE")[:, None]

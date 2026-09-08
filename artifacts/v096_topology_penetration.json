@@ -1,0 +1,5567 @@
+{
+  "version": "v0.9.6",
+  "cuda_environment": {
+    "python": "/home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/miniconda3/envs/test/bin/python",
+    "torch": "2.5.1+cu124",
+    "torch_version_cuda": "12.4",
+    "cuda_available": true,
+    "cuda_device_count": 1,
+    "devices": [
+      "Quadro RTX 5000"
+    ],
+    "CUDA_VISIBLE_DEVICES": "",
+    "PATH": "/home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/.codex/tmp/arg0/codex-arg0KqjpDJ:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/opt/puppetlabs/bin:/home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/.vscode/extensions/openai.chatgpt-26.901.22334-linux-x64/bin/linux-x86_64",
+    "LD_LIBRARY_PATH": "",
+    "nvidia_smi": {
+      "command": [
+        "nvidia-smi"
+      ],
+      "returncode": 0,
+      "stdout": "Tue Sep  8 21:02:14 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\n+-----------------------------------------+------------------------+----------------------+\n| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n|                                         |                        |               MIG M. |\n|=========================================+========================+======================|\n|   0  Quadro RTX 5000                On  |   00000000:65:00.0  On |                  Off |\n| 34%   32C    P5             25W /  230W |     982MiB /  16384MiB |     36%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n\n+-----------------------------------------------------------------------------------------+\n| Processes:                                                                              |\n|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n|        ID   ID                                                               Usage      |\n|=========================================================================================|\n|    0   N/A  N/A            8202      G   /usr/lib/xorg/Xorg                      458MiB |\n|    0   N/A  N/A            8502      G   /usr/bin/gnome-shell                    219MiB |\n|    0   N/A  N/A            9026      G   ...exec/xdg-desktop-portal-gnome          3MiB |\n|    0   N/A  N/A           11890      G   ...rack-uuid=3190708988185955192        147MiB |\n|    0   N/A  N/A          384425      G   ...rack-uuid=3190708988185955192         98MiB |\n|    0   N/A  N/A         4170359      G   /usr/bin/nautilus                        31MiB |\n+-----------------------------------------------------------------------------------------+\n",
+      "stderr": ""
+    },
+    "pip_show_torch": {
+      "command": [
+        "/home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/miniconda3/envs/test/bin/python",
+        "-m",
+        "pip",
+        "show",
+        "torch"
+      ],
+      "returncode": 0,
+      "stdout": "Name: torch\nVersion: 2.5.1+cu124\nSummary: Tensors and Dynamic neural networks in Python with strong GPU acceleration\nHome-page: https://pytorch.org/\nAuthor: PyTorch Team\nAuthor-email: packages@pytorch.org\nLicense: BSD-3-Clause\nLocation: /home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/miniconda3/envs/test/lib/python3.10/site-packages\nRequires: filelock, fsspec, jinja2, networkx, nvidia-cublas-cu12, nvidia-cuda-cupti-cu12, nvidia-cuda-nvrtc-cu12, nvidia-cuda-runtime-cu12, nvidia-cudnn-cu12, nvidia-cufft-cu12, nvidia-curand-cu12, nvidia-cusolver-cu12, nvidia-cusparse-cu12, nvidia-nccl-cu12, nvidia-nvjitlink-cu12, nvidia-nvtx-cu12, sympy, triton, typing-extensions\nRequired-by: hrbf-reproduction, torchaudio, torchvision, zero-set-light-tracing\n",
+      "stderr": ""
+    },
+    "hard_gate_passed": true,
+    "diagnosis": "The managed workspace sandbox hid the GPU; the existing local test Conda environment is CUDA-capable when executed in the host context. No dependency was installed or changed."
+  },
+  "representation_capacity": {
+    "version": "v096",
+    "phase": "A_CAPACITY",
+    "cuda": {
+      "torch": "2.5.1+cu124",
+      "torch_cuda": "12.4",
+      "device_count": 1,
+      "device": "Quadro RTX 5000",
+      "capability": [
+        7,
+        5
+      ]
+    },
+    "representation": "unchanged v0.9.2 ManifoldJetField with exact sphere reference and frozen charts",
+    "structural_invariant": "F_theta(0)=-1 for every theta because |grad F_sphere(0)|=0; centered ordinary torus is excluded, not all genus-1 surfaces",
+    "oracle": {
+      "kind": "shifted analytic torus",
+      "major": 0.5,
+      "minor": 0.3,
+      "center_x": 0.5,
+      "origin_inside_solid_tube": true,
+      "optimization_use": "Phase A geometry capacity only"
+    },
+    "configs": [
+      {
+        "K": 128,
+        "order": 0,
+        "parameters": 128,
+        "radius": 0.8,
+        "weighted_rmse": 0.37707933908135866,
+        "surface_abs_mean": 0.2834299390612518,
+        "coefficient_l2": 3.69351472244715,
+        "coefficient_abs_max": 1.6379874986516685,
+        "damping": 1.054668189052457e-05,
+        "gram_condition": 34787.48615759568,
+        "runtime_seconds": 0.33865644689649343,
+        "peak_cuda_allocated_mib": 131.03466796875,
+        "origin_value": -1.0,
+        "topology_screen": {
+          "grid": 72,
+          "vertices": 4746,
+          "faces": 9488,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "component_areas": [
+            5.530033912813914
+          ],
+          "diagnostic_only": true
+        },
+        "overlap": {
+          "median": 26.0,
+          "max": 30.0,
+          "min": 22.0
+        }
+      },
+      {
+        "K": 128,
+        "order": 0,
+        "parameters": 128,
+        "radius": 1.1,
+        "weighted_rmse": 0.26392718996943687,
+        "surface_abs_mean": 0.10983501168032547,
+        "coefficient_l2": 2.9612252139914035,
+        "coefficient_abs_max": 1.1119313330780207,
+        "damping": 1.9158199870526785e-05,
+        "gram_condition": 251054.58936950713,
+        "runtime_seconds": 0.15560763701796532,
+        "peak_cuda_allocated_mib": 201.18408203125,
+        "origin_value": -1.0,
+        "topology_screen": {
+          "grid": 72,
+          "vertices": 5128,
+          "faces": 10252,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "component_areas": [
+            6.168279589634493
+          ],
+          "diagnostic_only": true
+        },
+        "overlap": {
+          "median": 70.0,
+          "max": 75.0,
+          "min": 67.0
+        }
+      },
+      {
+        "K": 128,
+        "order": 0,
+        "parameters": 128,
+        "radius": 1.35,
+        "weighted_rmse": 0.27514075381806824,
+        "surface_abs_mean": 0.08100018445074804,
+        "coefficient_l2": 3.88518915321586,
+        "coefficient_abs_max": 1.1194270278198932,
+        "damping": 2.6872689232055797e-05,
+        "gram_condition": 837722.098925517,
+        "runtime_seconds": 0.16761052515357733,
+        "peak_cuda_allocated_mib": 253.943359375,
+        "origin_value": -1.0,
+        "topology_screen": {
+          "grid": 72,
+          "vertices": 6168,
+          "faces": 12332,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "component_areas": [
+            7.018263374697702
+          ],
+          "diagnostic_only": true
+        },
+        "overlap": {
+          "median": 86.0,
+          "max": 89.0,
+          "min": 83.0
+        }
+      },
+      {
+        "K": 256,
+        "order": 0,
+        "parameters": 256,
+        "radius": 1.1,
+        "weighted_rmse": 0.2616814924174409,
+        "surface_abs_mean": 0.10643473133165665,
+        "coefficient_l2": 5.507345208608741,
+        "coefficient_abs_max": 2.3540012750528305,
+        "damping": 2.0097710005540903e-05,
+        "gram_condition": 1660928.1051935372,
+        "runtime_seconds": 0.3484380168374628,
+        "peak_cuda_allocated_mib": 390.09765625,
+        "origin_value": -1.0,
+        "topology_screen": {
+          "grid": 72,
+          "vertices": 5320,
+          "faces": 10636,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "component_areas": [
+            6.313964477524266
+          ],
+          "diagnostic_only": true
+        },
+        "overlap": {
+          "median": 140.0,
+          "max": 146.0,
+          "min": 135.0
+        }
+      },
+      {
+        "K": 256,
+        "order": 0,
+        "parameters": 256,
+        "radius": 1.35,
+        "weighted_rmse": 0.2729048709549675,
+        "surface_abs_mean": 0.07836339900199049,
+        "coefficient_l2": 6.498975430093048,
+        "coefficient_abs_max": 2.659498570317805,
+        "damping": 2.8243530119323517e-05,
+        "gram_condition": 2817076.5571149173,
+        "runtime_seconds": 0.39624212495982647,
+        "peak_cuda_allocated_mib": 496.0517578125,
+        "origin_value": -1.0,
+        "topology_screen": {
+          "grid": 72,
+          "vertices": 6497,
+          "faces": 12966,
+          "components": 1,
+          "watertight": false,
+          "euler_number": 1,
+          "inferred_genus": null,
+          "component_areas": [
+            7.442004395475361
+          ],
+          "diagnostic_only": true
+        },
+        "overlap": {
+          "median": 173.0,
+          "max": 179.0,
+          "min": 169.0
+        }
+      },
+      {
+        "K": 512,
+        "order": 0,
+        "parameters": 512,
+        "radius": 1.1,
+        "weighted_rmse": 0.2609828444056808,
+        "surface_abs_mean": 0.10489001207347466,
+        "coefficient_l2": 6.03130393574939,
+        "coefficient_abs_max": 1.6283391353835597,
+        "damping": 2.0097710005540883e-05,
+        "gram_condition": 3577519.4236246627,
+        "runtime_seconds": 0.8621412960346788,
+        "peak_cuda_allocated_mib": 768.5439453125,
+        "origin_value": -1.0,
+        "topology_screen": {
+          "grid": 72,
+          "vertices": 5358,
+          "faces": 10712,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "component_areas": [
+            6.305103256099385
+          ],
+          "diagnostic_only": true
+        },
+        "overlap": {
+          "median": 281.0,
+          "max": 288.0,
+          "min": 276.0
+        }
+      },
+      {
+        "K": 512,
+        "order": 0,
+        "parameters": 512,
+        "radius": 1.35,
+        "weighted_rmse": 0.27200878198109696,
+        "surface_abs_mean": 0.07753463905776403,
+        "coefficient_l2": 6.672638218981916,
+        "coefficient_abs_max": 1.953211579359038,
+        "damping": 2.8243530119323663e-05,
+        "gram_condition": 5740096.292125929,
+        "runtime_seconds": 1.0110566241201013,
+        "peak_cuda_allocated_mib": 982.4228515625,
+        "origin_value": -1.0,
+        "topology_screen": {
+          "grid": 72,
+          "vertices": 6632,
+          "faces": 13222,
+          "components": 1,
+          "watertight": false,
+          "euler_number": 0,
+          "inferred_genus": null,
+          "component_areas": [
+            7.581899797875881
+          ],
+          "diagnostic_only": true
+        },
+        "overlap": {
+          "median": 346.0,
+          "max": 353.0,
+          "min": 339.0
+        }
+      },
+      {
+        "K": 1024,
+        "order": 0,
+        "parameters": 1024,
+        "radius": 1.1,
+        "weighted_rmse": 0.2607439615081438,
+        "surface_abs_mean": 0.10429647952178055,
+        "coefficient_l2": 5.787536421557863,
+        "coefficient_abs_max": 1.0031124053434646,
+        "damping": 2.0097710005540883e-05,
+        "gram_condition": 7200361.708616574,
+        "runtime_seconds": 2.607834500959143,
+        "peak_cuda_allocated_mib": 1530.08984375,
+        "origin_value": -1.0,
+        "topology_screen": {
+          "grid": 72,
+          "vertices": 5392,
+          "faces": 10780,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "component_areas": [
+            6.32414832298633
+          ],
+          "diagnostic_only": true
+        },
+        "overlap": {
+          "median": 563.0,
+          "max": 570.0,
+          "min": 555.0
+        }
+      },
+      {
+        "K": 1024,
+        "order": 0,
+        "parameters": 1024,
+        "radius": 1.35,
+        "weighted_rmse": 0.27167058784559117,
+        "surface_abs_mean": 0.07752498888022044,
+        "coefficient_l2": 6.326823832256872,
+        "coefficient_abs_max": 1.2805527388547964,
+        "damping": 2.824353011932347e-05,
+        "gram_condition": 11499506.47118003,
+        "runtime_seconds": 2.960213858168572,
+        "peak_cuda_allocated_mib": 1959.49853515625,
+        "origin_value": -1.0,
+        "topology_screen": {
+          "grid": 72,
+          "vertices": 6691,
+          "faces": 13344,
+          "components": 1,
+          "watertight": false,
+          "euler_number": 0,
+          "inferred_genus": null,
+          "component_areas": [
+            7.655003467534118
+          ],
+          "diagnostic_only": true
+        },
+        "overlap": {
+          "median": 691.0,
+          "max": 700.0,
+          "min": 683.0
+        }
+      },
+      {
+        "K": 256,
+        "order": 1,
+        "parameters": 768,
+        "radius": 1.1,
+        "weighted_rmse": 0.21687757059870372,
+        "surface_abs_mean": 0.06592801434903728,
+        "coefficient_l2": 12.149323822011528,
+        "coefficient_abs_max": 2.3505296721229514,
+        "damping": 2.0097710005540883e-05,
+        "gram_condition": 1856164.0231821565,
+        "runtime_seconds": 1.3942193740513176,
+        "peak_cuda_allocated_mib": 654.865234375,
+        "origin_value": -1.0,
+        "topology_screen": {
+          "grid": 72,
+          "vertices": 5108,
+          "faces": 10216,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 0,
+          "inferred_genus": 1,
+          "component_areas": [
+            5.923784742057524
+          ],
+          "diagnostic_only": true
+        },
+        "overlap": {
+          "median": 140.0,
+          "max": 146.0,
+          "min": 135.0
+        },
+        "topology_verification": {
+          "96": {
+            "grid": 96,
+            "vertices": 9248,
+            "faces": 18496,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 0,
+            "inferred_genus": 1,
+            "bounds_min": [
+              -0.28781472457082646,
+              -0.8037641224108244,
+              -0.32740447194952704
+            ],
+            "bounds_max": [
+              1.3057611083984375,
+              0.8042682286312706,
+              0.3280880255448191
+            ],
+            "boundary_clearance": 0.14423889160156245,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              5.929610427960718
+            ],
+            "diagnostic_only": true
+          },
+          "144": {
+            "grid": 144,
+            "vertices": 20878,
+            "faces": 41756,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 0,
+            "inferred_genus": 1,
+            "bounds_min": [
+              -0.28811663114107566,
+              -0.8040138884857818,
+              -0.3274646759033204
+            ],
+            "bounds_max": [
+              1.3059327879152096,
+              0.8046285989401223,
+              0.32872511857039455
+            ],
+            "boundary_clearance": 0.14406721208479034,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              5.933631852794711
+            ],
+            "diagnostic_only": true
+          }
+        }
+      },
+      {
+        "K": 128,
+        "order": 2,
+        "parameters": 768,
+        "radius": 1.1,
+        "weighted_rmse": 0.14733601991677567,
+        "surface_abs_mean": 0.022936122712875998,
+        "coefficient_l2": 18.138333307681638,
+        "coefficient_abs_max": 2.556997786507411,
+        "damping": 1.9158199870526863e-05,
+        "gram_condition": 975586.8449575587,
+        "runtime_seconds": 1.2575952431652695,
+        "peak_cuda_allocated_mib": 548.5732421875,
+        "origin_value": -1.0,
+        "topology_screen": {
+          "grid": 72,
+          "vertices": 5104,
+          "faces": 10208,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 0,
+          "inferred_genus": 1,
+          "component_areas": [
+            6.000904387162336
+          ],
+          "diagnostic_only": true
+        },
+        "overlap": {
+          "median": 70.0,
+          "max": 75.0,
+          "min": 67.0
+        }
+      }
+    ],
+    "winner": {
+      "K": 256,
+      "order": 1,
+      "parameters": 768,
+      "radius": 1.1,
+      "weighted_rmse": 0.21687757059870372,
+      "surface_abs_mean": 0.06592801434903728,
+      "coefficient_l2": 12.149323822011528,
+      "coefficient_abs_max": 2.3505296721229514,
+      "damping": 2.0097710005540883e-05,
+      "gram_condition": 1856164.0231821565,
+      "runtime_seconds": 1.3942193740513176,
+      "peak_cuda_allocated_mib": 654.865234375,
+      "origin_value": -1.0,
+      "topology_screen": {
+        "grid": 72,
+        "vertices": 5108,
+        "faces": 10216,
+        "components": 1,
+        "watertight": true,
+        "euler_number": 0,
+        "inferred_genus": 1,
+        "component_areas": [
+          5.923784742057524
+        ],
+        "diagnostic_only": true
+      },
+      "overlap": {
+        "median": 140.0,
+        "max": 146.0,
+        "min": 135.0
+      },
+      "topology_verification": {
+        "96": {
+          "grid": 96,
+          "vertices": 9248,
+          "faces": 18496,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 0,
+          "inferred_genus": 1,
+          "bounds_min": [
+            -0.28781472457082646,
+            -0.8037641224108244,
+            -0.32740447194952704
+          ],
+          "bounds_max": [
+            1.3057611083984375,
+            0.8042682286312706,
+            0.3280880255448191
+          ],
+          "boundary_clearance": 0.14423889160156245,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            5.929610427960718
+          ],
+          "diagnostic_only": true
+        },
+        "144": {
+          "grid": 144,
+          "vertices": 20878,
+          "faces": 41756,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 0,
+          "inferred_genus": 1,
+          "bounds_min": [
+            -0.28811663114107566,
+            -0.8040138884857818,
+            -0.3274646759033204
+          ],
+          "bounds_max": [
+            1.3059327879152096,
+            0.8046285989401223,
+            0.32872511857039455
+          ],
+          "boundary_clearance": 0.14406721208479034,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            5.933631852794711
+          ],
+          "diagnostic_only": true
+        }
+      }
+    },
+    "sphere_fibers": {
+      "directions": 2048,
+      "samples_per_fiber": 513,
+      "s_interval": [
+        -0.98,
+        1.0
+      ],
+      "root_count_histogram": {
+        "1": 2048
+      },
+      "one_root_fraction": 1.0,
+      "multi_root_fraction": 0.0,
+      "zero_root_fraction": 0.0,
+      "near_even_root_fibers": 0,
+      "root_slope_abs_min": 2.0000000000000546,
+      "root_slope_abs_quantiles": [
+        2.0000000000000546,
+        2.000000000000055,
+        2.000000000000055,
+        2.0000000000000555
+      ],
+      "lowest_slope_root_locations": [
+        [
+          0.9181110776859197,
+          0.10403315356838695,
+          -0.3824253547936784
+        ],
+        [
+          0.7373689088444496,
+          -0.06474797320821489,
+          -0.6723799463361688
+        ],
+        [
+          -0.8291355220369887,
+          0.37440100459800774,
+          0.4151604194194194
+        ],
+        [
+          -0.0113029063063227,
+          -0.6859473309510161,
+          0.7275634016841852
+        ],
+        [
+          0.5102365526754189,
+          0.7990802095459435,
+          -0.3180086147040217
+        ],
+        [
+          -0.3615202710500267,
+          0.8815143936426261,
+          0.3037029262632216
+        ],
+        [
+          -0.31174316836241595,
+          -0.5219491555987954,
+          -0.7939680572599392
+        ],
+        [
+          -0.05844519971933347,
+          0.5520085421566124,
+          -0.831787670031213
+        ],
+        [
+          -0.6441944847495353,
+          -0.6944609117967375,
+          0.3205269221216529
+        ],
+        [
+          0.15155882204144835,
+          -0.9392399863670693,
+          -0.30799053795636555
+        ],
+        [
+          0.6338154223467732,
+          -0.7483475992658388,
+          0.19558599404991217
+        ],
+        [
+          -0.7262630318920846,
+          0.5492302165287556,
+          -0.4133862331509705
+        ],
+        [
+          -0.08507317313400395,
+          -0.705521810116944,
+          -0.7035634517669873
+        ],
+        [
+          -0.8614897145216951,
+          -0.5074048732173618,
+          -0.019384695217013897
+        ],
+        [
+          -0.2702376974333778,
+          0.9255565677785653,
+          -0.2651728242635801
+        ],
+        [
+          -0.9894056672424805,
+          0.09860448588171038,
+          -0.10655318386853037
+        ]
+      ]
+    },
+    "sphere_monotonicity": {
+      "empirical_grid_only": true,
+      "directions": 2048,
+      "samples_per_fiber": 513,
+      "minimum_dG_ds": 0.04000000000000002,
+      "quantiles": [
+        0.04000000000000002,
+        0.040000000000000036,
+        0.07867187499999993,
+        0.23335937500000004,
+        2.02
+      ],
+      "not_a_theorem": true
+    },
+    "capacity_success": true,
+    "winner_fibers": {
+      "directions": 2048,
+      "samples_per_fiber": 513,
+      "s_interval": [
+        -0.98,
+        1.0
+      ],
+      "root_count_histogram": {
+        "1": 1959,
+        "3": 89
+      },
+      "one_root_fraction": 0.95654296875,
+      "multi_root_fraction": 0.04345703125,
+      "zero_root_fraction": 0.0,
+      "near_even_root_fibers": 5,
+      "root_slope_abs_min": 0.0297353157864515,
+      "root_slope_abs_quantiles": [
+        0.0297353157864515,
+        0.36288255557043053,
+        0.9394808703278816,
+        3.9593577499216264
+      ],
+      "lowest_slope_root_locations": [
+        [
+          0.4824166112661208,
+          0.24730303461409636,
+          0.1713735204536022
+        ],
+        [
+          0.47833245095265087,
+          0.24520935621293038,
+          0.16992266466905684
+        ],
+        [
+          0.13936018902318303,
+          0.4249493851639151,
+          0.2844916403940987
+        ],
+        [
+          0.1860831225084727,
+          -0.3444566805099649,
+          -0.2663214521444988
+        ],
+        [
+          -0.05620399516990137,
+          0.5450411990097086,
+          -0.020036756434199193
+        ],
+        [
+          0.008758041580817093,
+          -0.4533534608577605,
+          -0.13130009052673178
+        ],
+        [
+          -0.06042561805459355,
+          0.585980608955279,
+          -0.021541767407919393
+        ],
+        [
+          0.04492044559055662,
+          -0.47784530180748525,
+          -0.2026687933708403
+        ],
+        [
+          0.13078551242242847,
+          -0.4390658115518873,
+          -0.2757635436628529
+        ],
+        [
+          0.39186194935873886,
+          -0.2917024998818687,
+          0.2339382664548106
+        ],
+        [
+          0.008169087007516637,
+          -0.4228666686188891,
+          -0.12247051509289739
+        ],
+        [
+          0.5065359109770154,
+          0.29167945591573863,
+          -0.21892557308529179
+        ],
+        [
+          0.23422385874735577,
+          0.3645419855465375,
+          -0.28525183152490247
+        ],
+        [
+          0.030707989730560034,
+          -0.49625673562590494,
+          -0.19517167205616417
+        ],
+        [
+          0.16853059197353976,
+          -0.4209735870398014,
+          0.29124561730151594
+        ],
+        [
+          0.08331934351925491,
+          -0.38472679935091564,
+          -0.22037264481540444
+        ]
+      ]
+    },
+    "winner_monotonicity": {
+      "empirical_grid_only": true,
+      "directions": 2048,
+      "samples_per_fiber": 513,
+      "minimum_dG_ds": -5.752927373367554,
+      "quantiles": [
+        -5.752927373367554,
+        -2.919551927936996,
+        -1.996888228622178,
+        -0.6647576819467578,
+        2.0917640521317504
+      ],
+      "not_a_theorem": true
+    }
+  },
+  "image_penetration": {
+    "phase": "B_SAME_FAMILY_RGB_ONLY",
+    "K": 256,
+    "order": 1,
+    "parameters": 768,
+    "radius": 1.1,
+    "selected_views": [
+      0,
+      1
+    ],
+    "maximum_steps": 100,
+    "optimizer_target_inputs": [
+      "immutable RGB target image"
+    ],
+    "optimizer_forbidden_inputs": {
+      "theta_T": false,
+      "torus_field": false,
+      "target_mesh": false,
+      "genus": false,
+      "hole_center": false,
+      "topology_mode": false
+    },
+    "oracle_direction_scope": "post-step diagnostic only; _image_step has no oracle argument",
+    "trajectory": [
+      {
+        "iteration": 0,
+        "actual_fresh_retrace_mse": 0.17272083729839496,
+        "all_view_mse": 0.17107992490040358,
+        "topology": {
+          "grid": 40,
+          "vertices": 3360,
+          "faces": 6716,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "bounds_min": [
+            -0.9984297593434651,
+            -0.9984297593434651,
+            -0.9984297593434651
+          ],
+          "bounds_max": [
+            0.9984297238863433,
+            0.9984297238863433,
+            0.9984297238863433
+          ],
+          "boundary_clearance": 0.45157024065653484,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            12.537275407116482
+          ],
+          "diagnostic_only": true
+        },
+        "geometry": {
+          "spatial_gradient_quantiles": [
+            1.9999999999999996,
+            1.9999999999999998,
+            1.9999999999999998,
+            1.9999999999999998,
+            2.0
+          ],
+          "chart_denominator_quantiles": [
+            1.9999999999999996,
+            1.9999999999999998,
+            2.0,
+            2.0,
+            2.0
+          ],
+          "lowest_gradient_locations": [
+            [
+              -0.6024516811825064,
+              -0.012414892761603957,
+              -0.7980587962538157
+            ],
+            [
+              -0.658092851061674,
+              0.06208423123223348,
+              0.7503728057531267
+            ],
+            [
+              -0.7742665031605553,
+              0.5615363753968832,
+              -0.29187031570486266
+            ],
+            [
+              -0.658092851061674,
+              -0.06208423123223333,
+              0.7503728057531267
+            ],
+            [
+              -0.7401836803148728,
+              0.2862493736815797,
+              -0.6084319316591078
+            ],
+            [
+              -0.7980587962538157,
+              0.012414892761604176,
+              -0.6024516811825064
+            ],
+            [
+              -0.7400769947467903,
+              0.27967113110458625,
+              0.6116127044733786
+            ],
+            [
+              -0.7429317670896343,
+              0.43459491271051387,
+              -0.5090968977466018
+            ]
+          ],
+          "critical_candidate": {
+            "location": [
+              -0.6024516811825064,
+              -0.012414892761603957,
+              -0.7980587962538157
+            ],
+            "active_centers": 141,
+            "active_scalar_parameters": 423,
+            "center_ids": [
+              0,
+              3,
+              6,
+              7,
+              8,
+              11,
+              12,
+              15,
+              16,
+              17,
+              20,
+              23,
+              24,
+              27,
+              30,
+              31,
+              32,
+              33,
+              36,
+              39,
+              40,
+              43,
+              46,
+              47,
+              48,
+              51,
+              52,
+              55,
+              56,
+              57,
+              60,
+              63,
+              64,
+              65,
+              68,
+              71,
+              72,
+              75,
+              76,
+              78,
+              79,
+              80,
+              83,
+              85,
+              86,
+              87,
+              88,
+              89,
+              91,
+              92,
+              95,
+              96,
+              99,
+              100,
+              102,
+              103,
+              105,
+              106,
+              108,
+              111,
+              112,
+              113,
+              115,
+              116,
+              119,
+              120,
+              123,
+              126,
+              127,
+              128,
+              129,
+              131,
+              132,
+              135,
+              136,
+              139,
+              142,
+              143,
+              144,
+              147,
+              148,
+              150,
+              151,
+              152,
+              153,
+              156,
+              159,
+              160,
+              161,
+              163,
+              166,
+              167,
+              168,
+              169,
+              170,
+              171,
+              172,
+              175,
+              176,
+              177,
+              180,
+              183,
+              184,
+              187,
+              190,
+              191,
+              192,
+              195,
+              196,
+              199,
+              200,
+              201,
+              203,
+              204,
+              207,
+              208,
+              209,
+              212,
+              215,
+              216,
+              219,
+              222,
+              223,
+              224,
+              225,
+              228,
+              231,
+              232,
+              235,
+              238,
+              239,
+              240,
+              243,
+              245,
+              246,
+              247,
+              248,
+              249,
+              251,
+              252,
+              255
+            ],
+            "block_extent": 1.9985378169462875
+          },
+          "active_coefficients_gt_1e_8": 0,
+          "coefficient_l2": 0.0,
+          "coefficient_abs_max": 0.0,
+          "surface_residual_max": 4.440892098500626e-16,
+          "surface_area": 12.537275407116482,
+          "topology": {
+            "grid": 40,
+            "vertices": 3360,
+            "faces": 6716,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -0.9984297593434651,
+              -0.9984297593434651,
+              -0.9984297593434651
+            ],
+            "bounds_max": [
+              0.9984297238863433,
+              0.9984297238863433,
+              0.9984297238863433
+            ],
+            "boundary_clearance": 0.45157024065653484,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              12.537275407116482
+            ],
+            "diagnostic_only": true
+          },
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          }
+        },
+        "render_seconds": 16.367623675847426,
+        "coefficient_l2": 0.0,
+        "coefficient_abs_max": 0.0,
+        "jacobian_seconds": 4.108827631920576,
+        "jacobian_shape": [
+          6144,
+          768
+        ],
+        "jacobian_nnz": 2199754,
+        "oracle_diagnostic": {
+          "effective_rank_relative_1e_8": 298,
+          "leading_singular_values": [
+            2.227582366611594,
+            1.9194294521141526,
+            1.8321545758100415,
+            1.691292085657217,
+            1.5244064729509368,
+            1.4344638914680812,
+            1.3965383400490006,
+            1.3228012391291644,
+            1.1873472902350104,
+            1.100570491166052,
+            1.0800570508352803,
+            1.016389721481976,
+            0.8857953143039896,
+            0.8675402375516286,
+            0.7985945506618447,
+            0.75444401875246,
+            0.72887655938938,
+            0.6931283394165054,
+            0.6500889803881605,
+            0.6022329091976004,
+            0.573862134619023,
+            0.49847160689407227,
+            0.47776664935470164,
+            0.46142270146484504,
+            0.44848304632789626,
+            0.4127371776797115,
+            0.3975290258365523,
+            0.3856156868022392,
+            0.36153746607969217,
+            0.328890121841799,
+            0.30714358664375363,
+            0.2729710366533164
+          ],
+          "smallest_retained_singular": 0.00022310454748001652,
+          "oracle_gradient_cosine": 0.0018959610797648309,
+          "oracle_observable_projection_fraction": 0.6106967602014416,
+          "oracle_direction_used_by_optimizer": false
+        },
+        "trials": [
+          {
+            "method": "GN_0.02",
+            "alpha": 1.0,
+            "damping": 0.0079183813449786,
+            "predicted_local_mse": 0.1340826264425391,
+            "actual_fresh_retrace_mse": 0.1561542320993376,
+            "topology": {
+              "grid": 40,
+              "vertices": 3708,
+              "faces": 7412,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0759980287307347,
+                -1.0075926242730555,
+                -1.1237552618369078
+              ],
+              "bounds_max": [
+                1.0722046485314,
+                1.0667825454320663,
+                1.0291276491605317
+              ],
+              "boundary_clearance": 0.3262447381630922,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.576044881945641
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": true
+          }
+        ],
+        "accepted": true,
+        "accepted_method": "GN_0.02",
+        "accepted_update_l2": 0.5967977277107204
+      },
+      {
+        "iteration": 1,
+        "actual_fresh_retrace_mse": 0.1561542320993376,
+        "all_view_mse": 0.15905599900274045,
+        "topology": {
+          "grid": 40,
+          "vertices": 3708,
+          "faces": 7412,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "bounds_min": [
+            -1.0759980287307347,
+            -1.0075926242730555,
+            -1.1237552618369078
+          ],
+          "bounds_max": [
+            1.0722046485314,
+            1.0667825454320663,
+            1.0291276491605317
+          ],
+          "boundary_clearance": 0.3262447381630922,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            13.576044881945641
+          ],
+          "diagnostic_only": true
+        },
+        "geometry": {
+          "spatial_gradient_quantiles": [
+            1.3360092243083428,
+            1.5874387265045697,
+            1.7077388637607671,
+            1.79354467640165,
+            2.1433826841568946
+          ],
+          "chart_denominator_quantiles": [
+            1.3029608453883583,
+            1.552254232783354,
+            1.6598771150799274,
+            1.726461394411703,
+            2.0226995221657065
+          ],
+          "lowest_gradient_locations": [
+            [
+              0.6074492947094544,
+              -0.08646009081683136,
+              0.806815068367194
+            ],
+            [
+              0.582910757661994,
+              -0.06068377739040242,
+              0.8230278330266013
+            ],
+            [
+              0.585513691512774,
+              -0.13753968400592195,
+              0.8224491657318382
+            ],
+            [
+              0.5494807751640811,
+              -0.13686358313564856,
+              0.846184389452864
+            ],
+            [
+              0.6312716142447956,
+              -0.06168663218212584,
+              0.7762056564639235
+            ],
+            [
+              0.629607436338687,
+              -0.08677802784033245,
+              0.780201199277528
+            ],
+            [
+              0.6150290104056804,
+              -0.010925179078180223,
+              0.7803449996466283
+            ],
+            [
+              0.5900170149082591,
+              -0.010405244331687519,
+              0.8013369665484689
+            ]
+          ],
+          "critical_candidate": {
+            "location": [
+              0.6074492947094544,
+              -0.08646009081683136,
+              0.806815068367194
+            ],
+            "active_centers": 141,
+            "active_scalar_parameters": 423,
+            "center_ids": [
+              1,
+              2,
+              4,
+              5,
+              9,
+              10,
+              13,
+              14,
+              18,
+              19,
+              21,
+              22,
+              25,
+              26,
+              28,
+              29,
+              34,
+              35,
+              37,
+              38,
+              41,
+              42,
+              44,
+              45,
+              49,
+              50,
+              53,
+              54,
+              56,
+              58,
+              59,
+              61,
+              62,
+              66,
+              67,
+              69,
+              70,
+              73,
+              74,
+              76,
+              77,
+              78,
+              81,
+              82,
+              84,
+              85,
+              87,
+              89,
+              90,
+              93,
+              94,
+              97,
+              98,
+              100,
+              101,
+              102,
+              104,
+              106,
+              107,
+              109,
+              110,
+              114,
+              115,
+              117,
+              118,
+              121,
+              122,
+              124,
+              125,
+              129,
+              130,
+              131,
+              133,
+              134,
+              137,
+              138,
+              140,
+              141,
+              145,
+              146,
+              148,
+              149,
+              150,
+              154,
+              155,
+              157,
+              158,
+              161,
+              162,
+              164,
+              165,
+              168,
+              170,
+              171,
+              173,
+              174,
+              178,
+              179,
+              181,
+              182,
+              185,
+              186,
+              188,
+              189,
+              190,
+              193,
+              194,
+              197,
+              198,
+              200,
+              202,
+              203,
+              205,
+              206,
+              210,
+              211,
+              213,
+              214,
+              217,
+              218,
+              220,
+              221,
+              226,
+              227,
+              229,
+              230,
+              233,
+              234,
+              236,
+              237,
+              238,
+              241,
+              242,
+              244,
+              245,
+              246,
+              247,
+              249,
+              250,
+              253,
+              254
+            ],
+            "block_extent": 1.9985378169462875
+          },
+          "active_coefficients_gt_1e_8": 768,
+          "coefficient_l2": 0.5967977277107205,
+          "coefficient_abs_max": 0.10846281363977187,
+          "surface_residual_max": 1.2278565251201104e-15,
+          "surface_area": 13.576044881945641,
+          "topology": {
+            "grid": 40,
+            "vertices": 3708,
+            "faces": 7412,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -1.0759980287307347,
+              -1.0075926242730555,
+              -1.1237552618369078
+            ],
+            "bounds_max": [
+              1.0722046485314,
+              1.0667825454320663,
+              1.0291276491605317
+            ],
+            "boundary_clearance": 0.3262447381630922,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              13.576044881945641
+            ],
+            "diagnostic_only": true
+          },
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          }
+        },
+        "render_seconds": 17.543477904051542,
+        "coefficient_l2": 0.5967977277107205,
+        "coefficient_abs_max": 0.10846281363977187,
+        "jacobian_seconds": 4.209618717897683,
+        "jacobian_shape": [
+          6144,
+          768
+        ],
+        "jacobian_nnz": 2247620,
+        "oracle_diagnostic": {
+          "effective_rank_relative_1e_8": 295,
+          "leading_singular_values": [
+            2.2309736949149706,
+            1.9155627529969617,
+            1.5549567630320562,
+            1.4088964093060936,
+            1.387211513081507,
+            1.3024102144929717,
+            1.2797167902112587,
+            1.1422240636133933,
+            0.9691818884838662,
+            0.9620373810582755,
+            0.8652314572715238,
+            0.840636559233071,
+            0.7444200210203451,
+            0.6847225119865821,
+            0.6600343290087664,
+            0.6191225334232311,
+            0.5758969502135027,
+            0.556743221716531,
+            0.5208043330326078,
+            0.48370777334446186,
+            0.45519248200608925,
+            0.41864811454346235,
+            0.4091539162800139,
+            0.39969727290417695,
+            0.37726075259874586,
+            0.36026539732640017,
+            0.35548289929265253,
+            0.3004612153289504,
+            0.27848158797192357,
+            0.262371586109278,
+            0.251743470809295,
+            0.24280864791106016
+          ],
+          "smallest_retained_singular": 0.0002281674045962691,
+          "oracle_gradient_cosine": 0.0037096287488270706,
+          "oracle_observable_projection_fraction": 0.5761545215517321,
+          "oracle_direction_used_by_optimizer": false
+        },
+        "trials": [
+          {
+            "method": "GN_0.02",
+            "alpha": 1.0,
+            "damping": 0.008993211195895459,
+            "predicted_local_mse": 0.13059322634604412,
+            "actual_fresh_retrace_mse": 0.14552841467742972,
+            "topology": {
+              "grid": 40,
+              "vertices": 3608,
+              "faces": 7212,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0402501228528145,
+                -0.9674678557958358,
+                -1.0405162285535763
+              ],
+              "bounds_max": [
+                1.1167430486434544,
+                1.1496747726049177,
+                1.088273248917017
+              ],
+              "boundary_clearance": 0.3003252273950823,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.169417141943956
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": true
+          }
+        ],
+        "accepted": true,
+        "accepted_method": "GN_0.02",
+        "accepted_update_l2": 0.5813891121650542
+      },
+      {
+        "iteration": 2,
+        "actual_fresh_retrace_mse": 0.14552841467742972,
+        "all_view_mse": 0.15014794665937026,
+        "topology": {
+          "grid": 40,
+          "vertices": 3608,
+          "faces": 7212,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "bounds_min": [
+            -1.0402501228528145,
+            -0.9674678557958358,
+            -1.0405162285535763
+          ],
+          "bounds_max": [
+            1.1167430486434544,
+            1.1496747726049177,
+            1.088273248917017
+          ],
+          "boundary_clearance": 0.3003252273950823,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            13.169417141943956
+          ],
+          "diagnostic_only": true
+        },
+        "geometry": {
+          "spatial_gradient_quantiles": [
+            1.0218570622179453,
+            1.186583947753472,
+            1.428276121747465,
+            1.5860423650009736,
+            2.1880096147491153
+          ],
+          "chart_denominator_quantiles": [
+            0.7513772160747819,
+            0.9418261604650577,
+            1.2063660099884044,
+            1.3440933593567619,
+            1.945807485753906
+          ],
+          "lowest_gradient_locations": [
+            [
+              0.6957381605502566,
+              -0.061422935469143666,
+              0.7692589140518209
+            ],
+            [
+              0.6797288319014645,
+              -0.08808884486750976,
+              0.77866122854317
+            ],
+            [
+              0.6517769899681626,
+              -0.08717856288546708,
+              0.79205791976097
+            ],
+            [
+              0.7253243990791236,
+              -0.06208696759984867,
+              0.7411441233458397
+            ],
+            [
+              -0.4678335412014576,
+              0.3643005264913175,
+              -0.5327686702925098
+            ],
+            [
+              -0.4859717361960972,
+              0.3376076994480419,
+              -0.5363301993558787
+            ],
+            [
+              -0.48414730492972513,
+              0.3375913390270969,
+              -0.5114891872525275
+            ],
+            [
+              -0.46762669315158545,
+              0.36403682838970414,
+              -0.5711305769985672
+            ]
+          ],
+          "critical_candidate": {
+            "location": [
+              0.6957381605502566,
+              -0.061422935469143666,
+              0.7692589140518209
+            ],
+            "active_centers": 139,
+            "active_scalar_parameters": 417,
+            "center_ids": [
+              1,
+              2,
+              4,
+              5,
+              9,
+              10,
+              13,
+              14,
+              18,
+              19,
+              21,
+              22,
+              25,
+              26,
+              28,
+              29,
+              34,
+              35,
+              37,
+              38,
+              41,
+              42,
+              44,
+              45,
+              49,
+              50,
+              53,
+              54,
+              56,
+              58,
+              59,
+              61,
+              62,
+              66,
+              67,
+              69,
+              70,
+              73,
+              74,
+              76,
+              77,
+              78,
+              81,
+              82,
+              84,
+              87,
+              90,
+              91,
+              93,
+              94,
+              97,
+              98,
+              100,
+              101,
+              104,
+              107,
+              109,
+              110,
+              114,
+              115,
+              117,
+              118,
+              121,
+              122,
+              124,
+              125,
+              129,
+              130,
+              131,
+              133,
+              134,
+              137,
+              138,
+              140,
+              141,
+              145,
+              146,
+              148,
+              149,
+              150,
+              152,
+              154,
+              155,
+              157,
+              158,
+              161,
+              162,
+              164,
+              165,
+              167,
+              168,
+              170,
+              171,
+              173,
+              174,
+              178,
+              179,
+              181,
+              182,
+              185,
+              186,
+              188,
+              189,
+              190,
+              193,
+              194,
+              197,
+              198,
+              200,
+              202,
+              203,
+              205,
+              206,
+              210,
+              211,
+              213,
+              214,
+              217,
+              218,
+              220,
+              221,
+              226,
+              227,
+              229,
+              230,
+              233,
+              234,
+              236,
+              237,
+              241,
+              242,
+              244,
+              245,
+              247,
+              249,
+              250,
+              251,
+              253,
+              254
+            ],
+            "block_extent": 1.9984877258117517
+          },
+          "active_coefficients_gt_1e_8": 768,
+          "coefficient_l2": 0.8383039739335885,
+          "coefficient_abs_max": 0.18394666688080705,
+          "surface_residual_max": 1.4287381177371114e-15,
+          "surface_area": 13.169417141943956,
+          "topology": {
+            "grid": 40,
+            "vertices": 3608,
+            "faces": 7212,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -1.0402501228528145,
+              -0.9674678557958358,
+              -1.0405162285535763
+            ],
+            "bounds_max": [
+              1.1167430486434544,
+              1.1496747726049177,
+              1.088273248917017
+            ],
+            "boundary_clearance": 0.3003252273950823,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              13.169417141943956
+            ],
+            "diagnostic_only": true
+          },
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          }
+        },
+        "render_seconds": 16.868566913995892,
+        "coefficient_l2": 0.8383039739335885,
+        "coefficient_abs_max": 0.18394666688080705,
+        "jacobian_seconds": 4.64935139589943,
+        "jacobian_shape": [
+          6144,
+          768
+        ],
+        "jacobian_nnz": 2137795,
+        "oracle_diagnostic": {
+          "effective_rank_relative_1e_8": 257,
+          "leading_singular_values": [
+            2.966219436545999,
+            1.9768733499685076,
+            1.7397473660914013,
+            1.4153420668318264,
+            1.2498822239978966,
+            1.213447744951848,
+            1.1408908255503323,
+            1.099357363019601,
+            0.9829213728937696,
+            0.8885834942949823,
+            0.840238870409626,
+            0.7664176972057579,
+            0.7456119993189498,
+            0.7055372455519929,
+            0.5961529034242047,
+            0.5723728120232877,
+            0.5702019120121211,
+            0.5146779917301574,
+            0.4743872729290547,
+            0.46529729584061513,
+            0.4169268485286144,
+            0.4008002009067575,
+            0.38906632341786346,
+            0.3696272046920662,
+            0.34752482240117555,
+            0.3231348237099933,
+            0.3059241016792457,
+            0.29191054005863276,
+            0.26235189321221214,
+            0.248923939393871,
+            0.2437291841268752,
+            0.22317444820189178
+          ],
+          "smallest_retained_singular": 0.00029695858416420507,
+          "oracle_gradient_cosine": 0.00993768746011731,
+          "oracle_observable_projection_fraction": 0.4620509646832386,
+          "oracle_direction_used_by_optimizer": false
+        },
+        "trials": [
+          {
+            "method": "GN_0.02",
+            "alpha": 1.0,
+            "damping": 0.01623864170100221,
+            "predicted_local_mse": 0.12916416539104383,
+            "actual_fresh_retrace_mse": 0.13993870207400783,
+            "topology": {
+              "grid": 40,
+              "vertices": 3642,
+              "faces": 7280,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0463035045525966,
+                -0.9178780922522911,
+                -1.0430571213746682
+              ],
+              "bounds_max": [
+                1.2215029594225764,
+                1.1605167095477766,
+                1.1939615689791168
+              ],
+              "boundary_clearance": 0.2284970405774236,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.163028687506408
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": true
+          }
+        ],
+        "accepted": true,
+        "accepted_method": "GN_0.02",
+        "accepted_update_l2": 0.3715664673381904
+      },
+      {
+        "iteration": 3,
+        "actual_fresh_retrace_mse": 0.13993870207400783,
+        "all_view_mse": 0.14656542025073038,
+        "topology": {
+          "grid": 40,
+          "vertices": 3642,
+          "faces": 7280,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "bounds_min": [
+            -1.0463035045525966,
+            -0.9178780922522911,
+            -1.0430571213746682
+          ],
+          "bounds_max": [
+            1.2215029594225764,
+            1.1605167095477766,
+            1.1939615689791168
+          ],
+          "boundary_clearance": 0.2284970405774236,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            13.163028687506408
+          ],
+          "diagnostic_only": true
+        },
+        "geometry": {
+          "spatial_gradient_quantiles": [
+            1.0562691025729434,
+            1.2289239309965707,
+            1.4641179540883453,
+            1.6208676069102692,
+            2.298020143381869
+          ],
+          "chart_denominator_quantiles": [
+            0.32353063548869804,
+            0.5786524246744754,
+            0.9162752008708202,
+            1.1647770157799227,
+            1.9461933123314135
+          ],
+          "lowest_gradient_locations": [
+            [
+              -0.41797377731936014,
+              0.3481099888567408,
+              -0.6569818123434739
+            ],
+            [
+              -0.39603732728734903,
+              0.374054179538634,
+              -0.657103960988439
+            ],
+            [
+              -0.4170605958350365,
+              0.3437625147936321,
+              -0.6124584176876022
+            ],
+            [
+              -0.39436093235908737,
+              0.370426868889843,
+              -0.6062258228572424
+            ],
+            [
+              -0.4205980629334838,
+              0.3405109423187281,
+              -0.6822490216454861
+            ],
+            [
+              -0.45583702286718053,
+              0.2876097359297016,
+              -0.6568800530131256
+            ],
+            [
+              -0.40968823252427716,
+              0.3438300064302117,
+              -0.5873200729127325
+            ],
+            [
+              -0.4394354211200378,
+              0.31281015052725686,
+              -0.6824522899478456
+            ]
+          ],
+          "critical_candidate": {
+            "location": [
+              -0.41797377731936014,
+              0.3481099888567408,
+              -0.6569818123434739
+            ],
+            "active_centers": 142,
+            "active_scalar_parameters": 426,
+            "center_ids": [
+              0,
+              1,
+              3,
+              5,
+              7,
+              8,
+              9,
+              11,
+              12,
+              15,
+              16,
+              17,
+              19,
+              20,
+              23,
+              24,
+              27,
+              31,
+              32,
+              33,
+              35,
+              36,
+              39,
+              40,
+              41,
+              43,
+              46,
+              47,
+              48,
+              51,
+              53,
+              55,
+              56,
+              57,
+              59,
+              60,
+              63,
+              64,
+              65,
+              67,
+              68,
+              71,
+              72,
+              75,
+              79,
+              80,
+              81,
+              83,
+              85,
+              86,
+              87,
+              88,
+              89,
+              91,
+              92,
+              95,
+              96,
+              99,
+              103,
+              104,
+              105,
+              106,
+              107,
+              111,
+              112,
+              113,
+              115,
+              116,
+              119,
+              120,
+              123,
+              126,
+              127,
+              128,
+              129,
+              131,
+              132,
+              135,
+              136,
+              139,
+              142,
+              143,
+              144,
+              147,
+              149,
+              151,
+              152,
+              153,
+              155,
+              159,
+              160,
+              161,
+              163,
+              166,
+              167,
+              168,
+              169,
+              171,
+              172,
+              175,
+              176,
+              177,
+              179,
+              180,
+              183,
+              184,
+              187,
+              191,
+              192,
+              195,
+              199,
+              200,
+              201,
+              203,
+              204,
+              207,
+              208,
+              209,
+              211,
+              212,
+              215,
+              216,
+              217,
+              219,
+              222,
+              223,
+              224,
+              225,
+              231,
+              232,
+              235,
+              239,
+              240,
+              241,
+              243,
+              245,
+              247,
+              248,
+              249,
+              251,
+              252,
+              255
+            ],
+            "block_extent": 1.9984877258117517
+          },
+          "active_coefficients_gt_1e_8": 768,
+          "coefficient_l2": 0.9119466797509652,
+          "coefficient_abs_max": 0.25240722663179005,
+          "surface_residual_max": 1.9239167550755276e-15,
+          "surface_area": 13.163028687506408,
+          "topology": {
+            "grid": 40,
+            "vertices": 3642,
+            "faces": 7280,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -1.0463035045525966,
+              -0.9178780922522911,
+              -1.0430571213746682
+            ],
+            "bounds_max": [
+              1.2215029594225764,
+              1.1605167095477766,
+              1.1939615689791168
+            ],
+            "boundary_clearance": 0.2284970405774236,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              13.163028687506408
+            ],
+            "diagnostic_only": true
+          },
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          }
+        },
+        "render_seconds": 16.62411502492614,
+        "coefficient_l2": 0.9119466797509652,
+        "coefficient_abs_max": 0.25240722663179005,
+        "jacobian_seconds": 5.095476781949401,
+        "jacobian_shape": [
+          6144,
+          768
+        ],
+        "jacobian_nnz": 2103672,
+        "oracle_diagnostic": {
+          "effective_rank_relative_1e_8": 243,
+          "leading_singular_values": [
+            3.03155444154125,
+            2.205768513280164,
+            1.6516620532121293,
+            1.3745796962894146,
+            1.224429765493512,
+            1.1125158370892163,
+            0.9962651805465161,
+            0.9166181913130291,
+            0.8625415242082499,
+            0.8474159609491427,
+            0.7891270612709544,
+            0.6828971269378076,
+            0.676266560617352,
+            0.6135984775620626,
+            0.6057851187184606,
+            0.526760105991388,
+            0.4937454507892736,
+            0.46468491205868706,
+            0.428833062345932,
+            0.40888480704075036,
+            0.38543224038950963,
+            0.34867722804268675,
+            0.3415106868837144,
+            0.32113166328106124,
+            0.30555035229052424,
+            0.279444068719094,
+            0.25679761264020745,
+            0.23882366661709759,
+            0.2338813647452965,
+            0.21507651292203447,
+            0.20943220520755992,
+            0.20135401783967294
+          ],
+          "smallest_retained_singular": 0.0003125895998953363,
+          "oracle_gradient_cosine": -0.008676069698722949,
+          "oracle_observable_projection_fraction": 0.44542098508364913,
+          "oracle_direction_used_by_optimizer": false
+        },
+        "trials": [
+          {
+            "method": "GN_0.02",
+            "alpha": 1.0,
+            "damping": 0.016774403871000015,
+            "predicted_local_mse": 0.12214952946645248,
+            "actual_fresh_retrace_mse": 0.1407658810538282,
+            "topology": {
+              "grid": 40,
+              "vertices": 3856,
+              "faces": 7708,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.087026789249518,
+                -0.8824570655822753,
+                -1.1005699915763658
+              ],
+              "bounds_max": [
+                1.2590560228396683,
+                1.1680787208752756,
+                1.3091728210449218
+              ],
+              "boundary_clearance": 0.14082717895507812,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.748789524418724
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.02",
+            "alpha": 0.5,
+            "damping": 0.016774403871000015,
+            "predicted_local_mse": 0.12809513629113423,
+            "actual_fresh_retrace_mse": 0.13887512198711802,
+            "topology": {
+              "grid": 40,
+              "vertices": 3696,
+              "faces": 7388,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0562174931550636,
+                -0.8971892870389497,
+                -1.0716270165565687
+              ],
+              "bounds_max": [
+                1.2392278328920023,
+                1.1615787212665263,
+                1.2511405749198719
+              ],
+              "boundary_clearance": 0.1988594250801281,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.371069830370473
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": true
+          }
+        ],
+        "accepted": true,
+        "accepted_method": "GN_0.02",
+        "accepted_update_l2": 0.21133081403879841
+      },
+      {
+        "iteration": 4,
+        "actual_fresh_retrace_mse": 0.13887512198711802,
+        "all_view_mse": 0.14595952525817765,
+        "topology": {
+          "grid": 40,
+          "vertices": 3696,
+          "faces": 7388,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "bounds_min": [
+            -1.0562174931550636,
+            -0.8971892870389497,
+            -1.0716270165565687
+          ],
+          "bounds_max": [
+            1.2392278328920023,
+            1.1615787212665263,
+            1.2511405749198719
+          ],
+          "boundary_clearance": 0.1988594250801281,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            13.371069830370473
+          ],
+          "diagnostic_only": true
+        },
+        "geometry": {
+          "spatial_gradient_quantiles": [
+            1.0931562936812353,
+            1.3005155495151606,
+            1.529883738973283,
+            1.6844298722351831,
+            2.3841983323445435
+          ],
+          "chart_denominator_quantiles": [
+            0.21142977196461588,
+            0.4704806572816378,
+            0.8616765165422633,
+            1.1222442851361965,
+            1.9921653485863307
+          ],
+          "lowest_gradient_locations": [
+            [
+              -0.395030694173837,
+              0.3688386378391271,
+              -0.6564928911644441
+            ],
+            [
+              -0.4142456567222484,
+              0.3427504622435839,
+              -0.6565155850287905
+            ],
+            [
+              -0.41646854393201904,
+              0.3399095776183803,
+              -0.6818651967691609
+            ],
+            [
+              -0.43342698657815565,
+              0.3126238835698899,
+              -0.6818703511403331
+            ],
+            [
+              -0.37451200246342864,
+              0.3911945014532847,
+              -0.6821772692286999
+            ],
+            [
+              -0.41172846109223205,
+              0.33798117158171936,
+              -0.627568092327282
+            ],
+            [
+              -0.4454077504402646,
+              0.28740117345685573,
+              -0.6562219517577154
+            ],
+            [
+              -0.3437557715967745,
+              0.421336182060424,
+              -0.6567993880207162
+            ]
+          ],
+          "critical_candidate": {
+            "location": [
+              -0.395030694173837,
+              0.3688386378391271,
+              -0.6564928911644441
+            ],
+            "active_centers": 145,
+            "active_scalar_parameters": 435,
+            "center_ids": [
+              0,
+              1,
+              3,
+              5,
+              7,
+              8,
+              9,
+              11,
+              12,
+              15,
+              16,
+              17,
+              19,
+              20,
+              23,
+              24,
+              27,
+              31,
+              32,
+              33,
+              35,
+              36,
+              39,
+              40,
+              41,
+              43,
+              46,
+              47,
+              48,
+              51,
+              53,
+              55,
+              56,
+              57,
+              59,
+              60,
+              63,
+              64,
+              65,
+              67,
+              68,
+              71,
+              72,
+              75,
+              79,
+              80,
+              81,
+              83,
+              85,
+              86,
+              87,
+              88,
+              89,
+              91,
+              92,
+              95,
+              96,
+              97,
+              99,
+              103,
+              104,
+              105,
+              106,
+              107,
+              111,
+              112,
+              113,
+              115,
+              116,
+              119,
+              120,
+              121,
+              123,
+              126,
+              127,
+              128,
+              129,
+              131,
+              132,
+              135,
+              136,
+              139,
+              142,
+              143,
+              144,
+              147,
+              149,
+              151,
+              152,
+              153,
+              155,
+              159,
+              160,
+              161,
+              163,
+              166,
+              167,
+              168,
+              169,
+              171,
+              172,
+              175,
+              176,
+              177,
+              179,
+              180,
+              183,
+              184,
+              187,
+              191,
+              192,
+              195,
+              197,
+              199,
+              200,
+              201,
+              203,
+              204,
+              207,
+              208,
+              209,
+              211,
+              212,
+              215,
+              216,
+              217,
+              219,
+              222,
+              223,
+              224,
+              225,
+              231,
+              232,
+              235,
+              239,
+              240,
+              241,
+              243,
+              245,
+              247,
+              248,
+              249,
+              251,
+              252,
+              255
+            ],
+            "block_extent": 1.9984877258117517
+          },
+          "active_coefficients_gt_1e_8": 768,
+          "coefficient_l2": 0.9513836723623372,
+          "coefficient_abs_max": 0.2666803780474171,
+          "surface_residual_max": 1.9629607387792146e-15,
+          "surface_area": 13.371069830370473,
+          "topology": {
+            "grid": 40,
+            "vertices": 3696,
+            "faces": 7388,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -1.0562174931550636,
+              -0.8971892870389497,
+              -1.0716270165565687
+            ],
+            "bounds_max": [
+              1.2392278328920023,
+              1.1615787212665263,
+              1.2511405749198719
+            ],
+            "boundary_clearance": 0.1988594250801281,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              13.371069830370473
+            ],
+            "diagnostic_only": true
+          },
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          }
+        },
+        "render_seconds": 16.702450681012124,
+        "coefficient_l2": 0.9513836723623372,
+        "coefficient_abs_max": 0.2666803780474171,
+        "jacobian_seconds": 5.369899714831263,
+        "jacobian_shape": [
+          6144,
+          768
+        ],
+        "jacobian_nnz": 2078463,
+        "oracle_diagnostic": {
+          "effective_rank_relative_1e_8": 251,
+          "leading_singular_values": [
+            2.6057712294129725,
+            1.8590889722198227,
+            1.7133190400369236,
+            1.2930555301489866,
+            1.1984804167938403,
+            1.0936864040425571,
+            1.0740979983577004,
+            0.9900452891873922,
+            0.867276817824754,
+            0.8408600980318011,
+            0.7671418334636896,
+            0.7094285017298372,
+            0.6182719214443433,
+            0.5732932528431844,
+            0.5506328428988152,
+            0.526732822521301,
+            0.4991320187620109,
+            0.4827271386574164,
+            0.4189501447075032,
+            0.4038827020264641,
+            0.3731828505517543,
+            0.36507563318606917,
+            0.3389078985314964,
+            0.3144076697048937,
+            0.30404582355427134,
+            0.2810296120329136,
+            0.2770464572587146,
+            0.24643664889478314,
+            0.23757131017904745,
+            0.22875523077761475,
+            0.20207956996385332,
+            0.19842190551448255
+          ],
+          "smallest_retained_singular": 0.0002639605849614087,
+          "oracle_gradient_cosine": -0.004461811651944769,
+          "oracle_observable_projection_fraction": 0.4938887723533674,
+          "oracle_direction_used_by_optimizer": false
+        },
+        "trials": [
+          {
+            "method": "GN_0.02",
+            "alpha": 1.0,
+            "damping": 0.012633228570752466,
+            "predicted_local_mse": 0.12357189357310168,
+            "actual_fresh_retrace_mse": 0.13977795766287907,
+            "topology": {
+              "grid": 40,
+              "vertices": 3790,
+              "faces": 7576,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0745216296269344,
+                -0.886504744260739,
+                -1.1404609557909842
+              ],
+              "bounds_max": [
+                1.3136043939834987,
+                1.1129945217034758,
+                1.3625633044120595
+              ],
+              "boundary_clearance": 0.08743669558794043,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.590827321961841
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.02",
+            "alpha": 0.5,
+            "damping": 0.012633228570752466,
+            "predicted_local_mse": 0.12856988125937108,
+            "actual_fresh_retrace_mse": 0.13831992672939708,
+            "topology": {
+              "grid": 40,
+              "vertices": 3712,
+              "faces": 7420,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0626632788242438,
+                -0.8889707161830022,
+                -1.1056308220594357
+              ],
+              "bounds_max": [
+                1.2718645535982571,
+                1.1225044054862783,
+                1.3066165043757512
+              ],
+              "boundary_clearance": 0.1433834956242488,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.393026674947539
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": true
+          }
+        ],
+        "accepted": true,
+        "accepted_method": "GN_0.02",
+        "accepted_update_l2": 0.21538977706455595
+      },
+      {
+        "iteration": 5,
+        "actual_fresh_retrace_mse": 0.13831992672939708,
+        "all_view_mse": 0.14661741484278334,
+        "topology": {
+          "grid": 40,
+          "vertices": 3712,
+          "faces": 7420,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "bounds_min": [
+            -1.0626632788242438,
+            -0.8889707161830022,
+            -1.1056308220594357
+          ],
+          "bounds_max": [
+            1.2718645535982571,
+            1.1225044054862783,
+            1.3066165043757512
+          ],
+          "boundary_clearance": 0.1433834956242488,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            13.393026674947539
+          ],
+          "diagnostic_only": true
+        },
+        "geometry": {
+          "spatial_gradient_quantiles": [
+            1.121640329322856,
+            1.3099245805110997,
+            1.5439947412076338,
+            1.6947258872031075,
+            2.4325927766865085
+          ],
+          "chart_denominator_quantiles": [
+            0.13671338557179777,
+            0.3573555354383259,
+            0.8051416208842351,
+            1.0481704151446918,
+            2.011486905049665
+          ],
+          "lowest_gradient_locations": [
+            [
+              -0.3934775718158387,
+              0.36627911614957465,
+              -0.6560456515297621
+            ],
+            [
+              -0.4146725811849018,
+              0.3399744648845492,
+              -0.6816218323267335
+            ],
+            [
+              -0.3731201902531179,
+              0.39140854578905715,
+              -0.6818649567185775
+            ],
+            [
+              -0.41234264223534006,
+              0.3399386964502383,
+              -0.6562373161660144
+            ],
+            [
+              -0.43134767265093815,
+              0.3126424472553243,
+              -0.6815141161652791
+            ],
+            [
+              0.6937060371355507,
+              -0.06262986444144555,
+              0.6777377482677324
+            ],
+            [
+              -0.3419141128608923,
+              0.4200493619251923,
+              -0.656524131537748
+            ],
+            [
+              -0.3467678315077583,
+              0.4160664113050221,
+              -0.6818905468168408
+            ]
+          ],
+          "critical_candidate": {
+            "location": [
+              -0.3934775718158387,
+              0.36627911614957465,
+              -0.6560456515297621
+            ],
+            "active_centers": 145,
+            "active_scalar_parameters": 435,
+            "center_ids": [
+              0,
+              1,
+              3,
+              5,
+              7,
+              8,
+              9,
+              11,
+              12,
+              15,
+              16,
+              17,
+              19,
+              20,
+              23,
+              24,
+              27,
+              31,
+              32,
+              33,
+              35,
+              36,
+              39,
+              40,
+              41,
+              43,
+              46,
+              47,
+              48,
+              51,
+              53,
+              55,
+              56,
+              57,
+              59,
+              60,
+              63,
+              64,
+              65,
+              67,
+              68,
+              71,
+              72,
+              75,
+              79,
+              80,
+              81,
+              83,
+              85,
+              86,
+              87,
+              88,
+              89,
+              91,
+              92,
+              95,
+              96,
+              97,
+              99,
+              103,
+              104,
+              105,
+              106,
+              107,
+              111,
+              112,
+              113,
+              115,
+              116,
+              119,
+              120,
+              121,
+              123,
+              126,
+              127,
+              128,
+              129,
+              131,
+              132,
+              135,
+              136,
+              139,
+              142,
+              143,
+              144,
+              147,
+              149,
+              151,
+              152,
+              153,
+              155,
+              159,
+              160,
+              161,
+              163,
+              166,
+              167,
+              168,
+              169,
+              171,
+              172,
+              175,
+              176,
+              177,
+              179,
+              180,
+              183,
+              184,
+              187,
+              191,
+              192,
+              195,
+              197,
+              199,
+              200,
+              201,
+              203,
+              204,
+              207,
+              208,
+              209,
+              211,
+              212,
+              215,
+              216,
+              217,
+              219,
+              222,
+              223,
+              224,
+              225,
+              231,
+              232,
+              235,
+              239,
+              240,
+              241,
+              243,
+              245,
+              247,
+              248,
+              249,
+              251,
+              252,
+              255
+            ],
+            "block_extent": 1.9984877258117517
+          },
+          "active_coefficients_gt_1e_8": 768,
+          "coefficient_l2": 0.9863401589437149,
+          "coefficient_abs_max": 0.2770384422698047,
+          "surface_residual_max": 2.26554885962571e-15,
+          "surface_area": 13.39302667494754,
+          "topology": {
+            "grid": 40,
+            "vertices": 3712,
+            "faces": 7420,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -1.0626632788242438,
+              -0.8889707161830022,
+              -1.1056308220594357
+            ],
+            "bounds_max": [
+              1.2718645535982571,
+              1.1225044054862783,
+              1.3066165043757512
+            ],
+            "boundary_clearance": 0.1433834956242488,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              13.393026674947539
+            ],
+            "diagnostic_only": true
+          },
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          }
+        },
+        "render_seconds": 16.641203900100663,
+        "coefficient_l2": 0.9863401589437149,
+        "coefficient_abs_max": 0.2770384422698047,
+        "jacobian_seconds": 5.261958023998886,
+        "jacobian_shape": [
+          6144,
+          768
+        ],
+        "jacobian_nnz": 2033284,
+        "oracle_diagnostic": {
+          "effective_rank_relative_1e_8": 254,
+          "leading_singular_values": [
+            2.324708731135886,
+            1.950430899967066,
+            1.5060089400352927,
+            1.3017864664902594,
+            1.2340673299470568,
+            1.0112979176497325,
+            0.958449078289711,
+            0.8909952928662266,
+            0.7919013994891916,
+            0.7281502937540326,
+            0.6651277124207245,
+            0.6310786784786053,
+            0.5999952454050408,
+            0.5615386471724994,
+            0.5288869518767273,
+            0.4935472419570232,
+            0.45877869720670233,
+            0.4301427567066973,
+            0.4085337600088324,
+            0.37279007557593413,
+            0.3670387327185992,
+            0.3406947915475761,
+            0.31499769763322777,
+            0.2986029957801675,
+            0.2907787925722781,
+            0.2847579909795354,
+            0.26231942294259686,
+            0.2439664688109092,
+            0.23090746835433149,
+            0.22022891028996236,
+            0.2015658594037783,
+            0.19491500478525892
+          ],
+          "smallest_retained_singular": 0.00023898429684068257,
+          "oracle_gradient_cosine": 0.007838549310756554,
+          "oracle_observable_projection_fraction": 0.4850269996144627,
+          "oracle_direction_used_by_optimizer": false
+        },
+        "trials": [
+          {
+            "method": "GN_0.02",
+            "alpha": 1.0,
+            "damping": 0.009087503816289028,
+            "predicted_local_mse": 0.12211850656131147,
+            "accepted": false,
+            "failure": "ZERO_SET_TOUCHES_EXTRACTION_BOUNDARY"
+          },
+          {
+            "method": "GN_0.02",
+            "alpha": 0.5,
+            "damping": 0.009087503816289028,
+            "predicted_local_mse": 0.12709342701996876,
+            "actual_fresh_retrace_mse": 0.13915296435457283,
+            "topology": {
+              "grid": 40,
+              "vertices": 3798,
+              "faces": 7592,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0608293655591132,
+                -0.8771707632602789,
+                -1.14306808251601
+              ],
+              "bounds_max": [
+                1.2783790197127904,
+                1.1323180858905497,
+                1.378920383942433
+              ],
+              "boundary_clearance": 0.07107961605756685,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.69005730686956
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.02",
+            "alpha": 0.25,
+            "damping": 0.009087503816289028,
+            "predicted_local_mse": 0.13192522946833654,
+            "actual_fresh_retrace_mse": 0.138608885829413,
+            "topology": {
+              "grid": 40,
+              "vertices": 3772,
+              "faces": 7540,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0617580939561893,
+                -0.8830297690171461,
+                -1.1242221257625482
+              ],
+              "bounds_max": [
+                1.2736331548446265,
+                1.1261953500600963,
+                1.341704588669997
+              ],
+              "boundary_clearance": 0.10829541133000298,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.525206981787466
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.02",
+            "alpha": 0.125,
+            "damping": 0.009087503816289028,
+            "predicted_local_mse": 0.1349272162472802,
+            "actual_fresh_retrace_mse": 0.13845782437174095,
+            "topology": {
+              "grid": 40,
+              "vertices": 3748,
+              "faces": 7492,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0622135761456613,
+                -0.8859899068490052,
+                -1.1149115819197435
+              ],
+              "bounds_max": [
+                1.2714776454827723,
+                1.124402070656801,
+                1.323380631666917
+              ],
+              "boundary_clearance": 0.12661936833308296,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.454982432123538
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.02",
+            "alpha": 0.0625,
+            "damping": 0.009087503816289028,
+            "predicted_local_mse": 0.13657473102544201,
+            "actual_fresh_retrace_mse": 0.13839257773002603,
+            "topology": {
+              "grid": 40,
+              "vertices": 3728,
+              "faces": 7452,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.062439154355954,
+                -0.8874776876889742,
+                -1.1102674789917775
+              ],
+              "bounds_max": [
+                1.2711817912566354,
+                1.1234668536063952,
+                1.3147228534405049
+              ],
+              "boundary_clearance": 0.13527714655949508,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.422998507045136
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.02",
+            "alpha": 0.03125,
+            "damping": 0.009087503816289028,
+            "predicted_local_mse": 0.13743511876169537,
+            "actual_fresh_retrace_mse": 0.13835689737198817,
+            "topology": {
+              "grid": 40,
+              "vertices": 3714,
+              "faces": 7424,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.062551376147148,
+                -0.8882235637077918,
+                -1.107948228640434
+              ],
+              "bounds_max": [
+                1.2715255835117436,
+                1.1229891752585386,
+                1.310664289425581
+              ],
+              "boundary_clearance": 0.13933571057441885,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.40775451801557
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.1",
+            "alpha": 1.0,
+            "damping": 0.04543751908144514,
+            "predicted_local_mse": 0.12502791382319392,
+            "accepted": false,
+            "failure": "ZERO_SET_TOUCHES_EXTRACTION_BOUNDARY"
+          },
+          {
+            "method": "GN_0.1",
+            "alpha": 0.5,
+            "damping": 0.04543751908144514,
+            "predicted_local_mse": 0.12930992927787566,
+            "actual_fresh_retrace_mse": 0.13909802328715518,
+            "topology": {
+              "grid": 40,
+              "vertices": 3796,
+              "faces": 7588,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.055215545801016,
+                -0.8799016707982772,
+                -1.1188263318477532
+              ],
+              "bounds_max": [
+                1.2724313002366288,
+                1.1342642564039964,
+                1.3652381896972658
+              ],
+              "boundary_clearance": 0.08476181030273411,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.580018198933821
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.1",
+            "alpha": 0.25,
+            "damping": 0.04543751908144514,
+            "predicted_local_mse": 0.13322393025403143,
+            "actual_fresh_retrace_mse": 0.13870492137662327,
+            "topology": {
+              "grid": 40,
+              "vertices": 3760,
+              "faces": 7516,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0590039974603898,
+                -0.8844509613819611,
+                -1.1122133303911257
+              ],
+              "bounds_max": [
+                1.2709021054781402,
+                1.1286489829038964,
+                1.3351867186717497
+              ],
+              "boundary_clearance": 0.1148132813282503,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.480442446361423
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.1",
+            "alpha": 0.125,
+            "damping": 0.04543751908144514,
+            "predicted_local_mse": 0.135624179054313,
+            "actual_fresh_retrace_mse": 0.13851414111585492,
+            "topology": {
+              "grid": 40,
+              "vertices": 3732,
+              "faces": 7460,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0608493633759326,
+                -0.8867145085946108,
+                -1.1089182645846636
+              ],
+              "bounds_max": [
+                1.2707163101587542,
+                1.1256473247821515,
+                1.3202419672256862
+              ],
+              "boundary_clearance": 0.12975803277431375,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.435167942671015
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.1",
+            "alpha": 0.0625,
+            "damping": 0.04543751908144514,
+            "predicted_local_mse": 0.13693511553250473,
+            "actual_fresh_retrace_mse": 0.13842175558367556,
+            "topology": {
+              "grid": 40,
+              "vertices": 3728,
+              "faces": 7452,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0617602213835104,
+                -0.887843534273979,
+                -1.1072735859797551
+              ],
+              "bounds_max": [
+                1.2712941194191958,
+                1.1240940191806892,
+                1.3133692423502603
+              ],
+              "boundary_clearance": 0.13663075764973964,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.413762587476587
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.1",
+            "alpha": 0.03125,
+            "damping": 0.04543751908144514,
+            "predicted_local_mse": 0.13761828679111335,
+            "actual_fresh_retrace_mse": 0.13837297328984885,
+            "topology": {
+              "grid": 40,
+              "vertices": 3714,
+              "faces": 7424,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0622127251747326,
+                -0.8884073379712226,
+                -1.1064519735483023
+              ],
+              "bounds_max": [
+                1.2715800456511668,
+                1.1233040345020784,
+                1.309992873363006
+              ],
+              "boundary_clearance": 0.140007126636994,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.40328349799199
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.5",
+            "alpha": 1.0,
+            "damping": 0.2271875954072257,
+            "predicted_local_mse": 0.12801442459754264,
+            "actual_fresh_retrace_mse": 0.14070077910340173,
+            "topology": {
+              "grid": 40,
+              "vertices": 3808,
+              "faces": 7612,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0456099987030028,
+                -0.8732216199239095,
+                -1.111043209907336
+              ],
+              "bounds_max": [
+                1.2794773395244892,
+                1.1512533236772586,
+                1.3855386685102415
+              ],
+              "boundary_clearance": 0.06446133148975841,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.677439328862775
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.5",
+            "alpha": 0.5,
+            "damping": 0.2271875954072257,
+            "predicted_local_mse": 0.131755644516518,
+            "actual_fresh_retrace_mse": 0.13941918470751,
+            "topology": {
+              "grid": 40,
+              "vertices": 3764,
+              "faces": 7524,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0541844881497897,
+                -0.8811596540304331,
+                -1.1083357749841152
+              ],
+              "bounds_max": [
+                1.2743644225291717,
+                1.1377384870480267,
+                1.346206508538662
+              ],
+              "boundary_clearance": 0.10379349146133787,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.526713187632984
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.5",
+            "alpha": 0.25,
+            "damping": 0.2271875954072257,
+            "predicted_local_mse": 0.1346849028362196,
+            "actual_fresh_retrace_mse": 0.13888567601159654,
+            "topology": {
+              "grid": 40,
+              "vertices": 3750,
+              "faces": 7496,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0584357616228934,
+                -0.8850808571546506,
+                -1.1069830148647992
+              ],
+              "bounds_max": [
+                1.2726077348758011,
+                1.1303560305864384,
+                1.3258495819874299
+              ],
+              "boundary_clearance": 0.1241504180125701,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.457767822205703
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.5",
+            "alpha": 0.125,
+            "damping": 0.2271875954072257,
+            "predicted_local_mse": 0.13641419408612385,
+            "actual_fresh_retrace_mse": 0.13859461296389539,
+            "topology": {
+              "grid": 40,
+              "vertices": 3734,
+              "faces": 7464,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0605524808932574,
+                -0.8870296869522486,
+                -1.1063068475478735
+              ],
+              "bounds_max": [
+                1.2722344422951724,
+                1.1264917716001854,
+                1.3161107870248647
+              ],
+              "boundary_clearance": 0.13388921297513523,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.424817327778175
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.5",
+            "alpha": 0.0625,
+            "damping": 0.2271875954072257,
+            "predicted_local_mse": 0.13734500523358933,
+            "actual_fresh_retrace_mse": 0.13846205393719938,
+            "topology": {
+              "grid": 40,
+              "vertices": 3718,
+              "faces": 7432,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0616086067297519,
+                -0.8880011766384809,
+                -1.1059688348036545
+              ],
+              "bounds_max": [
+                1.2720489306327625,
+                1.1245138315054086,
+                1.3113700279822715
+              ],
+              "boundary_clearance": 0.13862997201772842,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.408817857229856
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "GN_0.5",
+            "alpha": 0.03125,
+            "damping": 0.2271875954072257,
+            "predicted_local_mse": 0.13782695218795044,
+            "actual_fresh_retrace_mse": 0.1383966518119333,
+            "topology": {
+              "grid": 40,
+              "vertices": 3716,
+              "faces": 7428,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0621361377911689,
+                -0.8884861946105956,
+                -1.105799810702984
+              ],
+              "bounds_max": [
+                1.27195674211551,
+                1.1235130896935097,
+                1.3089946844638922
+              ],
+              "boundary_clearance": 0.14100531553610773,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.400894318657675
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "STEEPEST",
+            "alpha": 1.0,
+            "damping": 0.0,
+            "predicted_local_mse": 0.5046288583356991,
+            "accepted": false,
+            "failure": "ZERO_SET_TOUCHES_EXTRACTION_BOUNDARY"
+          },
+          {
+            "method": "STEEPEST",
+            "alpha": 0.5,
+            "damping": 0.0,
+            "predicted_local_mse": 0.20790962607653332,
+            "accepted": false,
+            "failure": "ZERO_SET_TOUCHES_EXTRACTION_BOUNDARY"
+          },
+          {
+            "method": "STEEPEST",
+            "alpha": 0.25,
+            "damping": 0.0,
+            "predicted_local_mse": 0.1447235847889615,
+            "actual_fresh_retrace_mse": 0.1447538036062484,
+            "topology": {
+              "grid": 40,
+              "vertices": 3718,
+              "faces": 7432,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0604964231833434,
+                -0.8390954873500726,
+                -1.1084901907505134
+              ],
+              "bounds_max": [
+                1.278910876543094,
+                1.1598050141945861,
+                1.3650382115290716
+              ],
+              "boundary_clearance": 0.08496178847092839,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.441171366617874
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "STEEPEST",
+            "alpha": 0.125,
+            "damping": 0.0,
+            "predicted_local_mse": 0.13442395785567837,
+            "actual_fresh_retrace_mse": 0.14106913547434616,
+            "topology": {
+              "grid": 40,
+              "vertices": 3720,
+              "faces": 7436,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0615596049871199,
+                -0.860189177439763,
+                -1.10706499173091
+              ],
+              "bounds_max": [
+                1.2743386097443408,
+                1.1422557243934046,
+                1.3355957520313753
+              ],
+              "boundary_clearance": 0.1144042479686247,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.383184313161848
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "STEEPEST",
+            "alpha": 0.0625,
+            "damping": 0.0,
+            "predicted_local_mse": 0.1345974928166625,
+            "actual_fresh_retrace_mse": 0.13934889177832585,
+            "topology": {
+              "grid": 40,
+              "vertices": 3728,
+              "faces": 7452,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.0621062119801838,
+                -0.8747644656743758,
+                -1.1063490415230774
+              ],
+              "bounds_max": [
+                1.2730950575608475,
+                1.1325923821864985,
+                1.3209945091834434
+              ],
+              "boundary_clearance": 0.12900549081655655,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.379772469584326
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          },
+          {
+            "method": "STEEPEST",
+            "alpha": 0.03125,
+            "damping": 0.0,
+            "predicted_local_mse": 0.13601509740406098,
+            "actual_fresh_retrace_mse": 0.13874521641534346,
+            "topology": {
+              "grid": 40,
+              "vertices": 3722,
+              "faces": 7440,
+              "components": 1,
+              "watertight": true,
+              "euler_number": 2,
+              "inferred_genus": 0,
+              "bounds_min": [
+                -1.06238345121726,
+                -0.8819128342163868,
+                -1.1059902154482328
+              ],
+              "bounds_max": [
+                1.2724781036376955,
+                1.1276031396327875,
+                1.3138330215062852
+              ],
+              "boundary_clearance": 0.13616697849371473,
+              "extraction_boundary_contact": false,
+              "component_areas": [
+                13.384466720531229
+              ],
+              "diagnostic_only": true
+            },
+            "accepted": false
+          }
+        ],
+        "accepted": false
+      }
+    ],
+    "stop": "EXHAUSTED_24_FRESH_RETRACE_TRIALS",
+    "accepted_steps": 5,
+    "initial_mse": 0.17272083729839496,
+    "final_mse": 0.13831992672939708,
+    "target_topology": {
+      "grid": 40,
+      "vertices": 1562,
+      "faces": 3124,
+      "components": 1,
+      "watertight": true,
+      "euler_number": 0,
+      "inferred_genus": 1,
+      "bounds_min": [
+        -0.2832530486278044,
+        -0.800991916656494,
+        -0.3252674689659705
+      ],
+      "bounds_max": [
+        1.3054305345584185,
+        0.8011135345850235,
+        0.32503756498679137
+      ],
+      "boundary_clearance": 0.14456946544158145,
+      "extraction_boundary_contact": false,
+      "component_areas": [
+        5.89420496309234
+      ],
+      "diagnostic_only": true
+    },
+    "final_topology": {
+      "72": {
+        "grid": 72,
+        "vertices": 12348,
+        "faces": 24692,
+        "components": 1,
+        "watertight": true,
+        "euler_number": 2,
+        "inferred_genus": 0,
+        "bounds_min": [
+          -1.0647344481777137,
+          -0.8912819607157102,
+          -1.1064191092907543
+        ],
+        "bounds_max": [
+          1.2761301712251047,
+          1.1266764842288597,
+          1.3072635059625333
+        ],
+        "boundary_clearance": 0.1427364940374667,
+        "extraction_boundary_contact": false,
+        "component_areas": [
+          13.430820763027794
+        ],
+        "diagnostic_only": true
+      },
+      "96": {
+        "grid": 96,
+        "vertices": 22134,
+        "faces": 44264,
+        "components": 1,
+        "watertight": true,
+        "euler_number": 2,
+        "inferred_genus": 0,
+        "bounds_min": [
+          -1.0650771422135201,
+          -0.8913569159256785,
+          -1.1064849150808234
+        ],
+        "bounds_max": [
+          1.2776217571057769,
+          1.1268601106342515,
+          1.3072111270302218
+        ],
+        "boundary_clearance": 0.14278887296977816,
+        "extraction_boundary_contact": false,
+        "component_areas": [
+          13.438066276357558
+        ],
+        "diagnostic_only": true
+      },
+      "144": {
+        "grid": 144,
+        "vertices": 50078,
+        "faces": 100152,
+        "components": 1,
+        "watertight": true,
+        "euler_number": 2,
+        "inferred_genus": 0,
+        "bounds_min": [
+          -1.0651969416158182,
+          -0.8914071716628708,
+          -1.1066582179569697
+        ],
+        "bounds_max": [
+          1.2776570353474652,
+          1.1270156860351561,
+          1.307694761903136
+        ],
+        "boundary_clearance": 0.1423052380968639,
+        "extraction_boundary_contact": false,
+        "component_areas": [
+          13.443156156461374
+        ],
+        "diagnostic_only": true
+      }
+    },
+    "final_fibers": {
+      "directions": 2048,
+      "samples_per_fiber": 513,
+      "s_interval": [
+        -0.98,
+        1.0
+      ],
+      "root_count_histogram": {
+        "1": 2048
+      },
+      "one_root_fraction": 1.0,
+      "multi_root_fraction": 0.0,
+      "zero_root_fraction": 0.0,
+      "near_even_root_fibers": 0,
+      "root_slope_abs_min": 0.18766510883856408,
+      "root_slope_abs_quantiles": [
+        0.18766510883856408,
+        0.5360103189555778,
+        0.9716591961441804,
+        1.9823950810399564
+      ],
+      "lowest_slope_root_locations": [
+        [
+          -0.3718463036196734,
+          0.20968320113302374,
+          -0.48908090984027647
+        ],
+        [
+          -0.33775363110482903,
+          0.281512061575905,
+          -0.48454908542905617
+        ],
+        [
+          -0.4397433453239662,
+          0.04807997706055879,
+          -0.5461362619227675
+        ],
+        [
+          -0.39019324890265267,
+          0.13169510479094312,
+          -0.4828861217335329
+        ],
+        [
+          -0.8067344424121037,
+          0.056110968177790245,
+          0.23999729647339965
+        ],
+        [
+          -0.42033555480283835,
+          -0.07316062620504075,
+          -0.519438465826715
+        ],
+        [
+          -0.44048657318065115,
+          -0.0920342789190216,
+          -0.5639896410996721
+        ],
+        [
+          -0.697273554023519,
+          0.2109720252255551,
+          0.22955779310130484
+        ],
+        [
+          -0.29219727247298094,
+          0.4275893802584057,
+          -0.5659158501273304
+        ],
+        [
+          -0.6370722685643697,
+          0.07222891490927152,
+          0.1689353383194787
+        ],
+        [
+          -0.4058047191224985,
+          -0.26411515743979236,
+          -0.5754561884594984
+        ],
+        [
+          -0.7683148185115747,
+          -0.032931261593690496,
+          0.23879816790534925
+        ],
+        [
+          -0.3384322217790186,
+          -0.38660586254898305,
+          -0.5196455228785155
+        ],
+        [
+          -0.38912474429749644,
+          -0.14098783741504714,
+          -0.4805061233226213
+        ],
+        [
+          -0.4777011572566124,
+          -0.015056635168179289,
+          -0.632496608199724
+        ],
+        [
+          -0.37629559056911366,
+          -0.3608708492211814,
+          -0.5819070383021131
+        ]
+      ]
+    },
+    "final_coefficients": [
+      0.0028672708112661,
+      6.122557889951861e-05,
+      0.002184294068638508,
+      0.010155022505821145,
+      -0.0025774846903382255,
+      -0.029715709996105524,
+      -0.051147083390336,
+      0.011744713472323084,
+      -0.0039432628297056665,
+      -0.06829601019848633,
+      -0.0022152067233163547,
+      -0.026852846139421647,
+      -0.06283580675492717,
+      -0.02784957286851194,
+      -0.03755318339891548,
+      0.027276391860204717,
+      0.044270234097203695,
+      -0.015358840195482837,
+      -0.030600558522990498,
+      0.028884911275167166,
+      0.028080226224645913,
+      0.015533769538845367,
+      0.006078543733026692,
+      -0.0019335415627831029,
+      0.014208217237965323,
+      0.0013077625198092834,
+      0.002180119325999469,
+      0.09843786305698544,
+      -0.009382749372938095,
+      0.048020208271207745,
+      -0.08740817104671463,
+      -0.009097977579440463,
+      0.01768588799399488,
+      -0.04638962436012917,
+      -0.00984466035743079,
+      0.011618698159745509,
+      -0.06765850850024252,
+      -0.011923250801586852,
+      0.00048396305085812805,
+      0.041043080002886305,
+      0.0034222284433364563,
+      0.010663444708491761,
+      -0.0416208031151493,
+      0.025473380543846104,
+      0.001178095148352576,
+      -0.0023144144975503042,
+      -0.001774779452260053,
+      0.0003684896425377995,
+      -0.015013469087566511,
+      -0.007276451296918724,
+      0.009621856494117599,
+      0.06403323408017719,
+      0.034895312454597205,
+      -0.000925508499526217,
+      -0.05204824003603699,
+      0.01791099234668678,
+      0.006635798682740286,
+      0.03168741117663928,
+      -0.002379545019286121,
+      0.0457549431206291,
+      -0.008616954293640225,
+      0.00983561623702887,
+      0.00713974050584295,
+      -0.012440202588645883,
+      -0.0027591435143468597,
+      -0.0327471677101799,
+      0.04747918638983946,
+      -0.03345557892089644,
+      0.003198284659838669,
+      -0.01796405939881599,
+      -0.007330179793549671,
+      -0.006822878708752691,
+      -0.0032897429748786314,
+      -0.0021351718450452334,
+      0.000674152152301766,
+      -0.06618821055895648,
+      0.0030653830153063036,
+      -0.03431250033515969,
+      -0.024559548937251995,
+      0.023091054672843718,
+      0.06312902140369371,
+      -0.0324480254354243,
+      -0.006475802540849494,
+      -0.014079779516237349,
+      0.05306715166885396,
+      0.02830304360099234,
+      -0.026631685518557345,
+      0.11511336136050868,
+      -0.003958607213233824,
+      -0.01889354420126248,
+      -0.018587381216021527,
+      0.001038193899361686,
+      0.01588843873183626,
+      0.00782354265596916,
+      -0.0064315607916698315,
+      0.012751412687402463,
+      -0.0029731730693999176,
+      0.0030681420391979897,
+      -0.0017419188640213777,
+      -0.10315985384327461,
+      -0.016055086444401973,
+      -0.02134958554820615,
+      0.12329708745321269,
+      -0.005684055192031489,
+      0.02797147292328711,
+      -0.0029028044289217333,
+      -0.0034584758596910782,
+      0.03560628853430765,
+      -0.047539327397432066,
+      0.0036837793765645338,
+      -0.018548448341784058,
+      0.010724202986227324,
+      0.037862828873310495,
+      -0.022720019409807994,
+      0.004784942686907811,
+      0.01979182759733089,
+      -0.009840532889906288,
+      -0.00042972804450262466,
+      -0.0010310027547612967,
+      0.0005442126272957153,
+      0.010522155335393735,
+      0.003918767992595981,
+      0.00710136141384511,
+      0.14918400386397807,
+      0.015312084402533389,
+      -0.0096251291843548,
+      0.06426493958337054,
+      -0.013741154485946736,
+      0.045919932630876126,
+      -0.05146037537315856,
+      -0.010437676992664851,
+      -0.002015072461547478,
+      -0.010297514841346198,
+      -0.0230199085508394,
+      0.004307244243180124,
+      0.026654916447585844,
+      0.03721256195246074,
+      0.026132549891632433,
+      0.0014701632581366753,
+      0.030257928118129277,
+      0.015916575151080047,
+      0.05876481782841397,
+      -0.0024224424475721507,
+      0.012478719975093835,
+      -0.002418306358549926,
+      -0.0016042552457995682,
+      0.00048424292011763623,
+      0.005143955249556752,
+      0.012835189730024461,
+      -0.04695936760621159,
+      0.07760312638347869,
+      0.019164066362221857,
+      0.028365990544676235,
+      -0.0598153711363763,
+      -0.006588151515696832,
+      -0.006899783098412767,
+      0.00047694852609712576,
+      0.003660661421291113,
+      -2.2399397809600352e-05,
+      0.039619939803838586,
+      0.02353293976228263,
+      0.02856876250785563,
+      0.034393518635685336,
+      0.020215445250192508,
+      -0.038192156850340095,
+      -0.016087961264522867,
+      -0.004064562537325792,
+      0.01676239794728965,
+      0.08369088244369229,
+      -0.06207710101829237,
+      0.020550873721721048,
+      0.0076031101691423665,
+      0.047016956906909685,
+      0.018415909631641966,
+      -0.0038677782062775667,
+      -0.021416993928253476,
+      -0.013730982301062462,
+      0.0004801360337068489,
+      -0.020989869135069172,
+      0.03589653280311849,
+      -0.03567467871908542,
+      0.0027948116473600535,
+      0.0034601402543392116,
+      -0.06585864714409109,
+      -0.014759219627493558,
+      -0.006968690314165421,
+      -0.01826812184451366,
+      0.030933695447803094,
+      -0.012176607971183681,
+      -0.0016940183475242458,
+      -0.0011660506128728795,
+      -5.073857943922253e-05,
+      0.015639420732235565,
+      -0.0071460333442960825,
+      0.004371062045711583,
+      -0.09859172672192015,
+      0.024078894258314915,
+      -0.007057750818315194,
+      0.06784002810524326,
+      -0.009483115229852066,
+      -0.01021801562522153,
+      -0.05379234494434509,
+      -0.016597149540095335,
+      0.04540653028110735,
+      -0.034785282304221406,
+      0.006100117497843058,
+      -0.010375697128182424,
+      -0.006247622686393023,
+      0.026063776898417133,
+      0.025216216267831597,
+      0.0021793117956709646,
+      0.013569836570687444,
+      -0.005083028768740709,
+      0.0017499291878225222,
+      -0.0005065951646845986,
+      -0.00032240173621493216,
+      -0.01154426030251403,
+      -0.0066518159154178675,
+      0.00028518574402265547,
+      -0.054056262569423016,
+      -0.03219623539143169,
+      0.006203464090675659,
+      -0.0016208811248308967,
+      -0.008620568081530255,
+      0.007328014109596151,
+      -0.02782977814390931,
+      -0.013150351988331628,
+      -0.00023201682743926707,
+      -0.04311061900398703,
+      0.012822752118820896,
+      -0.022867728401051973,
+      0.05351390266233633,
+      -0.013820560630147449,
+      -0.02113718573951076,
+      -0.08771017905474662,
+      0.004397773023758928,
+      -0.0068339266690040845,
+      -0.008926583990186105,
+      -0.00046999392850749,
+      0.00594785281598772,
+      0.0037242770128435064,
+      -0.0013367197035334556,
+      0.002276839940233357,
+      0.011838700265115009,
+      0.005097137918045989,
+      -0.004176115434813556,
+      -0.0007237730552253838,
+      0.013074932693409218,
+      -0.0341637101156319,
+      -0.03391292570186552,
+      0.005166866950292415,
+      -0.01189272085039326,
+      0.19298330335097869,
+      0.06678805897177092,
+      -0.022070051553364556,
+      0.012698657175539104,
+      -0.03523939933951725,
+      0.008589245990576224,
+      0.03826851089613274,
+      0.018041687737701474,
+      0.011039022277108089,
+      -0.06276536961815898,
+      0.006418046886768449,
+      0.012881358979031032,
+      -0.009229780195849547,
+      0.0012510094741926153,
+      -0.007940408821390176,
+      -0.09436620213269799,
+      -0.03859703481558092,
+      0.009810041678261099,
+      0.0125044483721497,
+      -0.004014722881329837,
+      -0.0062590679692507405,
+      0.016928350823969346,
+      0.013010074801463788,
+      0.025520665197579784,
+      -0.11676263071328552,
+      0.006008420523632915,
+      -0.012158645376190248,
+      -0.06652815451089789,
+      0.06384222863095418,
+      -0.0033053133996353875,
+      -0.03666610994058226,
+      0.04392273808046783,
+      0.03785584437167441,
+      -6.427058100542e-05,
+      5.400081452765119e-05,
+      0.00012711719328686614,
+      0.0004096207759563613,
+      -0.0005434609121602921,
+      -0.0001785791465786082,
+      0.0508529720580535,
+      -0.027158995954119095,
+      0.03967359086605035,
+      -0.04796470882303368,
+      0.03347622041905976,
+      0.008963630189219338,
+      -0.09179058631929077,
+      0.008625687147133894,
+      -0.022020906742205314,
+      0.03132737512198666,
+      0.0016070097112117418,
+      0.03580647089078194,
+      0.09451241154714415,
+      0.022394693104953293,
+      0.0329833215277769,
+      0.03594401479480144,
+      0.022953251976921326,
+      0.01750971944392952,
+      0.011944587839282983,
+      0.002686810380087063,
+      0.014244594006054545,
+      -0.03439832761057018,
+      0.013946494987806028,
+      -0.05656070013522123,
+      0.07869948968093399,
+      -0.027109187566645154,
+      0.012703094332984903,
+      0.03554674698574271,
+      -0.02339832903372514,
+      -0.007146331939778209,
+      -0.06982520174607292,
+      0.003297457446510695,
+      -0.033830998465215756,
+      -0.03469029452669284,
+      0.013998006224657633,
+      0.0014545997839507897,
+      0.024500590857564994,
+      -0.013724320825508288,
+      -0.02528783019387799,
+      -0.08788350342407061,
+      -0.00881767291773933,
+      0.0008004706479731762,
+      -0.006697004476982253,
+      -0.0017466933715703436,
+      -0.0009619651786500188,
+      0.007458415375596047,
+      -0.0014993750396058705,
+      -0.0011224702765158213,
+      -0.018572052814174827,
+      -0.024620678233760473,
+      0.0277992441359678,
+      0.07565174263091515,
+      -0.03625850247196623,
+      0.018277438951878885,
+      0.046782777953864464,
+      -0.04893551029539823,
+      0.021599786533879648,
+      -0.02438130260831908,
+      -0.011510125497701792,
+      0.001988867556228825,
+      0.03470977415355563,
+      -0.037660736229401796,
+      0.004544090491373812,
+      0.027046813325475445,
+      0.005468569749269202,
+      0.012171310871544196,
+      -0.011562303322726957,
+      -0.007654864887372022,
+      0.0014333666200593484,
+      9.349537247084136e-05,
+      0.0014440520133116397,
+      0.004162735924690006,
+      -0.11611906380293657,
+      -0.0033285254765483214,
+      -0.027558898845711773,
+      -0.06457767371612758,
+      0.03568175950198369,
+      -0.013468031818087941,
+      -0.01964715795079923,
+      0.00281695560313363,
+      -0.013345342340976455,
+      -0.14607987604547223,
+      0.0034627307143415414,
+      0.026662017700621744,
+      0.01998117123347629,
+      -0.037902255677898844,
+      0.015044653277043428,
+      -0.10634731994760445,
+      -0.012572301471599082,
+      0.009332887984744697,
+      0.016499433490508718,
+      -0.011406722132430049,
+      -0.0013562042432984768,
+      0.008426643559600879,
+      0.0005930010975656912,
+      0.0059298733696766465,
+      -0.07608058869874704,
+      -0.011194031989983071,
+      0.037303449296402516,
+      -0.029322741607729862,
+      0.012540834067681889,
+      -0.029382052641528773,
+      -0.05282092364033205,
+      -0.04730282950282917,
+      0.01704596315160908,
+      -0.05677736833898954,
+      -0.016054304595046035,
+      -0.0009868879915604458,
+      -0.006885894685994763,
+      -0.022625712649103607,
+      0.016864300359963308,
+      -0.06678669203495133,
+      0.010370262835346002,
+      -0.006098525922480155,
+      -0.006635844460463766,
+      -0.004320849546610614,
+      0.00038196446627520366,
+      -0.008589468840745783,
+      0.004278481686707718,
+      0.0040210265440317906,
+      -0.04693080130922287,
+      -0.028276339788655167,
+      0.032299185855896737,
+      -0.07323059030804731,
+      0.02131716656308799,
+      0.018625574958275742,
+      0.00069177417964862,
+      -0.0041636437834942416,
+      0.0005972867676656349,
+      0.02664133540905933,
+      -0.057043318223115015,
+      -0.010309913740446635,
+      0.07781246461561099,
+      0.033109733509439264,
+      0.002604152322043669,
+      -0.10584132439532898,
+      0.012226149728808507,
+      0.020951191835141266,
+      0.017836557989419317,
+      -0.01291323805464506,
+      -0.009284568731230099,
+      -0.0011116994122991788,
+      -0.0009158383500264166,
+      0.0002541487227578468,
+      0.03922096417797727,
+      0.012270615045435716,
+      -0.04641569800477125,
+      0.03327210706366661,
+      0.0370845932025406,
+      0.052581782016956395,
+      -0.038726909401111335,
+      -0.003825155835549071,
+      -0.014897893730478201,
+      -0.03234897929477389,
+      -0.015556930035989324,
+      0.004299110287644775,
+      -0.05878981100588421,
+      0.019097769288571986,
+      0.04174624304215594,
+      0.07763546659057204,
+      -0.010279976532457156,
+      -0.01684477044449466,
+      0.02457296307407606,
+      0.0040014696164335836,
+      0.016223481406453848,
+      0.018959585539046028,
+      -0.0332219035162552,
+      -0.007594214192069832,
+      0.10029448698220764,
+      0.02384275436195509,
+      0.01352679854735379,
+      -0.028576074311011904,
+      -0.0110024937646989,
+      -0.012164420217097112,
+      -0.021483150023960257,
+      -0.03562405962532256,
+      0.029134974443544567,
+      -0.03385190009668691,
+      -0.010559276479404238,
+      0.008689400530602265,
+      -0.02445546292213086,
+      -0.013036495047376463,
+      -0.022868731990907578,
+      -0.0679051118574707,
+      0.01906054755724614,
+      -0.018434201249553393,
+      -0.0026280757408043177,
+      -0.0016045763782275358,
+      -2.807545718277427e-05,
+      0.006465848844479105,
+      -0.0016809101593250474,
+      0.003416602074735104,
+      -0.05399336567800014,
+      -0.0313821936451852,
+      0.034028091081867703,
+      0.06077589717926982,
+      0.014700583119090936,
+      -0.037954325628470766,
+      -0.08458581309393318,
+      -0.0020798978000312026,
+      0.014625159595219261,
+      -0.01903546383406661,
+      0.016448645844213183,
+      -0.045824358233249485,
+      -0.060700926508221495,
+      0.004002536891607628,
+      0.014357576648339008,
+      0.053776645390725915,
+      0.0090456949052055,
+      0.01111008637228879,
+      0.01939280542249196,
+      0.018001689472626547,
+      -0.009059274829690591,
+      -0.05755880104493066,
+      -0.0051620280578610084,
+      0.0046421843406104,
+      -0.1323421900994533,
+      0.014380288072220257,
+      0.016024429677975023,
+      0.03895079685814894,
+      0.001603995772506381,
+      -0.014277061975252182,
+      0.012859850647694954,
+      0.01421565243602239,
+      0.0011727091569097344,
+      -0.06642390365387062,
+      0.01303434733129901,
+      -0.015581939501836426,
+      -0.06990985571792248,
+      0.06058309423283083,
+      0.0007209390973455395,
+      -0.03646021955630838,
+      0.007741959333254782,
+      0.029671454773744436,
+      -0.0005317902407783151,
+      0.00036877926756872083,
+      -0.00019784127971800576,
+      -0.0231569464301995,
+      -0.012072729021121432,
+      0.0049321319993384325,
+      -0.036625757792907165,
+      0.026499984767303142,
+      0.019912350421905742,
+      -0.047200904289845635,
+      0.014029176084934895,
+      -0.0037280638785100635,
+      0.030905194968592033,
+      -0.038515366059389405,
+      0.043251698391442946,
+      -0.014257539364837698,
+      0.007159501724649263,
+      0.00469839885788023,
+      -0.026010500015884196,
+      0.011305383723354361,
+      0.006681409896266238,
+      0.03913689395813849,
+      0.002242407675915073,
+      -0.017589743378091688,
+      -0.0005717052612905201,
+      -0.0021460386604938205,
+      -0.0032712652177196303,
+      -0.009382924299536142,
+      -0.00531346120859841,
+      0.0008117966845135241,
+      -0.07647568382787882,
+      0.013128384959516617,
+      -0.02469454125793075,
+      0.005369462102359564,
+      0.010923999758091862,
+      0.03820000681987801,
+      -0.05373184495467104,
+      -0.016611376943504307,
+      0.003284910865055417,
+      0.0017934889850101305,
+      0.038349503810295386,
+      -0.01790549393626237,
+      0.050576582101562184,
+      -0.0174559852844741,
+      -0.038751221194874355,
+      -0.04237851916659901,
+      -0.02471912316792821,
+      0.004585688555254947,
+      0.006101899973012406,
+      -0.004679981014787931,
+      0.008842258641714212,
+      0.00020891300892038946,
+      -0.00033672590371576277,
+      6.515073917863378e-06,
+      0.010198312307843186,
+      0.025951272723434126,
+      0.010384832091986335,
+      -0.056234881278935264,
+      0.05989336509772725,
+      -0.001159239562454323,
+      -0.07802994988954558,
+      -0.004297439518547243,
+      -0.002093466762182211,
+      -0.016194905038446165,
+      0.01790301626466072,
+      0.006046701458787837,
+      0.07465703818194315,
+      -0.007544475166156429,
+      0.02380658004238742,
+      -0.03996855344330507,
+      0.0003302167914124481,
+      -0.027612134515909735,
+      -0.018814069720210675,
+      -0.005768314830206627,
+      0.0036076062261650513,
+      0.009562838038201009,
+      -0.03705220922134462,
+      0.03400887973716052,
+      -0.0762498608271128,
+      0.039785018586684116,
+      0.0128219557309074,
+      0.01593369128611075,
+      -0.018867027875494394,
+      -0.011877267732727419,
+      -0.033152473685054154,
+      -0.0014235742991546914,
+      -0.007126967289224274,
+      -0.05374788949977045,
+      0.014766602922413687,
+      -0.007732968050798462,
+      -0.042233961069446074,
+      -0.009043142394012793,
+      0.04865123836410107,
+      0.007273203489166159,
+      0.004037870463015065,
+      -0.008033063603492327,
+      -0.0006491319338880518,
+      -0.000408766981598725,
+      -0.0007520104120017229,
+      0.0007286617598322278,
+      -0.00020046033554100114,
+      -0.001670847347845361,
+      -0.053026986936108994,
+      -0.03858131100281893,
+      0.008594575653337194,
+      0.11003349543233217,
+      -0.021115611121189266,
+      0.02164946519364514,
+      0.04436079689485614,
+      0.01967860536931574,
+      0.024963871673611533,
+      -0.042471780427930914,
+      -0.0004547972501393713,
+      -0.0176783850939945,
+      0.006457200808273026,
+      -0.03204585401713008,
+      -0.031098058587850058,
+      0.023502887942110987,
+      0.022765264781564806,
+      -0.0041434878531309005,
+      -0.008375718202979308,
+      -0.00658249674918267,
+      0.0017767296870944752,
+      0.005419595807407753,
+      -0.0006623623510350117,
+      0.004694609491336487,
+      -0.0005590304057553827,
+      0.0003426852626739023,
+      -0.04073805304184725,
+      0.032260047194826294,
+      0.03541750663201448,
+      -0.020173371205797652,
+      -0.01947279842202465,
+      -0.010518802409795311,
+      -0.008889238573037056,
+      -0.004359147981276457,
+      0.04831551288370941,
+      0.03703819585271336,
+      0.07602703524595471,
+      0.032793702372452924,
+      0.02150094037932124,
+      -0.07668561018670736,
+      -0.014429604439041302,
+      0.010029650263091272,
+      0.059383754537933174,
+      -0.012666989566201863,
+      0.0019284974515663045,
+      0.026802226058144068,
+      -0.005070154990083104,
+      0.014533455337650854,
+      -0.05863877893453049,
+      0.018785222911446766,
+      0.0042463411174252265,
+      0.0706504636723894,
+      0.022575023913824818,
+      0.02269876823244256,
+      0.08135927190832072,
+      0.021172991243388443,
+      0.016104882661767555,
+      -0.01454341185598404,
+      0.016098457304740077,
+      0.00603478156876007,
+      0.007318949024378098,
+      -0.027775096633237458,
+      -0.008662510044463737,
+      -0.042023756996846406,
+      -0.03629814212499062,
+      0.022190014854022038,
+      -0.011549993808137229,
+      -0.002750855187750411,
+      0.0021390750799507364,
+      -0.018358991600817866,
+      0.0019324215865540375,
+      -0.00936216937642533,
+      -0.08243062137440531,
+      -0.023444286696083987,
+      0.01627553485679909,
+      -0.0601024499189757,
+      0.022831577122699658,
+      -0.029236822161917926,
+      -0.011530138474068499,
+      -0.0026988045605933074,
+      -0.01034289761608676,
+      0.10682311299198116,
+      -0.016986004033107106,
+      0.017670937079603544,
+      0.10816503012100748,
+      0.002946020418153949,
+      0.009864682614004382,
+      0.021972317903488053,
+      0.026114975592041206,
+      0.021867885058998816,
+      0.012633472409910581,
+      -0.005543222660176076,
+      0.017202552244196295,
+      -0.00022404714801832742,
+      0.0004343991805242627,
+      0.0022108271804721197,
+      -0.020604479290425127,
+      0.010613071621823275,
+      -0.03395471461253789,
+      -0.03063311267046105,
+      0.028851468505172492,
+      -0.02531198879544988,
+      -0.0358035048009239,
+      -0.005244192454882612,
+      -0.02050515949930055,
+      0.2770384422698047,
+      0.02471823428703892,
+      0.04030100622290369,
+      -0.02537263446453867,
+      0.0009783576128510223,
+      -0.012842415837002876,
+      0.043078209318572785,
+      0.010006289701677468,
+      0.000786609963811264,
+      -0.044205250120038994,
+      0.011675900981174624,
+      0.013076920105158821,
+      0.005436732945963996,
+      -0.0003742669685698147,
+      -0.003972814699874175,
+      0.008076678004835598,
+      -0.040659653202770894,
+      0.01934294410959878,
+      -0.036348249512956884,
+      -0.030117739049766043,
+      0.0022453308445880204,
+      -0.02642910770823514,
+      0.012973484567221364,
+      0.049307065760838896,
+      -0.0923939665040259,
+      -0.009329478837871214,
+      -0.01145500801594224,
+      -0.09987017057956174,
+      0.020732399968313036,
+      0.005050643943620341,
+      0.016057527568559528,
+      0.03246865543694686,
+      0.010327051492435834,
+      0.0006835283931207177,
+      -0.0006888676351777444,
+      -4.1306099213819805e-05
+    ],
+    "runtime_seconds": 522.4500665969681,
+    "target_render_seconds": 9.226240653079003,
+    "peak_cuda_allocated_mib": 1221.99755859375,
+    "topology_penetrated": false
+  },
+  "controls": {
+    "same_topology": {
+      "name": "control_same_topology",
+      "selected_views": [
+        0,
+        1
+      ],
+      "maximum_steps": 5,
+      "trajectory": [
+        {
+          "iteration": 0,
+          "mse": 0.0015629130582600272,
+          "topology": {
+            "grid": 40,
+            "vertices": 3360,
+            "faces": 6716,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -0.9984297593434651,
+              -0.9984297593434651,
+              -0.9984297593434651
+            ],
+            "bounds_max": [
+              0.9984297238863433,
+              0.9984297238863433,
+              0.9984297238863433
+            ],
+            "boundary_clearance": 0.45157024065653484,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              12.537275407116482
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 1.9999999999999996,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          },
+          "trials": [
+            {
+              "method": "GN_0.02",
+              "alpha": 1.0,
+              "damping": 0.007918381344978598,
+              "predicted_mse": 0.00045450136287288723,
+              "actual_fresh_mse": 0.0002140963552550273,
+              "accepted": true
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 1,
+          "mse": 0.0002140963552550273,
+          "topology": {
+            "grid": 40,
+            "vertices": 3386,
+            "faces": 6768,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -1.0320853759080935,
+              -0.95580721390553,
+              -1.0051578900752922
+            ],
+            "bounds_max": [
+              1.022752174964318,
+              0.9728498214330428,
+              1.0011522635435448
+            ],
+            "boundary_clearance": 0.4179146240919065,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              12.553189995020745
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 1.89208298746962,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          },
+          "trials": [
+            {
+              "method": "GN_0.02",
+              "alpha": 1.0,
+              "damping": 0.00992166165272102,
+              "predicted_mse": 9.561767338252189e-05,
+              "actual_fresh_mse": 8.093493456340641e-05,
+              "accepted": true
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 2,
+          "mse": 8.093493456340641e-05,
+          "topology": {
+            "grid": 40,
+            "vertices": 3392,
+            "faces": 6780,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -1.0361971965202919,
+              -0.9555121397360777,
+              -1.0050571209345107
+            ],
+            "bounds_max": [
+              1.0299031673333585,
+              0.9627692198142028,
+              1.0033185518704928
+            ],
+            "boundary_clearance": 0.4138028034797081,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              12.563955338361916
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 1.878953865378032,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          },
+          "trials": [
+            {
+              "method": "GN_0.02",
+              "alpha": 1.0,
+              "damping": 0.008650543363962822,
+              "predicted_mse": 4.439232373510037e-05,
+              "actual_fresh_mse": 4.208215628951322e-05,
+              "accepted": true
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 3,
+          "mse": 4.208215628951322e-05,
+          "topology": {
+            "grid": 40,
+            "vertices": 3412,
+            "faces": 6820,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -1.0389292032290727,
+              -0.9551402654403295,
+              -1.006205258002648
+            ],
+            "bounds_max": [
+              1.0356353075076374,
+              0.9594966692802236,
+              1.0050125513321315
+            ],
+            "boundary_clearance": 0.4110707967709273,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              12.594054789019633
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 1.8818349786851363,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          },
+          "trials": [
+            {
+              "method": "GN_0.02",
+              "alpha": 1.0,
+              "damping": 0.007848971920330784,
+              "predicted_mse": 2.9615619871415136e-05,
+              "actual_fresh_mse": 2.9227807497774318e-05,
+              "accepted": true
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 4,
+          "mse": 2.9227807497774318e-05,
+          "topology": {
+            "grid": 40,
+            "vertices": 3412,
+            "faces": 6820,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -1.0396985518626678,
+              -0.9580561527839073,
+              -1.007488415791438
+            ],
+            "bounds_max": [
+              1.037569564428085,
+              0.9591401124611878,
+              1.005439171424279
+            ],
+            "boundary_clearance": 0.41030144813733216,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              12.613373395046889
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 1.8844297487828654,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          },
+          "trials": [
+            {
+              "method": "GN_0.02",
+              "alpha": 1.0,
+              "damping": 0.009372085441350179,
+              "predicted_mse": 2.5227998241426783e-05,
+              "actual_fresh_mse": 2.545859721081635e-05,
+              "accepted": true
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 5,
+          "mse": 2.545859721081635e-05,
+          "topology": {
+            "grid": 40,
+            "vertices": 3416,
+            "faces": 6828,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -1.039448118209839,
+              -0.9584031361799974,
+              -1.0073887812785614
+            ],
+            "bounds_max": [
+              1.0368280850923977,
+              0.9583084302070815,
+              1.0063170897654998
+            ],
+            "boundary_clearance": 0.410551881790161,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              12.614890062316093
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 1.8830638428408524,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          }
+        }
+      ],
+      "stop": "ITERATION_BUDGET",
+      "accepted_steps": 5,
+      "initial_mse": 0.0015629130582600272,
+      "final_mse": 2.545859721081635e-05,
+      "final_topology": {
+        "72": {
+          "grid": 72,
+          "vertices": 11316,
+          "faces": 22628,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "bounds_min": [
+            -1.0404875956790547,
+            -0.9598753593337368,
+            -1.0075515209789008
+          ],
+          "bounds_max": [
+            1.0377435979708822,
+            0.9593181771291814,
+            1.007157473496988
+          ],
+          "boundary_clearance": 0.40951240432094527,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            12.63501886803866
+          ],
+          "diagnostic_only": true
+        },
+        "96": {
+          "grid": 96,
+          "vertices": 20312,
+          "faces": 40620,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "bounds_min": [
+            -1.040570377550627,
+            -0.9600111409237511,
+            -1.007559047498201
+          ],
+          "bounds_max": [
+            1.037985566791735,
+            0.9593256659256786,
+            1.0073025111148233
+          ],
+          "boundary_clearance": 0.409429622449373,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            12.638865455030299
+          ],
+          "diagnostic_only": true
+        }
+      },
+      "runtime_seconds": 112.69115463108756,
+      "target_information": "RGB only"
+    },
+    "weak_observability": {
+      "name": "control_weak_view",
+      "selected_views": [
+        2
+      ],
+      "maximum_steps": 5,
+      "trajectory": [
+        {
+          "iteration": 0,
+          "mse": 0.16779810010442087,
+          "topology": {
+            "grid": 40,
+            "vertices": 3360,
+            "faces": 6716,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -0.9984297593434651,
+              -0.9984297593434651,
+              -0.9984297593434651
+            ],
+            "bounds_max": [
+              0.9984297238863433,
+              0.9984297238863433,
+              0.9984297238863433
+            ],
+            "boundary_clearance": 0.45157024065653484,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              12.537275407116482
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 1.9999999999999996,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          },
+          "trials": [
+            {
+              "method": "GN_0.02",
+              "alpha": 1.0,
+              "damping": 0.008364140749290093,
+              "predicted_mse": 0.10679621537622701,
+              "actual_fresh_mse": 0.17570841122343786,
+              "accepted": false
+            },
+            {
+              "method": "GN_0.02",
+              "alpha": 0.5,
+              "damping": 0.008364140749290093,
+              "predicted_mse": 0.1253072987304089,
+              "actual_fresh_mse": 0.1664758773161916,
+              "accepted": true
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 1,
+          "mse": 0.1664758773161916,
+          "topology": {
+            "grid": 40,
+            "vertices": 3258,
+            "faces": 6512,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -0.9947280712616748,
+              -0.9741817327646108,
+              -1.016183955852802
+            ],
+            "bounds_max": [
+              0.8839480375632263,
+              0.9674163720546625,
+              1.000973559648563
+            ],
+            "boundary_clearance": 0.4338160441471979,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              12.03604133910105
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 1.5614373353479654,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          },
+          "trials": [
+            {
+              "method": "GN_0.02",
+              "alpha": 1.0,
+              "damping": 0.01021241874073756,
+              "predicted_mse": 0.12566552780399168,
+              "actual_fresh_mse": 0.17019731855430228,
+              "accepted": false
+            },
+            {
+              "method": "GN_0.02",
+              "alpha": 0.5,
+              "damping": 0.01021241874073756,
+              "predicted_mse": 0.1377889145120495,
+              "actual_fresh_mse": 0.16572230107683728,
+              "accepted": true
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 2,
+          "mse": 0.16572230107683728,
+          "topology": {
+            "grid": 40,
+            "vertices": 3166,
+            "faces": 6328,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -0.9934107682643792,
+              -0.9649112909268109,
+              -1.0310991006019787
+            ],
+            "bounds_max": [
+              0.9703621497521036,
+              0.9788077525603465,
+              0.9911831391163364
+            ],
+            "boundary_clearance": 0.4189008993980212,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              11.677732725052092
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 1.2158794065222678,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          },
+          "trials": [
+            {
+              "method": "GN_0.02",
+              "alpha": 1.0,
+              "damping": 0.012641454837149426,
+              "predicted_mse": 0.13607715558035563,
+              "actual_fresh_mse": 0.17005319911646669,
+              "accepted": false
+            },
+            {
+              "method": "GN_0.02",
+              "alpha": 0.5,
+              "damping": 0.012641454837149426,
+              "predicted_mse": 0.14551391234168087,
+              "actual_fresh_mse": 0.16510706636860847,
+              "accepted": true
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 3,
+          "mse": 0.16510706636860847,
+          "topology": {
+            "grid": 40,
+            "vertices": 3076,
+            "faces": 6148,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -0.992351770401001,
+              -0.9653639010893993,
+              -0.9950213371179042
+            ],
+            "bounds_max": [
+              1.0133509318033853,
+              0.9592277624668217,
+              1.0327627133100463
+            ],
+            "boundary_clearance": 0.41723728668995363,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              11.341634835600605
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 1.0022765859148752,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          },
+          "trials": [
+            {
+              "method": "GN_0.02",
+              "alpha": 1.0,
+              "damping": 0.008901510339375926,
+              "predicted_mse": 0.1308889960639847,
+              "actual_fresh_mse": 0.1747967205011731,
+              "accepted": false
+            },
+            {
+              "method": "GN_0.02",
+              "alpha": 0.5,
+              "damping": 0.008901510339375926,
+              "predicted_mse": 0.14111419848485554,
+              "actual_fresh_mse": 0.1675792740897731,
+              "accepted": false
+            },
+            {
+              "method": "GN_0.02",
+              "alpha": 0.25,
+              "damping": 0.008901510339375926,
+              "predicted_mse": 0.15138967424387176,
+              "actual_fresh_mse": 0.1653122568754742,
+              "accepted": false
+            },
+            {
+              "method": "GN_0.02",
+              "alpha": 0.125,
+              "damping": 0.008901510339375926,
+              "predicted_mse": 0.15781813076052506,
+              "actual_fresh_mse": 0.1647901979697305,
+              "accepted": true
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 4,
+          "mse": 0.1647901979697305,
+          "topology": {
+            "grid": 40,
+            "vertices": 3082,
+            "faces": 6160,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -0.9902589492308788,
+              -0.9600044152675531,
+              -0.9896376340817182
+            ],
+            "bounds_max": [
+              1.0247882647392077,
+              0.9616674961187901,
+              1.0362621894249548
+            ],
+            "boundary_clearance": 0.4137378105750451,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              11.23360278840012
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 0.9934089057009877,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          },
+          "trials": [
+            {
+              "method": "GN_0.02",
+              "alpha": 1.0,
+              "damping": 0.01794306604323107,
+              "predicted_mse": 0.13571380077341386,
+              "actual_fresh_mse": 0.16423956779555438,
+              "accepted": true
+            }
+          ],
+          "accepted": true
+        },
+        {
+          "iteration": 5,
+          "mse": 0.16423956779555438,
+          "topology": {
+            "grid": 40,
+            "vertices": 3092,
+            "faces": 6180,
+            "components": 1,
+            "watertight": true,
+            "euler_number": 2,
+            "inferred_genus": 0,
+            "bounds_min": [
+              -0.9938651512830685,
+              -0.995586878214127,
+              -0.9951924886458958
+            ],
+            "bounds_max": [
+              1.0973287142240082,
+              0.9470390222011467,
+              1.0644123077392578
+            ],
+            "boundary_clearance": 0.3526712857759917,
+            "extraction_boundary_contact": false,
+            "component_areas": [
+              11.26206786167079
+            ],
+            "diagnostic_only": true
+          },
+          "min_gradient": 0.9939276667606165,
+          "fibers": {
+            "directions": 512,
+            "samples": 257,
+            "histogram": {
+              "1": 512
+            },
+            "multi_root_fraction": 0.0
+          }
+        }
+      ],
+      "stop": "ITERATION_BUDGET",
+      "accepted_steps": 5,
+      "initial_mse": 0.16779810010442087,
+      "final_mse": 0.16423956779555438,
+      "final_topology": {
+        "72": {
+          "grid": 72,
+          "vertices": 10350,
+          "faces": 20696,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "bounds_min": [
+            -0.9948978679280884,
+            -0.9958876999331192,
+            -0.9974243137198434
+          ],
+          "bounds_max": [
+            1.0974209906349721,
+            0.9494813247465752,
+            1.0646334043690857
+          ],
+          "boundary_clearance": 0.35257900936502784,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            11.306263172376369
+          ],
+          "diagnostic_only": true
+        },
+        "96": {
+          "grid": 96,
+          "vertices": 18536,
+          "faces": 37068,
+          "components": 1,
+          "watertight": true,
+          "euler_number": 2,
+          "inferred_genus": 0,
+          "bounds_min": [
+            -0.9950701914335551,
+            -0.9956982281333522,
+            -0.9972958454332854
+          ],
+          "bounds_max": [
+            1.0976969427811472,
+            0.9501141116493625,
+            1.0644999935752468
+          ],
+          "boundary_clearance": 0.3523030572188528,
+          "extraction_boundary_contact": false,
+          "component_areas": [
+            11.3146662797356
+          ],
+          "diagnostic_only": true
+        }
+      },
+      "runtime_seconds": 192.22626625513658,
+      "target_information": "RGB only"
+    },
+    "analytic_torus_generalization": {
+      "status": "NOT_RUN_PHASE_B_DID_NOT_REACH_GENUS1",
+      "reason": "Required experiment order makes analytic-target generalization conditional on same-family penetration success."
+    }
+  },
+  "normal_fiber_root_maps": {
+    "sphere": {
+      "directions": 2048,
+      "root_count_histogram": {
+        "1": 2048
+      }
+    },
+    "oracle genus 1": {
+      "directions": 2048,
+      "root_count_histogram": {
+        "1": 1959,
+        "3": 89
+      }
+    },
+    "RGB endpoint": {
+      "directions": 2048,
+      "root_count_histogram": {
+        "1": 2048
+      }
+    }
+  },
+  "saved_theta_T": {
+    "path": "artifacts/v096_theta_T.pt",
+    "sha256": "e137b58e55d8184b67feecf537575435a6a5ce58b0541d667dc08311592e9d4c",
+    "K": 256,
+    "order": 1,
+    "parameters": 768,
+    "radius": 1.1
+  },
+  "renderer_memory": {
+    "unstreamed_exploratory_target_render": "OOM observed before the measured run; allocator text was not persisted, so no fabricated byte count is reported",
+    "fix": "exact emitter-axis transmission chunking; source quadrature and finite-packet equations unchanged",
+    "transport_chunk_emitters": 128,
+    "measured_penetration_peak_cuda_allocated_mib": 1221.99755859375,
+    "measured_capacity_peak_cuda_allocated_mib": 654.865234375
+  },
+  "verdicts": {
+    "CUDA_HARD_GATE_PASSED": true,
+    "FROZEN_CHART_FAMILY_CONTAINS_GENUS1": true,
+    "P0_CAPACITY_ESTABLISHED": false,
+    "P1_CAPACITY_ESTABLISHED": true,
+    "P2_CAPACITY_ESTABLISHED": true,
+    "SAME_FAMILY_RGB_ONLY_REACHED_GENUS1": false,
+    "GENUINE_CRITICAL_EVENT_OBSERVED": false,
+    "COMPLEX_CONTINUATION_ACTIVATED": false,
+    "SAME_TOPOLOGY_CONTROL_PASSED": true,
+    "WEAK_VIEW_CONTROL_IS_WEAKER": true,
+    "FINAL_CLASSIFICATION": "CAPACITY_YES_REACHABILITY_NO"
+  },
+  "figures": [
+    "figures/v096_capacity_sweep.png",
+    "figures/v096_normal_fibers.png",
+    "figures/v096_same_family_images.png",
+    "figures/v096_penetration.png",
+    "figures/v096_spectrum.png",
+    "figures/v096_oracle_alignment.png",
+    "figures/v096_controls.png",
+    "figures/v096_normal_fiber_maps.png",
+    "figures/v096_topology_sections.png",
+    "figures/v096_low_gradient_map.png"
+  ],
+  "csv": "artifacts/v096_topology_penetration.csv",
+  "runtime_seconds": {
+    "penetration": 522.4500665969681,
+    "same_topology_control": 112.69115463108756,
+    "weak_view_control": 192.22626625513658,
+    "reported_total_excluding_capacity_sweep_plotting_validation": 827.3674874831922
+  }
+}

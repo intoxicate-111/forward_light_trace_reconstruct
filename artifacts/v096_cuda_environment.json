@@ -1,0 +1,35 @@
+{
+  "python": "/home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/miniconda3/envs/test/bin/python",
+  "torch": "2.5.1+cu124",
+  "torch_version_cuda": "12.4",
+  "cuda_available": true,
+  "cuda_device_count": 1,
+  "devices": [
+    "Quadro RTX 5000"
+  ],
+  "CUDA_VISIBLE_DEVICES": "",
+  "PATH": "/home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/.codex/tmp/arg0/codex-arg0KqjpDJ:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/opt/puppetlabs/bin:/home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/.vscode/extensions/openai.chatgpt-26.901.22334-linux-x64/bin/linux-x86_64",
+  "LD_LIBRARY_PATH": "",
+  "nvidia_smi": {
+    "command": [
+      "nvidia-smi"
+    ],
+    "returncode": 0,
+    "stdout": "Tue Sep  8 21:02:14 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\n+-----------------------------------------+------------------------+----------------------+\n| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n|                                         |                        |               MIG M. |\n|=========================================+========================+======================|\n|   0  Quadro RTX 5000                On  |   00000000:65:00.0  On |                  Off |\n| 34%   32C    P5             25W /  230W |     982MiB /  16384MiB |     36%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n\n+-----------------------------------------------------------------------------------------+\n| Processes:                                                                              |\n|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n|        ID   ID                                                               Usage      |\n|=========================================================================================|\n|    0   N/A  N/A            8202      G   /usr/lib/xorg/Xorg                      458MiB |\n|    0   N/A  N/A            8502      G   /usr/bin/gnome-shell                    219MiB |\n|    0   N/A  N/A            9026      G   ...exec/xdg-desktop-portal-gnome          3MiB |\n|    0   N/A  N/A           11890      G   ...rack-uuid=3190708988185955192        147MiB |\n|    0   N/A  N/A          384425      G   ...rack-uuid=3190708988185955192         98MiB |\n|    0   N/A  N/A         4170359      G   /usr/bin/nautilus                        31MiB |\n+-----------------------------------------------------------------------------------------+\n",
+    "stderr": ""
+  },
+  "pip_show_torch": {
+    "command": [
+      "/home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/miniconda3/envs/test/bin/python",
+      "-m",
+      "pip",
+      "show",
+      "torch"
+    ],
+    "returncode": 0,
+    "stdout": "Name: torch\nVersion: 2.5.1+cu124\nSummary: Tensors and Dynamic neural networks in Python with strong GPU acceleration\nHome-page: https://pytorch.org/\nAuthor: PyTorch Team\nAuthor-email: packages@pytorch.org\nLicense: BSD-3-Clause\nLocation: /home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/miniconda3/envs/test/lib/python3.10/site-packages\nRequires: filelock, fsspec, jinja2, networkx, nvidia-cublas-cu12, nvidia-cuda-cupti-cu12, nvidia-cuda-nvrtc-cu12, nvidia-cuda-runtime-cu12, nvidia-cudnn-cu12, nvidia-cufft-cu12, nvidia-curand-cu12, nvidia-cusolver-cu12, nvidia-cusparse-cu12, nvidia-nccl-cu12, nvidia-nvjitlink-cu12, nvidia-nvtx-cu12, sympy, triton, typing-extensions\nRequired-by: hrbf-reproduction, torchaudio, torchvision, zero-set-light-tracing\n",
+    "stderr": ""
+  },
+  "hard_gate_passed": true,
+  "diagnosis": "The managed workspace sandbox hid the GPU; the existing local test Conda environment is CUDA-capable when executed in the host context. No dependency was installed or changed."
+}

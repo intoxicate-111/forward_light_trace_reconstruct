@@ -2071,6 +2071,44 @@ python scripts/validate_v095.py
 See `artifacts/v095_dense_jet_torus.json` / `.csv` / `.md`,
 `artifacts/v095_validation.json`, and `figures/v095_*.png`.
 
+## v0.9.6: frozen-chart topology capacity and RGB penetration
+
+This experiment separates representation capacity from inverse-rendering
+reachability. CUDA Phase A fits the unchanged v0.9.2 frozen-chart
+`ManifoldJetField` to a shifted genus-1 geometry oracle over K=128--1024 and
+p=0/1/2. The p=1 K=256 field supplies a certified one-component, watertight
+genus-1 member that is stable at 96^3 and 144^3; p=2 K=128 also passes the
+screen, while no tested p=0 case does. The successful same-family coefficient
+state is saved independently with a digest.
+
+Phase B discards geometry-oracle access and optimizes the exact sphere from
+immutable RGB images rendered from that saved member. Five accepted fresh-real
+retraces reduce informative-view MSE by 19.9%, but the next iteration exhausts
+24 line-search candidates. The final field remains genus 0 at 72^3/96^3/144^3,
+and every one of 2,048 normal fibers still has exactly one root. The oracle
+direction is partly image-observable but nearly orthogonal to the local image
+gradient. A matched same-topology ellipsoid control reduces MSE by 98.4%; a
+weak-view control improves only 2.1%. No genuine zero-set critical event is
+observed, so complex continuation and conditional analytic-torus generalization
+are not activated.
+
+The classification is **`CAPACITY_YES_REACHABILITY_NO`**: frozen sphere charts
+do not impose a global topology invariant, but this RGB-only optimizer does not
+enter the available genus-1 basin.
+
+```bash
+export PYTHONPATH=src MPLCONFIGDIR=/tmp/mpl-v096
+python -m zlt.topology_penetration --capacity
+python -m zlt.topology_penetration --penetration
+python -m zlt.topology_penetration --controls
+python scripts/report_v096.py
+python scripts/validate_v096.py
+```
+
+See `artifacts/v096_topology_penetration.json` / `.csv` / `.md`, the saved
+`artifacts/v096_theta_T.pt`, `artifacts/v096_cuda_environment.json`,
+`artifacts/v096_validation.json`, and `figures/v096_*.png`.
+
 ## Limitations
 
 v0.8 is one controlled Bunny run, not a general benchmark or a real-photo reconstruction. Its 20 direct Fibonacci packet directions are also its detector directions; it preserves a shared scene-centric transport state but does not validate arbitrary off-atlas cameras. The 8,192-element candidate dictionary is only a safety envelope. Visibility, ownership, and footprint topology remain frozen within each Jacobian cell. The 2×2 ablation changes the deterministic sampled target support with photon density, has no repeated stochastic trials, and uses a simplified one-shot K=1024 comparison; its signed effects are descriptive, not confidence intervals. In particular, a million attempted packets aggregated over 20 Full-HD views does not imply dense observations per pixel. The strict negative high-bandwidth verdict applies to this optimizer, dictionary, renderer approximation, and controlled target—not to every possible observation-driven birth method.

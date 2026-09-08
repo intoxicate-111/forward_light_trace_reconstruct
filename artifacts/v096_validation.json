@@ -1,0 +1,80 @@
+{
+  "version": "v0.9.6",
+  "passed": true,
+  "checks": {
+    "cuda_hard_gate": true,
+    "historical_v093_v094_v095_artifacts_unchanged": true,
+    "other_protected_files_unchanged_except_documented_renderer_streaming": true,
+    "capacity_genus1": true,
+    "capacity_high_resolution_stable": true,
+    "target_coefficients_saved_and_digest_matches": true,
+    "image_only_optimizer_contract": true,
+    "fresh_retrace_trials_recorded": true,
+    "final_genus0_negative_result": true,
+    "final_fibers_single_root": true,
+    "no_complex_without_critical_event": true,
+    "classification": true,
+    "all_cached_arrays_finite": true,
+    "csv_parses": true,
+    "figures_decode": true,
+    "required_report_headings": true,
+    "generated_text_has_no_trailing_whitespace": true,
+    "compileall": true,
+    "unit_tests": true,
+    "demo_verify": true,
+    "git_diff_check": true
+  },
+  "documented_allowed_code_change": {
+    "src/zlt/dense_jet_torus.py": "boundary-clearance audit and exact emitter-axis transport streaming"
+  },
+  "historical_mismatches": {},
+  "other_protected_mismatches": {},
+  "commands": [
+    {
+      "command": [
+        "/home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/miniconda3/envs/test/bin/python",
+        "-m",
+        "compileall",
+        "-q",
+        "src",
+        "tests",
+        "scripts",
+        "demo.py"
+      ],
+      "returncode": 0,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    {
+      "command": [
+        "/home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/miniconda3/envs/test/bin/python",
+        "-m",
+        "pytest",
+        "-q"
+      ],
+      "returncode": 0,
+      "stdout_tail": "........................................................................ [ 88%]\n.........                                                                [100%]\n81 passed in 12.17s\n",
+      "stderr_tail": ""
+    },
+    {
+      "command": [
+        "/home/zhou_c_WMGDS.WMG.WARWICK.AC.UK/miniconda3/envs/test/bin/python",
+        "demo.py",
+        "--verify"
+      ],
+      "returncode": 0,
+      "stdout_tail": ": {\n    \"max_difference\": 0.0\n  },\n  \"gate_g_determinism\": \"passed\",\n  \"gate_h_basis_locality\": \"passed\",\n  \"gate_i_zero_set_deformation\": {\n    \"max_residual\": 4.2630829422130034e-16,\n    \"root_failure_fraction\": 0.0\n  },\n  \"gate_j_implicit_root_derivative\": {\n    \"degenerate_emitter_fraction\": 0.0,\n    \"maximum_relative_error\": 1.4022555468090357e-10,\n    \"median_relative_error\": 1.0553891935565316e-10,\n    \"minimum_denominator_magnitude\": 1.9999999999999993\n  },\n  \"gate_k_image_jacobian\": {\n    \"best_steps\": [\n      3e-05,\n      3e-05,\n      3e-05,\n      3e-05,\n      3e-05,\n      3e-05,\n      0.0003,\n      0.0003\n    ],\n    \"max_stable_relative_error\": 1.4092646282750144e-09,\n    \"maximum_tested_transport_event_pixel_fraction\": 0.0,\n    \"maximum_tested_transport_event_pixels\": 0,\n    \"median_relative_error\": 5.817491645363511e-10,\n    \"parameters_tested\": [\n      9,\n      13,\n      15,\n      5,\n      8,\n      1,\n      6,\n      0\n    ],\n    \"transport_event_pixel_fraction\": 0.0\n  },\n  \"gate_l_locality\": {\n    \"mean_local_energy_norm_fraction\": 1.0,\n    \"median_local_energy_norm_fraction\": 1.0,\n    \"minimum_local_energy_norm_fraction\": 0.9999999999999998\n  },\n  \"gate_m_multiview_rank\": {\n    \"1\": 9,\n    \"2\": 11,\n    \"4\": 16,\n    \"8\": 16\n  },\n  \"gate_n_v01_regression\": {\n    \"absorbed_photons\": {\n      \"sphere\": 0,\n      \"torus\": 30\n    },\n    \"status\": \"passed\"\n  },\n  \"gate_v_shared_multiview_equivalence\": {\n    \"sphere\": {\n      \"absorbed_detector_bound_photons\": 0,\n      \"all_integer_state_exact\": true,\n      \"camera_hits\": 38,\n      \"cameras_checked\": 2,\n      \"max_camera_time_absolute_error\": 0.0,\n      \"max_image_absolute_error\": 0.0,\n      \"max_transport_value_absolute_error\": 0.0,\n      \"mean_image_absolute_error\": 0.0,\n      \"passed\": true,\n      \"scene_surface_hits\": 0,\n      \"transport_density\": 0.00341796875,\n      \"transport_nnz\": 105\n    },\n    \"torus\": {\n      \"absorbed_detector_bound_photons\": 0,\n      \"all_integer_state_exact\": true,\n      \"camera_hits\": 22,\n      \"cameras_checked\": 2,\n      \"max_camera_time_absolute_error\": 0.0,\n      \"max_image_absolute_error\": 0.0,\n      \"max_transport_value_absolute_error\": 0.0,\n      \"mean_image_absolute_error\": 0.0,\n      \"passed\": true,\n      \"scene_surface_hits\": 15,\n      \"transport_density\": 0.0021484375,\n      \"transport_nnz\": 66\n    }\n  },\n  \"gate_w_sparse_locality_equivalence\": {\n    \"active_bases_per_query\": 2.94921875,\n    \"gradient_max_absolute_error\": 4.440892098500626e-16,\n    \"root_max_absolute_residual\": 4.142122340658795e-16,\n    \"root_success\": true,\n    \"support_indices_exact\": true,\n    \"value_max_absolute_error\": 4.336808689942018e-19\n  },\n  \"gate_x_true_parameter_birth\": {\n    \"births_completed\": 2,\n    \"final_active_k\": 34,\n    \"maximum_birth_geometry_jump\": 0.0,\n    \"root_failures\": 0,\n    \"unique_births\": 2\n  },\n  \"gate_y_nested_observation_sampling\": {\n    \"maximum_unit_length_error\": 0.0,\n    \"nested_8_in_32_prefix_max_error\": 0.0\n  },\n  \"gate_z_natural_multiview_nesting\": {\n    \"P10_in_P100_max_error\": 0.0,\n    \"P1_in_P100_max_error\": 0.0,\n    \"P1_in_P10_max_error\": 0.0,\n    \"V8_in_V40_camera_prefix_max_error\": 0.0,\n    \"camera_count\": 40,\n    \"streamed_emitter_block_max_error\": 0.0\n  }\n}\nrender:\n{\n  \"absorbed\": 0,\n  \"absorption_fraction\": 0.0,\n  \"active_pixels\": 1431,\n  \"camera_candidates\": 1792,\n  \"camera_hit_fraction\": 0.109375,\n  \"camera_hits\": 1792,\n  \"candidate_absorption_fraction\": 0.0,\n  \"direct_sparse_max_difference\": 0.0,\n  \"emitted_photons\": 16384,\n  \"emitters\": 1024,\n  \"max_abs_field_at_emitters\": 4.440892098500626e-16,\n  \"max_normal_length_error\": 2.220446049250313e-16,\n  \"mean_active_emitters_per_pixel\": 0.349365234375,\n  \"mean_affected_pixels_per_emitter\": 1.3974609375,\n  \"min_direction_normal_dot\": 0.5370260767149182,\n  \"mode\": \"hard\",\n  \"runtime_seconds\": 0.061035663122311234,\n  \"scene\": \"sphere\",\n  \"seed\": 7,\n  \"transport_density\": 0.00034117698669433594,\n  \"transport_nnz\": 1431,\n  \"transport_shape\": [\n    4096,\n    1024\n  ]\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "returncode": 0,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    }
+  ]
+}
