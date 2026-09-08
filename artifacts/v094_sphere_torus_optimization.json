@@ -1,0 +1,2202 @@
+{
+  "version": "v094",
+  "experiment": "rendered sphere-to-torus optimization",
+  "runs": [
+    {
+      "name": "A_real_only_discrete",
+      "target_c": 0.005,
+      "selected_views": [
+        0,
+        1
+      ],
+      "complex_capable": false,
+      "continuous_real": false,
+      "trajectory": [
+        {
+          "iteration": 0,
+          "loss": 3.486558989429951e-05,
+          "c0": -0.005,
+          "delta_c": 0.010629004351987104,
+          "c_pred": 0.0056290043519871035,
+          "trigger": true,
+          "Jv_norm": 15.71623010678529,
+          "g_c": -2.625362892670542,
+          "h_c": 246.99988876942433,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.433185601804606,
+            10.783420411173449,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -0.005,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.04913097161662203,
+            "critical_branch_gradient_norm": 0.203345697152338,
+            "critical_branch_normal_denominator": 0.203345697152338,
+            "implicit_dc": 4.754004136748026
+          },
+          "sampled_surface_gradient_min": 0.43717505379057636,
+          "chart_denominator_min": 0.43717505379057636,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            813,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.2646484375,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.0056290043519871035,
+              "loss": 3.970023363493897e-05,
+              "accepted": false
+            },
+            {
+              "alpha": 0.5,
+              "c": 0.0003145021759935517,
+              "loss": 1.0543856724109565e-05,
+              "accepted": true
+            }
+          ],
+          "complex_capable": false,
+          "complex_bypass_activated": false,
+          "accepted_c": 0.0003145021759935517,
+          "accepted_loss": 1.0543856724109565e-05
+        },
+        {
+          "iteration": 1,
+          "loss": 1.0543856724109565e-05,
+          "c0": 0.0003145021759935517,
+          "delta_c": 0.00624461610227539,
+          "c_pred": 0.006559118278268942,
+          "trigger": false,
+          "Jv_norm": 15.94998223093363,
+          "g_c": -1.588642408305252,
+          "h_c": 254.40193316709866,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.611525442721042,
+            10.935008461823,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": 0.0003145021759935517,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": null,
+            "critical_branch_gradient_norm": null,
+            "critical_branch_normal_denominator": null,
+            "implicit_dc": null
+          },
+          "sampled_surface_gradient_min": 0.42697481582527036,
+          "chart_denominator_min": 0.42369046761539175,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.006559118278268942,
+              "loss": 3.9770350778240595e-05,
+              "accepted": false
+            },
+            {
+              "alpha": 0.5,
+              "c": 0.0034368102271312467,
+              "loss": 4.564490636910765e-06,
+              "accepted": true
+            }
+          ],
+          "complex_capable": false,
+          "complex_bypass_activated": false,
+          "accepted_c": 0.0034368102271312467,
+          "accepted_loss": 4.564490636910765e-06
+        },
+        {
+          "iteration": 2,
+          "loss": 4.564490636910765e-06,
+          "c0": 0.0034368102271312467,
+          "delta_c": 0.001975295349876159,
+          "c_pred": 0.005412105577007406,
+          "trigger": false,
+          "Jv_norm": 15.970874105730065,
+          "g_c": -0.503836253453942,
+          "h_c": 255.06881970107912,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.70187523614254,
+            10.868989633762334,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": 0.0034368102271312467,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": null,
+            "critical_branch_gradient_norm": null,
+            "critical_branch_normal_denominator": null,
+            "implicit_dc": null
+          },
+          "sampled_surface_gradient_min": 0.42518485733288036,
+          "chart_denominator_min": 0.4166860589564342,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.005412105577007406,
+              "loss": 3.96945849725718e-05,
+              "accepted": false
+            },
+            {
+              "alpha": 0.5,
+              "c": 0.004424457902069326,
+              "loss": 1.3791683289487478e-08,
+              "accepted": true
+            }
+          ],
+          "complex_capable": false,
+          "complex_bypass_activated": false,
+          "accepted_c": 0.004424457902069326,
+          "accepted_loss": 1.3791683289487478e-08
+        },
+        {
+          "iteration": 3,
+          "loss": 1.3791683289487478e-08,
+          "c0": 0.004424457902069326,
+          "delta_c": 0.0005759597273672839,
+          "c_pred": 0.00500041762943661,
+          "trigger": false,
+          "Jv_norm": 15.982397234322383,
+          "g_c": -0.14712143717952603,
+          "h_c": 255.43702135567565,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.727939449922998,
+            10.857829323332334,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": 0.004424457902069326,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": null,
+            "critical_branch_gradient_norm": null,
+            "critical_branch_normal_denominator": null,
+            "implicit_dc": null
+          },
+          "sampled_surface_gradient_min": 0.4252998110756683,
+          "chart_denominator_min": 0.41462019588472293,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.00500041762943661,
+              "loss": 7.272274915386305e-15,
+              "accepted": true
+            }
+          ],
+          "complex_capable": false,
+          "complex_bypass_activated": false,
+          "accepted_c": 0.00500041762943661,
+          "accepted_loss": 7.272274915386305e-15
+        },
+        {
+          "iteration": 4,
+          "loss": 7.272274915386305e-15,
+          "c0": 0.00500041762943661,
+          "delta_c": -4.1762922102654643e-07,
+          "c_pred": 0.005000000000215583,
+          "trigger": false,
+          "Jv_norm": 16.005522988614967,
+          "g_c": 0.00010698690328776468,
+          "h_c": 256.17676613908225,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.742550752362451,
+            10.87608697865525,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": 0.00500041762943661,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": null,
+            "critical_branch_gradient_norm": null,
+            "critical_branch_normal_denominator": null,
+            "implicit_dc": null
+          },
+          "sampled_surface_gradient_min": 0.4255197485753451,
+          "chart_denominator_min": 0.4134494355239942,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.005000000000215583,
+              "loss": 1.9367649248910354e-27,
+              "accepted": true
+            }
+          ],
+          "complex_capable": false,
+          "complex_bypass_activated": false,
+          "accepted_c": 0.005000000000215583,
+          "accepted_loss": 1.9367649248910354e-27
+        }
+      ],
+      "bridges": [],
+      "final_c": 0.005000000000215583,
+      "initial_loss": 3.486558989429951e-05,
+      "final_loss": 1.9367649248910354e-27,
+      "topology_initial": {
+        "c": -0.005,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 2,
+        "genus": 0.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.0,
+          "pole": 0.04913097161662203,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 2,
+          "inferred_genus": 0,
+          "positive_z_derivative_over_z_lower_bound": 3.84375,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "topology_final": {
+        "c": 0.005000000000215583,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 0,
+        "genus": 1.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.049188515077977585,
+          "pole": null,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 0,
+          "inferred_genus": 1,
+          "positive_z_derivative_over_z_lower_bound": 3.843749999993263,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "topology_target": {
+        "c": 0.005,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 0,
+        "genus": 1.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.04918851507694949,
+          "pole": null,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 0,
+          "inferred_genus": 1,
+          "positive_z_derivative_over_z_lower_bound": 3.84375,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "final_sample_gradient_min": 0.42551954821873983,
+      "final_owner_counts": [
+        109,
+        99,
+        0
+      ]
+    },
+    {
+      "name": "A2_real_only_continuous",
+      "target_c": 0.005,
+      "selected_views": [
+        0,
+        1
+      ],
+      "complex_capable": false,
+      "continuous_real": true,
+      "trajectory": [
+        {
+          "iteration": 0,
+          "loss": 3.486558989429951e-05,
+          "c0": -0.005,
+          "delta_c": 0.010629004351987104,
+          "c_pred": 0.0056290043519871035,
+          "trigger": true,
+          "Jv_norm": 15.71623010678529,
+          "g_c": -2.625362892670542,
+          "h_c": 246.99988876942433,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.433185601804606,
+            10.783420411173449,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -0.005,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.04913097161662203,
+            "critical_branch_gradient_norm": 0.203345697152338,
+            "critical_branch_normal_denominator": 0.203345697152338,
+            "implicit_dc": 4.754004136748026
+          },
+          "sampled_surface_gradient_min": 0.43717505379057636,
+          "chart_denominator_min": 0.43717505379057636,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            813,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.2646484375,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.0056290043519871035,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.5,
+              "c": 0.0003145021759935517,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.25,
+              "c": -0.002342748912003224,
+              "loss": 1.2202605472927164e-05,
+              "accepted": true
+            }
+          ],
+          "complex_capable": false,
+          "complex_bypass_activated": false,
+          "accepted_c": -0.002342748912003224,
+          "accepted_loss": 1.2202605472927164e-05
+        },
+        {
+          "iteration": 1,
+          "loss": 1.2202605472927164e-05,
+          "c0": -0.002342748912003224,
+          "delta_c": 0.0089677125965411,
+          "c_pred": 0.006624963684537876,
+          "trigger": true,
+          "Jv_norm": 15.818414202206199,
+          "g_c": -2.243921024827323,
+          "h_c": 250.2222278725588,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.52590227621951,
+            10.83401147274622,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -0.002342748912003224,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.03393184097172068,
+            "critical_branch_gradient_norm": 0.1380649366006026,
+            "critical_branch_normal_denominator": 0.1380649366006026,
+            "implicit_dc": 7.123372308887297
+          },
+          "sampled_surface_gradient_min": 0.4309955582133977,
+          "chart_denominator_min": 0.4301966026118419,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.006624963684537876,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.5,
+              "c": 0.002141107386267326,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.25,
+              "c": -0.0001008207628679491,
+              "loss": 1.0765614141748994e-05,
+              "accepted": true
+            }
+          ],
+          "complex_capable": false,
+          "complex_bypass_activated": false,
+          "accepted_c": -0.0001008207628679491,
+          "accepted_loss": 1.0765614141748994e-05
+        },
+        {
+          "iteration": 2,
+          "loss": 1.0765614141748994e-05,
+          "c0": -0.0001008207628679491,
+          "delta_c": 0.006666400008439854,
+          "c_pred": 0.006565579245571905,
+          "trigger": true,
+          "Jv_norm": 15.931299064448387,
+          "g_c": -1.69197425300408,
+          "h_c": 253.80628988089404,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.598646561120855,
+            10.921432499040288,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -0.0001008207628679491,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.007097192225004292,
+            "critical_branch_gradient_norm": 0.02841196975083776,
+            "critical_branch_normal_denominator": 0.02841196975083776,
+            "implicit_dc": 35.1692208245185
+          },
+          "sampled_surface_gradient_min": 0.4274550247589259,
+          "chart_denominator_min": 0.42467506423656004,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.006565579245571905,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.5,
+              "c": 0.003232379241351978,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.25,
+              "c": 0.0015657792392420144,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.125,
+              "c": 0.0007324792381870327,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.0625,
+              "c": 0.0003158292376595418,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.03125,
+              "c": 0.00010750423739579635,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": null,
+              "c": -1.0082076286794911e-05,
+              "loss": 1.0715971613486568e-05,
+              "accepted": true,
+              "boundary_approach": true
+            }
+          ],
+          "complex_capable": false,
+          "complex_bypass_activated": false,
+          "accepted_c": -1.0082076286794911e-05,
+          "accepted_loss": 1.0715971613486568e-05
+        },
+        {
+          "iteration": 3,
+          "loss": 1.0715971613486568e-05,
+          "c0": -1.0082076286794911e-05,
+          "delta_c": 0.006573675358797846,
+          "c_pred": 0.0065635932825110505,
+          "trigger": true,
+          "Jv_norm": 15.9357073012019,
+          "g_c": -1.6693636059205121,
+          "h_c": 253.9467671895795,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.601476782033634,
+            10.924857146229145,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -1.0082076286794911e-05,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.002245134880556567,
+            "critical_branch_gradient_norm": 0.008981286214196013,
+            "critical_branch_normal_denominator": 0.008981286214196013,
+            "implicit_dc": 111.33390668502965
+          },
+          "sampled_surface_gradient_min": 0.4273453450202275,
+          "chart_denominator_min": 0.4244589140686691,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.0065635932825110505,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.5,
+              "c": 0.003276755603112128,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.25,
+              "c": 0.0016333367634126666,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.125,
+              "c": 0.0008116273435629358,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.0625,
+              "c": 0.00040077263363807043,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.03125,
+              "c": 0.00019534527867563778,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": null,
+              "c": -1.0082076286794912e-06,
+              "loss": 1.0711044099546144e-05,
+              "accepted": true,
+              "boundary_approach": true
+            }
+          ],
+          "complex_capable": false,
+          "complex_bypass_activated": false,
+          "accepted_c": -1.0082076286794912e-06,
+          "accepted_loss": 1.0711044099546144e-05
+        },
+        {
+          "iteration": 4,
+          "loss": 1.0711044099546144e-05,
+          "c0": -1.0082076286794912e-06,
+          "delta_c": 0.006564404615594709,
+          "c_pred": 0.00656339640796603,
+          "trigger": true,
+          "Jv_norm": 15.936147410874588,
+          "g_c": -1.6671014102904018,
+          "h_c": 253.96079430112476,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.601759299697857,
+            10.92519910358612,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -1.0082076286794912e-06,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.0007099998055299517,
+            "critical_branch_gradient_norm": 0.0028400229638570625,
+            "critical_branch_normal_denominator": 0.0028400229638570625,
+            "implicit_dc": 352.1070604497151
+          },
+          "sampled_surface_gradient_min": 0.4273345232806952,
+          "chart_denominator_min": 0.42443733090643976,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.00656339640796603,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.5,
+              "c": 0.003281194100168675,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.25,
+              "c": 0.0016400929462699978,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.125,
+              "c": 0.0008195423693206592,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.0625,
+              "c": 0.00040926708084598984,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": 0.03125,
+              "c": 0.00020412943660865518,
+              "accepted": false,
+              "rejection": "REAL_CONTINUATION_CANNOT_CROSS_KNOWN_SINGULAR_C0"
+            },
+            {
+              "alpha": null,
+              "c": -1.0082076286794913e-07,
+              "loss": 1.0710551715664574e-05,
+              "accepted": true,
+              "boundary_approach": true
+            }
+          ],
+          "complex_capable": false,
+          "complex_bypass_activated": false,
+          "accepted_c": -1.0082076286794913e-07,
+          "accepted_loss": 1.0710551715664574e-05
+        }
+      ],
+      "bridges": [],
+      "final_c": -1.0082076286794913e-07,
+      "initial_loss": 3.486558989429951e-05,
+      "final_loss": 1.0710551715664574e-05,
+      "topology_initial": {
+        "c": -0.005,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 2,
+        "genus": 0.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.0,
+          "pole": 0.04913097161662203,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 2,
+          "inferred_genus": 0,
+          "positive_z_derivative_over_z_lower_bound": 3.84375,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "topology_final": {
+        "c": -1.0082076286794913e-07,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 2,
+        "genus": 0.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.0,
+          "pole": 0.0002245224720545728,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 2,
+          "inferred_genus": 0,
+          "positive_z_derivative_over_z_lower_bound": 3.9999968493511604,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "topology_target": {
+        "c": 0.005,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 0,
+        "genus": 1.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.04918851507694949,
+          "pole": null,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 0,
+          "inferred_genus": 1,
+          "positive_z_derivative_over_z_lower_bound": 3.84375,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "final_sample_gradient_min": 0.4273334425700269,
+      "final_owner_counts": [
+        109,
+        99,
+        0
+      ]
+    },
+    {
+      "name": "B_complex_capable",
+      "target_c": 0.005,
+      "selected_views": [
+        0,
+        1
+      ],
+      "complex_capable": true,
+      "continuous_real": false,
+      "trajectory": [
+        {
+          "iteration": 0,
+          "loss": 3.486558989429951e-05,
+          "c0": -0.005,
+          "delta_c": 0.010629004351987104,
+          "c_pred": 0.0056290043519871035,
+          "trigger": true,
+          "Jv_norm": 15.71623010678529,
+          "g_c": -2.625362892670542,
+          "h_c": 246.99988876942433,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.433185601804606,
+            10.783420411173449,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -0.005,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.04913097161662203,
+            "critical_branch_gradient_norm": 0.203345697152338,
+            "critical_branch_normal_denominator": 0.203345697152338,
+            "implicit_dc": 4.754004136748026
+          },
+          "sampled_surface_gradient_min": 0.43717505379057636,
+          "chart_denominator_min": 0.43717505379057636,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            813,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.2646484375,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.0056290043519871035,
+              "loss": 3.970023363493897e-05,
+              "accepted": false
+            },
+            {
+              "alpha": 0.5,
+              "c": 0.0003145021759935517,
+              "loss": 1.0543856724109565e-05,
+              "accepted": true
+            }
+          ],
+          "complex_capable": true,
+          "complex_bypass_activated": true,
+          "bridge_index": 0,
+          "accepted_c": 0.0003145021759935517,
+          "accepted_loss": 1.0543856724109565e-05
+        },
+        {
+          "iteration": 1,
+          "loss": 1.0543856724109565e-05,
+          "c0": 0.0003145021759935517,
+          "delta_c": 0.00624461610227539,
+          "c_pred": 0.006559118278268942,
+          "trigger": false,
+          "Jv_norm": 15.94998223093363,
+          "g_c": -1.588642408305252,
+          "h_c": 254.40193316709866,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.611525442721042,
+            10.935008461823,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": 0.0003145021759935517,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": null,
+            "critical_branch_gradient_norm": null,
+            "critical_branch_normal_denominator": null,
+            "implicit_dc": null
+          },
+          "sampled_surface_gradient_min": 0.42697481582527036,
+          "chart_denominator_min": 0.42369046761539175,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.006559118278268942,
+              "loss": 3.9770350778240595e-05,
+              "accepted": false
+            },
+            {
+              "alpha": 0.5,
+              "c": 0.0034368102271312467,
+              "loss": 4.564490636910765e-06,
+              "accepted": true
+            }
+          ],
+          "complex_capable": true,
+          "complex_bypass_activated": false,
+          "accepted_c": 0.0034368102271312467,
+          "accepted_loss": 4.564490636910765e-06
+        },
+        {
+          "iteration": 2,
+          "loss": 4.564490636910765e-06,
+          "c0": 0.0034368102271312467,
+          "delta_c": 0.001975295349876159,
+          "c_pred": 0.005412105577007406,
+          "trigger": false,
+          "Jv_norm": 15.970874105730065,
+          "g_c": -0.503836253453942,
+          "h_c": 255.06881970107912,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.70187523614254,
+            10.868989633762334,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": 0.0034368102271312467,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": null,
+            "critical_branch_gradient_norm": null,
+            "critical_branch_normal_denominator": null,
+            "implicit_dc": null
+          },
+          "sampled_surface_gradient_min": 0.42518485733288036,
+          "chart_denominator_min": 0.4166860589564342,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.005412105577007406,
+              "loss": 3.96945849725718e-05,
+              "accepted": false
+            },
+            {
+              "alpha": 0.5,
+              "c": 0.004424457902069326,
+              "loss": 1.3791683289487478e-08,
+              "accepted": true
+            }
+          ],
+          "complex_capable": true,
+          "complex_bypass_activated": false,
+          "accepted_c": 0.004424457902069326,
+          "accepted_loss": 1.3791683289487478e-08
+        },
+        {
+          "iteration": 3,
+          "loss": 1.3791683289487478e-08,
+          "c0": 0.004424457902069326,
+          "delta_c": 0.0005759597273672839,
+          "c_pred": 0.00500041762943661,
+          "trigger": false,
+          "Jv_norm": 15.982397234322383,
+          "g_c": -0.14712143717952603,
+          "h_c": 255.43702135567565,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.727939449922998,
+            10.857829323332334,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": 0.004424457902069326,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": null,
+            "critical_branch_gradient_norm": null,
+            "critical_branch_normal_denominator": null,
+            "implicit_dc": null
+          },
+          "sampled_surface_gradient_min": 0.4252998110756683,
+          "chart_denominator_min": 0.41462019588472293,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.00500041762943661,
+              "loss": 7.272274915386305e-15,
+              "accepted": true
+            }
+          ],
+          "complex_capable": true,
+          "complex_bypass_activated": false,
+          "accepted_c": 0.00500041762943661,
+          "accepted_loss": 7.272274915386305e-15
+        },
+        {
+          "iteration": 4,
+          "loss": 7.272274915386305e-15,
+          "c0": 0.00500041762943661,
+          "delta_c": -4.1762922102654643e-07,
+          "c_pred": 0.005000000000215583,
+          "trigger": false,
+          "Jv_norm": 16.005522988614967,
+          "g_c": 0.00010698690328776468,
+          "h_c": 256.17676613908225,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.742550752362451,
+            10.87608697865525,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": 0.00500041762943661,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": null,
+            "critical_branch_gradient_norm": null,
+            "critical_branch_normal_denominator": null,
+            "implicit_dc": null
+          },
+          "sampled_surface_gradient_min": 0.4255197485753451,
+          "chart_denominator_min": 0.4134494355239942,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            822,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.267578125,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": 0.005000000000215583,
+              "loss": 1.9367649248910354e-27,
+              "accepted": true
+            }
+          ],
+          "complex_capable": true,
+          "complex_bypass_activated": false,
+          "accepted_c": 0.005000000000215583,
+          "accepted_loss": 1.9367649248910354e-27
+        }
+      ],
+      "bridges": [
+        {
+          "max_residual": 8.753848760282803e-16,
+          "min_spatial_jacobian": 0.42337738162231575,
+          "path_tangent_fd_relative_l2": 1.0797998543495397e-05,
+          "max_implicit_derivative": 2.0429402209021186,
+          "start_real": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "start_imag": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "final_real": [
+            -0.0009621850585532973,
+            -0.002565466118835135,
+            -0.008459698778573752,
+            -0.0014674844401378192,
+            -0.0019590928396699273,
+            -0.004959826972638394,
+            -0.003399246014478711,
+            -0.0005339530168687329,
+            -0.00037065721634480355,
+            -0.004005655596417471,
+            -0.005912553171038358,
+            -0.0014948434935292633,
+            -0.0011051146386669996,
+            -0.01052143406939843,
+            -0.0030226370759876167,
+            -0.0007029907460209314,
+            -0.0006539087325914319,
+            -0.0028538651635454564,
+            -0.009687423599030812,
+            -0.001031779184507532,
+            -0.0017548035929933852,
+            -0.006991124819127083,
+            -0.004688050330724325,
+            -0.00046226554624986105,
+            -0.0005762129158937447,
+            -0.0036000885714127045,
+            -0.005283001483989351,
+            -0.002084146954369391,
+            -0.0012442589561339605,
+            -0.0070686428873459484,
+            -0.002194141525534659,
+            -0.0008007826807121362,
+            -0.0008391418918565632,
+            -0.0023950155729898057,
+            -0.007757480688475009,
+            -0.0012907674843711584,
+            -0.0021137956692304782,
+            -0.005636519010448374,
+            -0.0038046789605892307,
+            -0.0005824970159909365,
+            -0.00043785331238743546,
+            -0.004292283343725073,
+            -0.006392461324937035,
+            -0.0016946001868912472,
+            -0.0010155496008346907,
+            -0.008945687356697153,
+            -0.0027006304081358535,
+            -0.0006470542560064005,
+            -0.0007594083078443273,
+            -0.003070312760325502,
+            -0.010661812540755794,
+            -0.0011780363681841315,
+            -0.0016353085412218206,
+            -0.006159257655391109,
+            -0.004135160205054586,
+            -0.00041557888674051977,
+            -0.0004907950067171628,
+            -0.0033464308450936414,
+            -0.004911837518648216,
+            -0.0018471446228332392,
+            -0.0013392843321635493,
+            -0.00807922439082805,
+            -0.0024853925021148288,
+            -0.0008769437750454155
+          ],
+          "final_imag": [
+            0.0,
+            0.0,
+            0.0,
+            -4.6816763546921983e-97,
+            0.0,
+            -5.852095443365248e-98,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            9.363352709384397e-97,
+            0.0,
+            -4.6816763546921983e-97,
+            3.745341083753759e-96,
+            4.6816763546921983e-97,
+            -9.363352709384397e-97,
+            0.0,
+            0.0,
+            0.0,
+            -7.490682167507517e-96,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -2.926047721682624e-98,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -7.490682167507517e-96,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -2.3408381773460992e-97,
+            0.0,
+            0.0,
+            -1.1985091468012028e-94,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "endpoint_imag_max": 1.1985091468012028e-94,
+          "start": -0.005,
+          "end": 0.0003145021759935517,
+          "path": "log-radius upper semicircle in c-plane",
+          "min_distance_to_discriminant": 0.0003145021759935517,
+          "min_spatial_gradient_norm": 0.42684666388277825,
+          "endpoint_point_imaginary_max": 9.465900252492367e-95,
+          "endpoint_real_resolve_max_error": 3.885780586188048e-16,
+          "rendered_complex_states": 0,
+          "iteration": 0,
+          "accepted_retraced_loss": 1.0543856724109565e-05
+        }
+      ],
+      "final_c": 0.005000000000215583,
+      "initial_loss": 3.486558989429951e-05,
+      "final_loss": 1.9367649248910354e-27,
+      "topology_initial": {
+        "c": -0.005,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 2,
+        "genus": 0.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.0,
+          "pole": 0.04913097161662203,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 2,
+          "inferred_genus": 0,
+          "positive_z_derivative_over_z_lower_bound": 3.84375,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "topology_final": {
+        "c": 0.005000000000215583,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 0,
+        "genus": 1.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.049188515077977585,
+          "pole": null,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 0,
+          "inferred_genus": 1,
+          "positive_z_derivative_over_z_lower_bound": 3.843749999993263,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "topology_target": {
+        "c": 0.005,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 0,
+        "genus": 1.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.04918851507694949,
+          "pole": null,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 0,
+          "inferred_genus": 1,
+          "positive_z_derivative_over_z_lower_bound": 3.84375,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "final_sample_gradient_min": 0.42551954821873983,
+      "final_owner_counts": [
+        109,
+        99,
+        0
+      ]
+    },
+    {
+      "name": "C_same_side",
+      "target_c": -0.007,
+      "selected_views": [
+        0,
+        1
+      ],
+      "complex_capable": true,
+      "continuous_real": false,
+      "trajectory": [
+        {
+          "iteration": 0,
+          "loss": 1.5965880260705846e-07,
+          "c0": -0.005,
+          "delta_c": -0.001992832086015997,
+          "c_pred": -0.006992832086015997,
+          "trigger": false,
+          "Jv_norm": 15.71623010678529,
+          "g_c": 0.4922293035820912,
+          "h_c": 246.99988876942433,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.433185601804606,
+            10.783420411173449,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -0.005,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.04913097161662203,
+            "critical_branch_gradient_norm": 0.203345697152338,
+            "critical_branch_normal_denominator": 0.203345697152338,
+            "implicit_dc": 4.754004136748026
+          },
+          "sampled_surface_gradient_min": 0.43717505379057636,
+          "chart_denominator_min": 0.43717505379057636,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            813,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.2646484375,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": -0.006992832086015997,
+              "loss": 2.035955912267227e-12,
+              "accepted": true
+            }
+          ],
+          "complex_capable": true,
+          "complex_bypass_activated": false,
+          "accepted_c": -0.006992832086015997,
+          "accepted_loss": 2.035955912267227e-12
+        },
+        {
+          "iteration": 1,
+          "loss": 2.035955912267227e-12,
+          "c0": -0.006992832086015997,
+          "delta_c": -7.167819064853694e-06,
+          "c_pred": -0.006999999905080851,
+          "trigger": false,
+          "Jv_norm": 15.603526185104036,
+          "g_c": 0.0017451491185199496,
+          "h_c": 243.47002940922738,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.359535337249287,
+            10.697241996468628,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -0.006992832086015997,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.057737602921813486,
+            "critical_branch_gradient_norm": 0.24179808154171975,
+            "critical_branch_normal_denominator": 0.24179808154171975,
+            "implicit_dc": 3.9497065469659103
+          },
+          "sampled_surface_gradient_min": 0.44312455212803786,
+          "chart_denominator_min": 0.4427001765861396,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            813,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.2646484375,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": -0.006999999905080851,
+              "loss": 3.570097836849862e-22,
+              "accepted": true
+            }
+          ],
+          "complex_capable": true,
+          "complex_bypass_activated": false,
+          "accepted_c": -0.006999999905080851,
+          "accepted_loss": 3.570097836849862e-22
+        },
+        {
+          "iteration": 2,
+          "loss": 3.570097836849862e-22,
+          "c0": -0.006999999905080851,
+          "delta_c": -9.491927457082111e-11,
+          "c_pred": -0.007000000000000126,
+          "trigger": false,
+          "Jv_norm": 15.603112934547738,
+          "g_c": 2.310877447701571e-08,
+          "h_c": 243.45713324825093,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.359264591288081,
+            10.696926717209937,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -0.006999999905080851,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.05776590558073208,
+            "critical_branch_gradient_norm": 0.24192654551305484,
+            "critical_branch_normal_denominator": 0.24192654551305484,
+            "implicit_dc": 3.9474406062189873
+          },
+          "sampled_surface_gradient_min": 0.4431478738775825,
+          "chart_denominator_min": 0.4427204812643749,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            813,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.2646484375,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": -0.007000000000000126,
+              "loss": 6.407735933336227e-32,
+              "accepted": true
+            }
+          ],
+          "complex_capable": true,
+          "complex_bypass_activated": false,
+          "accepted_c": -0.007000000000000126,
+          "accepted_loss": 6.407735933336227e-32
+        },
+        {
+          "iteration": 3,
+          "loss": 6.407735933336227e-32,
+          "c0": -0.007000000000000126,
+          "delta_c": 1.0814132258769365e-16,
+          "c_pred": -0.0070000000000000175,
+          "trigger": false,
+          "Jv_norm": 15.60311292907495,
+          "g_c": -2.6327776364405292e-14,
+          "h_c": 243.4571330774658,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.359264587702487,
+            10.696926713034642,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -0.007000000000000126,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.057765905955419736,
+            "critical_branch_gradient_norm": 0.24192654721382956,
+            "critical_branch_normal_denominator": 0.24192654721382956,
+            "implicit_dc": 3.9474405762351203
+          },
+          "sampled_surface_gradient_min": 0.44314787418650686,
+          "chart_denominator_min": 0.44272048153327737,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            813,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.2646484375,
+            0.0
+          ],
+          "trials": [
+            {
+              "alpha": 1.0,
+              "c": -0.0070000000000000175,
+              "loss": 9.118110335078157e-33,
+              "accepted": true
+            }
+          ],
+          "complex_capable": true,
+          "complex_bypass_activated": false,
+          "accepted_c": -0.0070000000000000175,
+          "accepted_loss": 9.118110335078157e-33
+        },
+        {
+          "iteration": 4,
+          "loss": 9.118110335078157e-33,
+          "c0": -0.0070000000000000175,
+          "delta_c": 2.6580279742000826e-17,
+          "c_pred": -0.006999999999999991,
+          "trigger": false,
+          "Jv_norm": 15.603112929074952,
+          "g_c": -6.471158702384565e-15,
+          "h_c": 243.45713307746587,
+          "observable": true,
+          "per_view_Jv_norm": [
+            11.359264587702487,
+            10.696926713034644,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -0.0070000000000000175,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.057765905955419736,
+            "critical_branch_gradient_norm": 0.24192654721382942,
+            "critical_branch_normal_denominator": 0.24192654721382942,
+            "implicit_dc": 3.9474405762351226
+          },
+          "sampled_surface_gradient_min": 0.4431478741865068,
+          "chart_denominator_min": 0.4427204815332773,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            813,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.2646484375,
+            0.0
+          ],
+          "trials": [],
+          "complex_capable": true,
+          "complex_bypass_activated": false,
+          "stop": "UNOBSERVABLE_OR_STATIONARY"
+        }
+      ],
+      "bridges": [],
+      "final_c": -0.0070000000000000175,
+      "initial_loss": 1.5965880260705846e-07,
+      "final_loss": 9.118110335078157e-33,
+      "topology_initial": {
+        "c": -0.005,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 2,
+        "genus": 0.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.0,
+          "pole": 0.04913097161662203,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 2,
+          "inferred_genus": 0,
+          "positive_z_derivative_over_z_lower_bound": 3.84375,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "topology_final": {
+        "c": -0.0070000000000000175,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 2,
+        "genus": 0.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.0,
+          "pole": 0.057765905955419736,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 2,
+          "inferred_genus": 0,
+          "positive_z_derivative_over_z_lower_bound": 3.7812499999999996,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "topology_target": {
+        "c": -0.007,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 2,
+        "genus": 0.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.0,
+          "pole": 0.057765905955419736,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 2,
+          "inferred_genus": 0,
+          "positive_z_derivative_over_z_lower_bound": 3.78125,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "final_sample_gradient_min": 0.4431478741865068,
+      "final_owner_counts": [
+        109,
+        99,
+        0
+      ]
+    },
+    {
+      "name": "D_weak_observability",
+      "target_c": 0.005,
+      "selected_views": [
+        2
+      ],
+      "complex_capable": true,
+      "continuous_real": false,
+      "trajectory": [
+        {
+          "iteration": 0,
+          "loss": 0.0,
+          "c0": -0.005,
+          "delta_c": null,
+          "c_pred": null,
+          "trigger": false,
+          "Jv_norm": 0.0,
+          "g_c": 0.0,
+          "h_c": 0.0,
+          "observable": false,
+          "per_view_Jv_norm": [
+            11.433185601804606,
+            10.783420411173449,
+            0.0
+          ],
+          "local_zero_set": {
+            "origin_F": -0.005,
+            "origin_gradient_norm": 0.0,
+            "origin_is_zero_set": false,
+            "real_pole": 0.04913097161662203,
+            "critical_branch_gradient_norm": 0.203345697152338,
+            "critical_branch_normal_denominator": 0.203345697152338,
+            "implicit_dc": 4.754004136748026
+          },
+          "sampled_surface_gradient_min": 0.43717505379057636,
+          "chart_denominator_min": 0.43717505379057636,
+          "support_location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "support_radius": 0.8,
+          "support_pairs": 64,
+          "affected_parameters": 1,
+          "sparse_nnz": [
+            846,
+            813,
+            0
+          ],
+          "image_entries": [
+            3072,
+            3072,
+            3072
+          ],
+          "nonzero_fraction": [
+            0.275390625,
+            0.2646484375,
+            0.0
+          ],
+          "trials": [],
+          "complex_capable": true,
+          "complex_bypass_activated": false,
+          "stop": "UNOBSERVABLE_OR_STATIONARY"
+        }
+      ],
+      "bridges": [],
+      "final_c": -0.005,
+      "initial_loss": 0.0,
+      "final_loss": 0.0,
+      "topology_initial": {
+        "c": -0.005,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 2,
+        "genus": 0.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.0,
+          "pole": 0.04913097161662203,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 2,
+          "inferred_genus": 0,
+          "positive_z_derivative_over_z_lower_bound": 3.84375,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "topology_final": {
+        "c": -0.005,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 2,
+        "genus": 0.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.0,
+          "pole": 0.04913097161662203,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 2,
+          "inferred_genus": 0,
+          "positive_z_derivative_over_z_lower_bound": 3.84375,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "topology_target": {
+        "c": 0.005,
+        "a": null,
+        "grid": 144,
+        "components": 1,
+        "watertight": true,
+        "euler": 0,
+        "genus": 1.0,
+        "interpretation": "Finite extraction diagnostic only; not a renderer input or topology trigger.",
+        "meridian": {
+          "inner_radius": 0.04918851507694949,
+          "pole": null,
+          "outer_radius": 1.4142135623730951,
+          "axis_intersections": 0,
+          "inferred_genus": 1,
+          "positive_z_derivative_over_z_lower_bound": 3.84375,
+          "argument": "For |c|<.02: F_z/z>0, and F_r(r,0)<0 for 0<r<.8; outside support the unchanged quartic gives the unique outer radius sqrt(2). Rotating the one meridian gives sphere/torus.",
+          "grid_agrees": true
+        }
+      },
+      "final_sample_gradient_min": 0.43717505379057636,
+      "final_owner_counts": [
+        109,
+        99,
+        0
+      ]
+    }
+  ],
+  "operator": "Existing real reference-direction, first-arrival, bilinear fixed-cell renderer; every state/target re-traced.",
+  "comparison_policy": "Identical initialization, target, views, source IDs, GN rule and line search. Complex run uses the same accepted real endpoint as discrete real-only, with an internal continuation audit.",
+  "verdicts": {
+    "REAL_ONLY_DISCRETE_REACHES_GENUS1": true,
+    "REAL_CONTINUATION_STALLS_AT_BARRIER": true,
+    "CRITICAL_MODE_IMAGE_OBSERVABLE": true,
+    "IMAGE_TRIGGER_PREDICTS_CROSSING": true,
+    "COMPLEX_BYPASS_REGULAR": true,
+    "COMPLEX_REAL_REENTRY": true,
+    "COMPLEX_BEATS_CONTINUOUS_REAL": true,
+    "COMPLEX_BEATS_DISCRETE_REAL": false,
+    "COMPLEX_MATCHES_DISCRETE_REAL": true,
+    "COMPLEX_RUN_REACHES_GENUS1": true,
+    "SAME_SIDE_DOES_NOT_TRIGGER": true,
+    "WEAK_VIEW_UNDERDETERMINED": true,
+    "FULL_CLAIM_SUPPORTED": false
+  },
+  "seconds": 10.206307322951034,
+  "central_result": "Complex continuation is a valid regular audit/bridge and beats a continuity-constrained real tracker, but provides no loss or reachability advantage over ordinary discrete real parameter updates in this controlled renderer.",
+  "figures": [
+    "figures/v094_optimization.png",
+    "figures/v094_outcomes.png",
+    "figures/v094_complex_bridge.png",
+    "figures/v094_real_images.png",
+    "figures/v094_topology_neck.png"
+  ]
+}

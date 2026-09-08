@@ -1,0 +1,16 @@
+{
+  "compileall": true,
+  "unit_tests": true,
+  "demo_verify": true,
+  "diff_check": true,
+  "historical_files_unchanged": true,
+  "strict_json": true,
+  "csv_parse": true,
+  "finite_arrays": 16,
+  "figures_decode": true,
+  "positive_mechanism_results": true,
+  "central_falsification_retained": true,
+  "identical_real_optimizer_paths": true,
+  "complex_beats_only_continuity_baseline": true,
+  "passed": true
+}

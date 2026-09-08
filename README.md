@@ -1993,6 +1993,84 @@ checks are retained in `runs/v092_manifold_jets/`. `enabled=False` bypasses jets
 No old renderer/results were changed; no HPC, Full-HD, mesh-deformation pipeline,
 Eikonal, topology-changing birth, order learning, commit or push is involved.
 
+## v0.9.4: rendered sphere-to-torus optimization
+
+This controlled falsification experiment optimizes the known local critical
+coordinate `c` in `F_c = F_(a=1) + c W(||x||/0.8)` from a real genus-0 state
+`c=-0.005` toward real genus-1 target images at `c=+0.005`. All loss evaluations,
+line-search candidates and targets are real and freshly traced with the existing
+reference-direction first-arrival/bilinear diagnostic renderer. The critical
+mode uses the existing direct sparse image Jacobian; topology labels never enter
+the trigger or optimizer.
+
+The initial image prediction satisfies `c0*c_pred<0`, and a half step crosses
+zero while reducing actual re-traced loss. A complex normal-line bridge around
+`c=0` has small full-equation residual, nonzero sampled spatial derivatives and
+returns to an independently solved real endpoint. Same-side and invisible-view
+controls trigger neither an unwanted topology change nor arbitrary complex
+motion.
+
+The strongest hypothesis is **falsified in this case**. Ordinary discrete real
+optimization already jumps over the singular parameter and reaches genus 1 with
+the same five real iterates and final loss as the complex-capable run. Complex
+continuation beats only an explicitly continuity-constrained real tracker, which
+stalls at `c -> 0-`. It is a valid optional continuation audit here, not an
+observed loss/reachability advantage over ordinary real parameter updates.
+
+```bash
+export OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MPLCONFIGDIR=/tmp/mpl-v094 PYTHONPATH=src
+python -m zlt.sphere_torus_optimization
+python scripts/report_v094.py
+python scripts/validate_v094.py
+```
+
+See `artifacts/v094_sphere_torus_optimization.json` / `.csv` / `.md`,
+`artifacts/v094_validation.json`, and `figures/v094_*.png`. The experiment is a
+one-mode, local-source, 32x32 diagnostic on the historical renderer—not CURRENT
+C3, complete-surface optimization, arbitrary critical-mode discovery or global
+complex surface continuation.
+
+## v0.9.5: dense manifold-jet sphere-to-torus optimization
+
+This experiment removes v0.9.4's known topology coordinate. It initializes 128
+independent p=0 v0.9.2 manifold jets at zero on the exact analytic field
+`F=||x||²-1`; Fibonacci chart locations are selected without the target. The
+real torus `(major, minor)=(0.64, 0.36)` supplies only immutable RGB target
+images. No target scalar values, distances, mesh vertices, genus, hole center,
+topology loss, or analytic sphere-to-torus interpolation enter optimization.
+
+Every trial extracts the current real zero set, rebuilds a deterministic
+triangle-area surface quadrature, and recomputes existing CURRENT transmission,
+gate/lobe, and C3 detector readout. The existing v0.9.2 compact-support image
+tangent proposes damped Gauss--Newton steps; predicted local MSE and actual
+freshly re-traced MSE are recorded separately. Topology is evaluation only.
+
+The result is negative for spontaneous topology discovery. Four accepted real
+steps reduce informative-view MSE from `0.0193814` to `0.0126839` (34.6%), and
+all 128 coefficients activate, but the lowest sampled `||grad F||` is `1.69109`:
+no genuine critical event or one-dimensional discriminant emerges. Independent
+72³ meshes classify the exact initial sphere as genus 0, the target as genus 1,
+and the optimized endpoint as one-component watertight genus 0. K=32 and K=64
+density controls also remain genus 0. A sphere-like control reaches MSE
+`0.000229494` without unnecessary topology change; the weak view is less
+informative. Because no critical event limits real optimization, complex
+continuation is not activated.
+
+CUDA was unavailable during this run, so the completed density sweep is
+`K={32,64,128}`, not the suggested `{256,512,1024}`; p=1/p=2 are likewise not
+claimed. This is a 32x32, three-view CPU diagnostic, not Full-HD evidence or a
+global impossibility result.
+
+```bash
+export OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MPLCONFIGDIR=/tmp/mpl-v095 PYTHONPATH=src
+python -m zlt.dense_jet_torus
+python scripts/report_v095.py
+python scripts/validate_v095.py
+```
+
+See `artifacts/v095_dense_jet_torus.json` / `.csv` / `.md`,
+`artifacts/v095_validation.json`, and `figures/v095_*.png`.
+
 ## Limitations
 
 v0.8 is one controlled Bunny run, not a general benchmark or a real-photo reconstruction. Its 20 direct Fibonacci packet directions are also its detector directions; it preserves a shared scene-centric transport state but does not validate arbitrary off-atlas cameras. The 8,192-element candidate dictionary is only a safety envelope. Visibility, ownership, and footprint topology remain frozen within each Jacobian cell. The 2×2 ablation changes the deterministic sampled target support with photon density, has no repeated stochastic trials, and uses a simplified one-shot K=1024 comparison; its signed effects are descriptive, not confidence intervals. In particular, a million attempted packets aggregated over 20 Full-HD views does not imply dense observations per pixel. The strict negative high-bandwidth verdict applies to this optimizer, dictionary, renderer approximation, and controlled target—not to every possible observation-driven birth method.
