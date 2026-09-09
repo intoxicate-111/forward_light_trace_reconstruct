@@ -1,0 +1,15 @@
+{
+  "version": "v0.9.7",
+  "dense_shape": [
+    3072,
+    768
+  ],
+  "dense_entries": 2359296,
+  "sparse_nnz": 154530,
+  "maximum_absolute_error": 1.7763568394002505e-14,
+  "relative_l2_error": 2.2950953611219945e-16,
+  "dense_forward_error": 0.0,
+  "sparse_forward_error": 0.0,
+  "equivalent": true,
+  "production_storage": "chunk-local COO only"
+}

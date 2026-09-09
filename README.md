@@ -2109,6 +2109,59 @@ See `artifacts/v096_topology_penetration.json` / `.csv` / `.md`, the saved
 `artifacts/v096_theta_T.pt`, `artifacts/v096_cuda_environment.json`,
 `artifacts/v096_validation.json`, and `figures/v096_*.png`.
 
+## v0.9.7: high-bandwidth topology reachability
+
+This experiment directly retests v0.9.6 with the exact saved p=1, K=256
+same-family genus-1 target at 512x512, 1024x1024 and 1920x1080, using 16,384
+and 65,536 deterministic surface sources. The CURRENT/C3 renderer is unchanged.
+Its existing compact-support locality is carried into chunk-local coalesced COO
+image Jacobians and `torch.sparse.mm`; no dense source-by-parameter or
+Full-HD-pixel-by-parameter Jacobian is allocated. A small comparison agrees with
+the historical dense tangent to 1.78e-14 absolute / 2.30e-16 relative L2 error.
+
+All five high-bandwidth gradients remain nearly orthogonal to and point weakly
+away from the known topology direction: `cos(-J^T r,v_T)` ranges from -0.00904
+to -0.000979, and every oracle one-dimensional Gauss--Newton step is negative.
+A corrected 32-vector randomized output-space sketch `J^T Omega` captures only
+0.0518--0.0579 of the oracle direction in its sampled leading range, with no
+systematic bandwidth gain. Increased source count substantially reduces sampled
+image MSE, but does not recover topology-direction alignment.
+
+At the selected 1024x1024/16K setting, a 100-step-budget RGB-only optimizer
+accepts 20 fresh-retraced updates and lowers MSE from 4.49432 to 4.09937 before
+32 candidate retraces make no further progress. The endpoint is genus 0 at
+72^3/96^3/144^3, and all 2,048 normal fibers retain one root. Oracle-path
+tomography brackets the genus change in `(0.725,0.740] theta_T` but reveals a
+large non-monotone RGB-loss barrier. The 2-D oracle/gradient slice contains a
+narrow folded genus-1 region; moving farther down the image-gradient direction
+can return to genus 0. RGB-only basin starts at 0.25 and 0.50 remain genus 0;
+0.75 is genus 1 before its zero-step termination and therefore is not an
+optimization-driven crossing.
+
+The classification is **`HIGH_BANDWIDTH_STILL_MISALIGNED`**. The evidence does
+not support measurement bandwidth as the primary v0.9.6 reachability failure.
+Complex continuation is not activated because the actual RGB trajectory never
+approaches a genuine topology-critical event.
+
+```bash
+export PYTHONPATH=src MPLCONFIGDIR=/tmp/mpl-v097
+python -m zlt.high_bandwidth_topology --environment
+python -m zlt.high_bandwidth_topology --equivalence
+python -m zlt.high_bandwidth_topology --observe
+python -m zlt.high_bandwidth_topology --optimize
+python -m zlt.high_bandwidth_topology --oracle-path
+python -m zlt.high_bandwidth_topology --loss-slice
+python -m zlt.high_bandwidth_topology --basins
+python -m zlt.high_bandwidth_topology --fiber-audit
+python scripts/report_v097.py
+python scripts/validate_v097.py
+```
+
+See `artifacts/v097_high_bandwidth_topology.json` / `.csv` / `.md`,
+`artifacts/v097_cuda_environment.json` / `.txt`,
+`artifacts/v097_sparse_equivalence.json`, `artifacts/v097_validation.json`, and
+`figures/v097_*.png`.
+
 ## Limitations
 
 v0.8 is one controlled Bunny run, not a general benchmark or a real-photo reconstruction. Its 20 direct Fibonacci packet directions are also its detector directions; it preserves a shared scene-centric transport state but does not validate arbitrary off-atlas cameras. The 8,192-element candidate dictionary is only a safety envelope. Visibility, ownership, and footprint topology remain frozen within each Jacobian cell. The 2×2 ablation changes the deterministic sampled target support with photon density, has no repeated stochastic trials, and uses a simplified one-shot K=1024 comparison; its signed effects are descriptive, not confidence intervals. In particular, a million attempted packets aggregated over 20 Full-HD views does not imply dense observations per pixel. The strict negative high-bandwidth verdict applies to this optimizer, dictionary, renderer approximation, and controlled target—not to every possible observation-driven birth method.
